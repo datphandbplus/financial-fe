@@ -1,0 +1,10 @@
+export const PURCHASE_ORDER_STATUS: any = {
+	PROCESSING		: 0,
+	WAITING_APPROVAL: 1,
+	APPROVED		: 2,
+	CANCELLED		: 3,
+	REJECTED		: 4,
+	MODIFIED		: 5,
+	FREEZED			: 6,
+	DEFROST			: 7,
+};

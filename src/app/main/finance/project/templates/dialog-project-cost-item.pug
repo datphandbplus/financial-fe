@@ -1,0 +1,241 @@
+form.dialog-project-cost-item.layout-column(
+	[formGroup]='costItemForm',
+	(submit)='costItem?.id ? ( costItem?.is_modifying_vendor ? updateVendor() : update() ) : create()')
+	h1(matDialogTitle)
+		ng-template([ngIf]='!costItem?.id')
+			| {{ "FINANCE.PROJECT.TITLES.ADD_COST_ITEM" | translate }}
+		ng-template([ngIf]='costItem?.id')
+			| {{ "FINANCE.PROJECT.TITLES.EDIT_COST_ITEM" | translate }}
+		| &nbsp;-
+		| {{ costItem?.project_name || "N/A" }}
+
+	div(matDialogContent)
+		.layout-row.layout-wrap.layout-fixer-15
+			select-box.mb-10.ph-15.flex-33(
+				[init]='true',
+				[(ngModel)]='costItem.cost_item_category_id',
+				[label]='"FINANCE.COST_ITEM_CATEGORY.LABELS.COST_ITEM_CATEGORY" | translate',
+				[emptyLabel]='"GENERAL.LABELS.NO_CATEGORY" | translate',
+				[placeholder]='"GENERAL.PLACEHOLDERS.CATEGORY" | translate',
+				[disableControl]='isSubmitting || costItem?.is_modifying_cost || costItem?.is_modifying_vendor',
+				[data]='costItemCategoryService?.getAll( "reference" )',
+				[formControl]='costItemForm?.controls[ "cost_item_category_id" ]',
+				ngDefaultControl)
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.NAME" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='costItem.name',
+					[placeholder]='"GENERAL.PLACEHOLDERS.NAME" | translate',
+					[formControl]='costItemForm?.controls[ "name" ]',
+					[disableControl]='isSubmitting || costItem?.is_modifying_cost || costItem?.is_modifying_vendor',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.NAME" | translate',
+						[control]='costItemForm?.controls[ "name" ]')
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.UNIT" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='costItem.unit',
+					[placeholder]='"GENERAL.PLACEHOLDERS.UNIT" | translate',
+					[formControl]='costItemForm?.controls[ "unit" ]',
+					[disableControl]='isSubmitting || costItem?.is_modifying_cost || costItem?.is_modifying_vendor',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.UNIT" | translate',
+						[control]='costItemForm?.controls[ "unit" ]')
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.AMOUNT" | translate }}
+				input(
+					matInput,
+					type='number',
+					step='1',
+					min='0',
+					[(ngModel)]='costItem.amount',
+					(ngModelChange)='updateTotal()',
+					[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.AMOUNT" | translate',
+					[formControl]='costItemForm?.controls[ "amount" ]',
+					[disableControl]='isSubmitting || costItem?.is_modifying_vendor',
+					required,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( costItem?.amount?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( costItem?.amount?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"FINANCE.PROJECT.LABELS.AMOUNT" | translate',
+						[control]='costItemForm?.controls[ "amount" ]')
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.PRICE" | translate }}
+				input(
+					matInput,
+					type='number',
+					step='1000',
+					min='0',
+					[(ngModel)]='costItem.price',
+					(ngModelChange)='updateTotal()',
+					[formControl]='costItemForm?.controls[ "price" ]',
+					[disableControl]='isSubmitting || costItem?.is_modifying_vendor',
+					required,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( costItem?.price?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( costItem?.price?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.PRICE" | translate',
+						[control]='costItemForm?.controls[ "price" ]')
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.TOTAL" | translate }}
+				input(
+					matInput,
+					type='number',
+					[(ngModel)]='costItem.total',
+					[formControl]='costItemForm?.controls[ "total" ]',
+					readonly,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( costItem?.total?.toString() || "" ) | commas }}
+
+			select-box.mb-10.ph-15.flex-50(
+				[init]='true',
+				[(ngModel)]='costItem.vendor_category_id',
+				[label]='"FINANCE.VENDOR_CATEGORY.LABELS.VENDOR_CATEGORY" | translate',
+				[emptyLabel]='"GENERAL.LABELS.NO_CATEGORY" | translate',
+				[placeholder]='"FINANCE.VENDOR_CATEGORY.LABELS.VENDOR_CATEGORY" | translate',
+				[disableControl]='isSubmitting',
+				[data]='vendorCategoryService?.getAll( "reference" )',
+				(selectionChange)='updateVendorList( costItem.vendor_category_id )',
+				[formControl]='costItemForm?.controls[ "vendor_category_id" ]',
+				ngDefaultControl)
+
+			select-box.mb-10.ph-15.flex-50(
+				[init]='true',
+				[(ngModel)]='costItem.vendor_id',
+				[label]='"FINANCE.VENDOR.LABELS.VENDOR" | translate',
+				[placeholder]='"FINANCE.VENDOR.PLACEHOLDERS.VENDOR" | translate',
+				[disableControl]='isSubmitting',
+				[data]='vendorList',
+				[formControl]='costItemForm?.controls[ "vendor_id" ]',
+				ngDefaultControl)
+
+			mat-form-field.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.DESCRIPTION" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting || costItem?.is_modifying_cost || costItem?.is_modifying_vendor',
+					[(ngModel)]='costItem.description',
+					[placeholder]='"GENERAL.PLACEHOLDERS.DESCRIPTION" | translate',
+					[formControl]='costItemForm?.controls[ "description" ]',
+					ngDefaultControl)
+
+			mat-form-field.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.NOTE" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting || costItem?.is_modifying_cost || costItem?.is_modifying_vendor',
+					[(ngModel)]='costItem.note',
+					[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.NOTE" | translate',
+					[formControl]='costItemForm?.controls[ "note" ]',
+					ngDefaultControl)
+
+		.layout-row.layout-align-start-center.mt-10.mb-20
+			.mr-20.font-size-18.font-weight-500
+				| {{ "FINANCE.LINE_ITEM.LABELS.LINE_ITEM" | translate | uppercase }}
+			mat-divider.flex-auto
+
+		.layout-row.layout-wrap.layout-fixer-15
+			select-box.mb-10.ph-15.flex-50(
+				[init]='true',
+				[(ngModel)]='lineItem.project_sheet_id',
+				[label]='"FINANCE.PROJECT.LABELS.SHEET" | translate',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.SHEETS" | translate',
+				[disableControl]='isSubmitting || costItem?.is_modifying_cost || costItem?.is_modifying_vendor',
+				[data]='projectSheetService?.getAll( "reference", costItem.project_id )',
+				(ngModelChange)='updateLineItemList()',
+				[formControl]='costItemForm?.controls[ "project_sheet_id" ]',
+				ngDefaultControl)
+
+			select-box.mb-10.ph-15.flex-50(
+				[init]='true',
+				[(ngModel)]='lineItem.group',
+				[label]='"FINANCE.PROJECT.LABELS.GROUP" | translate',
+				[emptyLabel]='"FINANCE.PROJECT.LABELS.NO_GROUP" | translate',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.GROUP" | translate',
+				[disableControl]='isSubmitting || costItem?.is_modifying_cost || costItem?.is_modifying_vendor',
+				[data]='groupList',
+				(ngModelChange)='updateLineItemList()',
+				[formControl]='costItemForm?.controls[ "line_item_group" ]',
+				ngDefaultControl)
+
+			select-box.ph-15.flex-100(
+				[init]='true',
+				[(ngModel)]='lineItem.id',
+				[label]='"FINANCE.LINE_ITEM.LABELS.LINE_ITEM" | translate',
+				[placeholder]='"FINANCE.LINE_ITEM.PLACEHOLDERS.LINE_ITEM" | translate',
+				[disableControl]='isSubmitting || costItem?.is_modifying_cost || costItem?.is_modifying_vendor',
+				[data]='lineItemList',
+				[formControl]='costItemForm?.controls[ "project_line_item_id" ]',
+				ngDefaultControl)
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='costItemForm?.invalid || isSubmitting')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ ( costItem.id ? "GENERAL.LABELS.SAVE" : "GENERAL.LABELS.ADD" ) | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

@@ -1,0 +1,101 @@
+form.form-project-payment-order.mb-10(
+	*ngIf='( isCFO || isLiabilitiesAccountant ) && canEdit',
+	[formGroup]='paymentForm')
+	.layout-row.layout-align-start-center.mt-10.mb-20
+		.font-size-18.font-weight-500
+			| {{ "FINANCE.PROJECT.LABELS.PAYMENT_ORDER" | translate | uppercase }}
+		.ph-20.flex-auto
+			mat-divider
+		button(
+			*ngIf='!payment?.is_freezed',
+			mat-raised-button,
+			color='primary',
+			(click)='updatePaymentOrder()',
+			[disabled]='paymentForm?.invalid || isSubmitting || isUploading || !canUploadPaymentOrder')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting && !isUploading')
+						| {{ "GENERAL.LABELS.SAVE" | translate }}
+					ng-template([ngIf]='isSubmitting || isUploading')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')
+
+	.layout-row.layout-wrap.layout-fixer-15
+		mat-form-field.ph-15.flex-50(
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.PAYMENT_ORDER_NUMBER" | translate }}
+			input(
+				matInput,
+				[(ngModel)]='payment.payment_order_number',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.PAYMENT_ORDER_NUMBER" | translate',
+				[formControl]='paymentForm?.controls[ "payment_order_number" ]',
+				[disableControl]='isSubmitting || isUploading || payment?.is_freezed',
+				[readonly]='!canUploadPaymentOrder',
+				required,
+				ngDefaultControl)
+			mat-error
+				error-message(
+					[label]='"FINANCE.PROJECT.LABELS.PAYMENT_ORDER_NUMBER" | translate',
+					[control]='paymentForm?.controls[ "payment_order_number" ]')
+
+		mat-form-field.ph-15.flex-50(
+			floatLabel='always',
+			appearance='outline',
+			(click)='picker?.open()')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.PAYMENT_ORDER_DATE" | translate }}
+			span
+				| {{ payment?.payment_order_date ? ( payment?.payment_order_date | momentDateFormat ) : "FINANCE.PROJECT.PLACEHOLDERS.PAYMENT_ORDER_DATE" | translate }}
+			input.hide(
+				matInput,
+				[matDatepicker]='picker',
+				[(ngModel)]='payment.payment_order_date',
+				[formControl]='paymentForm?.controls[ "payment_order_date" ]',
+				ngDefaultControl,
+				required,
+				readonly)
+			mat-datepicker-toggle(
+				matSuffix,
+				[for]='picker')
+			mat-datepicker(
+				#picker,
+				[disabled]='isSubmitting || isUploading || !canUploadPaymentOrder || payment?.is_freezed')
+
+		mat-form-field.ph-15.flex-100.mt-10(
+			*ngIf='payment?.new_payment_order',
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.PAYMENT_ORDER_NOTE" | translate }}
+			textarea(
+				matInput,
+				[(ngModel)]='payment.new_payment_order.note',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.PAYMENT_ORDER_NOTE" | translate',
+				[formControl]='paymentForm?.controls[ "payment_order_note" ]',
+				[disableControl]='isSubmitting || isUploading || payment?.is_freezed',
+				ngDefaultControl)
+
+	upload-box(
+		[label]='"FINANCE.PROJECT.LABELS.PAYMENT_ORDER" | translate',
+		[disabled]='!canUploadPaymentOrder || payment?.is_freezed',
+		[uploading]='isUploading',
+		(onFileSelected)='onPaymentOrderFileSelected( $event )')
+
+	.layout-column(*ngIf='payment?.payment_orders?.length')
+		mat-label.mb-20
+			| {{ "FINANCE.PROJECT.LABELS.PAYMENT_ORDER_HISTORY" | translate }}:
+		mat-form-field(
+			appearance='outline',
+			*ngFor='let paymentOrder of payment?.payment_orders')
+			mat-label
+				| {{ paymentOrder?.created_at | momentDateFormat }}
+			input(
+				matInput,
+				readonly,
+				[value]='paymentOrder?.note || "N/A"')
+			span(matSuffix)
+				i.fa.fa-file-invoice.text-success.font-size-30.clickable((click)='downloadPaymentOrder( paymentOrder?.key, paymentOrder?.location )')

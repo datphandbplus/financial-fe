@@ -1,0 +1,23 @@
+.page {
+	&__content {
+		padding: 50px 0;
+	}
+}
+
+.cropper {
+	&__wrapper img {
+		max-width: 100%;
+	}
+
+	&__preview {
+		@include overflow-hidden;
+		width: 240px;
+		height: 240px;
+		border: 1px solid $gray;
+
+		img {
+			max-width: 100%;
+			border-radius: 8px;
+		}
+	}
+}

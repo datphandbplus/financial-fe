@@ -1,0 +1,73 @@
+html,
+body {
+	height: 100%;
+	overflow: unset !important;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	background-color: $gray;
+	min-width: 1440px;
+}
+
+.container {
+	min-width: 100%;
+	padding: 0 35px;
+}
+
+.app {
+	position: relative;
+}
+
+.drawer {
+	.mat-drawer {
+		position: fixed;
+		background-color: $primary;
+	}
+
+	.mat-drawer-content {
+		display: flex !important;
+	}
+}
+
+.header {
+	background-color: $white;
+	position: relative;
+	z-index: 999;
+
+	&__process {
+		position: absolute !important;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 2px !important;
+	}
+}
+
+.direction {
+	padding: 10px 0;
+	margin: 0;
+	width: 74px;
+	height: 100%;
+
+	&__icon {
+		font-size: 30px;
+	}
+
+	a {
+		@include transition;
+		color: $white;
+		text-align: center;
+		text-decoration: none;
+		position: relative;
+		padding: 22px 0;
+
+		&:hover {
+			text-decoration: none;
+		}
+
+		&:hover,
+		&.active {
+			color: $primary;
+			background-color: $white;
+		}
+	}
+}

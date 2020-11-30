@@ -1,0 +1,52 @@
+.dialog-project-payment-order.layout-column
+	h1(matDialogTitle)
+		| {{ "FINANCE.PROJECT.LABELS.PAYMENT_ORDER" | translate }}
+		| &nbsp;-
+		| {{ payment?.project_name || "N/A" }}
+
+	div(matDialogContent)
+		.layout-row.layout-wrap.layout-fixer-15
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.PAYMENT_ORDER_NUMBER" | translate }}
+				input(
+					matInput,
+					[value]='payment?.payment_order_number',
+					readonly)
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.PAYMENT_ORDER_DATE" | translate }}
+				span
+					| {{ payment?.payment_order_date ? ( payment?.payment_order_date | momentDateFormat ) : "FINANCE.PROJECT.PLACEHOLDERS.PAYMENT_ORDER_DATE" | translate }}
+				input.hide(
+					matInput,
+					readonly)
+
+		.layout-column(*ngIf='payment?.payment_orders?.length')
+			mat-label.mb-20
+				| {{ "FINANCE.PROJECT.LABELS.PAYMENT_ORDER_HISTORY" | translate }}:
+			mat-form-field(
+				appearance='outline',
+				*ngFor='let paymentOrder of payment?.payment_orders')
+				mat-label
+					| {{ paymentOrder?.created_at | momentDateFormat }}
+				input(
+					matInput,
+					readonly,
+					[value]='paymentOrder?.note || "N/A"')
+				span(matSuffix)
+					i.fa.fa-file-invoice.text-success.font-size-30.clickable((click)='downloadPaymentOrder( paymentOrder?.key, paymentOrder?.location )')
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}

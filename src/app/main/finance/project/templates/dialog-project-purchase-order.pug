@@ -1,0 +1,314 @@
+form.dialog-project-purchase-order.layout-column(
+	[formGroup]='projectPurchaseOrderForm',
+	(submit)='projectPurchaseOrder?.id ? update() : create()')
+	h1(matDialogTitle)
+		ng-template([ngIf]='!projectPurchaseOrder?.id')
+			| {{ "FINANCE.COST_ITEM.TITLES.MAKE_PURCHASE_ORDER" | translate }}
+		ng-template([ngIf]='projectPurchaseOrder?.id')
+			| {{ "FINANCE.COST_ITEM.TITLES.EDIT_PURCHASE_ORDER" | translate }}
+		| &nbsp;-
+		| {{ projectPurchaseOrder?.project_name || "N/A" }}
+
+	div(matDialogContent)
+		.layout-row.layout-wrap.layout-fixer-15
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.COST_ITEM.LABELS.PURCHASE_ORDER" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='projectPurchaseOrder.name',
+					[placeholder]='"FINANCE.COST_ITEM.PLACEHOLDERS.PURCHASE_ORDER" | translate',
+					[formControl]='projectPurchaseOrderForm?.controls[ "name" ]',
+					[disableControl]='isSubmitting || projectPurchaseOrder?.status === PURCHASE_ORDER_STATUS?.APPROVED',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"FINANCE.COST_ITEM.LABELS.PURCHASE_ORDER" | translate',
+						[control]='projectPurchaseOrderForm?.controls[ "name" ]')
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.VAT_PERCENT" | translate }}
+				input(
+					matInput,
+					step='1',
+					min='0',
+					type='number',
+					[(ngModel)]='projectPurchaseOrder.vat_percent',
+					[formControl]='projectPurchaseOrderForm?.controls[ "vat_percent" ]',
+					(ngModelChange)='updateDiscount()',
+					[disableControl]='isSubmitting || projectPurchaseOrder?.status === PURCHASE_ORDER_STATUS?.APPROVED',
+					ngDefaultControl)
+				span(matSuffix)
+					| %
+				span(matPrefix)
+					| {{ ( projectPurchaseOrder?.vat_percent?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( projectPurchaseOrder?.vat_percent?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.VAT_PERCENT" | translate',
+						[control]='projectPurchaseOrderForm?.controls[ "vat_percent" ]')
+
+		.layout-row.layout-align-start-center.mt-10.mb-20
+			.mr-20.font-size-18.font-weight-500
+				| {{ "FINANCE.PROJECT.LABELS.DISCOUNT" | translate | uppercase }}
+			mat-divider.flex-auto
+
+		.layout-row.layout-wrap.layout-fixer-15.mb-10
+			select-box.ph-15.flex-20(
+				[(ngModel)]='projectPurchaseOrder.discount_type',
+				(selectionChange)='updateDiscount()',
+				[label]='"FINANCE.PROJECT.LABELS.DISCOUNT_TYPE" | translate',
+				[disableControl]='isSubmitting',
+				[data]='DISCOUNT_TYPE',
+				[formControl]='projectPurchaseOrderForm?.controls[ "discount_type" ]',
+				required,
+				ngDefaultControl)
+
+			mat-form-field.ph-15.flex-20(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_AMOUNT" | translate }}
+				input(
+					matInput,
+					type='number',
+					step='1',
+					min='0',
+					[(ngModel)]='projectPurchaseOrder.discount_amount',
+					(ngModelChange)='updateDiscount()',
+					[formControl]='projectPurchaseOrderForm?.controls[ "discount_amount" ]',
+					[disableControl]='isSubmitting',
+					required,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( projectPurchaseOrder?.discount_amount?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( projectPurchaseOrder?.discount_value?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"FINANCE.PROJECT.LABELS.DISCOUNT_AMOUNT" | translate',
+						[control]='projectPurchaseOrderForm?.controls[ "discount_amount" ]')
+
+			mat-form-field.ph-15.flex-30(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_VALUE" | translate }}
+				input(
+					matInput,
+					type='number',
+					[(ngModel)]='projectPurchaseOrder.discount_value',
+					[formControl]='projectPurchaseOrderForm?.controls[ "discount_value" ]',
+					readonly,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( projectPurchaseOrder?.discount_value?.toString() || "" ) | commas }}
+
+			mat-form-field.ph-15.flex-30(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_REMAIN" | translate }}
+				input(
+					matInput,
+					type='number',
+					[(ngModel)]='projectPurchaseOrder.discount_remain',
+					[formControl]='projectPurchaseOrderForm?.controls[ "discount_remain" ]',
+					readonly,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( projectPurchaseOrder?.discount_remain?.toString() || "" ) | commas }}
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.DESCRIPTION" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting || projectPurchaseOrder?.status === PURCHASE_ORDER_STATUS?.APPROVED',
+					[(ngModel)]='projectPurchaseOrder.description',
+					[placeholder]='"GENERAL.PLACEHOLDERS.DESCRIPTION" | translate',
+					[formControl]='projectPurchaseOrderForm?.controls[ "description" ]',
+					ngDefaultControl)
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.NOTE" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting || projectPurchaseOrder?.status === PURCHASE_ORDER_STATUS?.APPROVED',
+					[(ngModel)]='projectPurchaseOrder.note',
+					[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.NOTE" | translate',
+					[formControl]='projectPurchaseOrderForm?.controls[ "note" ]',
+					ngDefaultControl)
+
+		.layout-row.layout-wrap.layout-fixer-15
+			select-box.ph-15.flex-auto(
+				[(ngModel)]='projectPurchaseOrder.selecting_cost_item_id',
+				[label]='"FINANCE.COST_ITEM.LABELS.ADD_MORE_COST_ITEM" | translate',
+				[emptyLabel]='"FINANCE.PROJECT.LABELS.NO_COST_ITEM" | translate',
+				[placeholder]='"FINANCE.COST_ITEM.LABELS.COST_ITEM" | translate',
+				[disableControl]='isSubmitting',
+				[data]='projectPurchaseOrder?.remaining_cost_items',
+				[formControl]='projectPurchaseOrderForm?.controls[ "selecting_cost_item_id" ]',
+				ngDefaultControl)
+			.ph-15.mt-10
+				button(
+					mat-raised-button,
+					type='button',
+					color='accent',
+					[disabled]='!projectPurchaseOrder?.selecting_cost_item_id',
+					(click)='updateCostItemLists( projectPurchaseOrder?.selecting_cost_item_id )')
+					| {{ "GENERAL.LABELS.ADD" | translate }}
+			.ph-15.mt-10
+				button(
+					mat-raised-button,
+					type='button',
+					color='primary',
+					[disabled]='!projectPurchaseOrder?.remaining_cost_items?.length',
+					(click)='addAllCostItems()')
+					| {{ "GENERAL.LABELS.ADD_ALL" | translate }}
+
+		div
+			mat-table(
+				#table,
+				plugin-data-table,
+				[dataSource]='dataSourcePOItem',
+				[attr.data-label]='!dataSourcePOItem?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+				// No. Column
+				ng-container(matColumnDef='no')
+					mat-header-cell.w-50(*matHeaderCellDef)
+						| {{ "GENERAL.ATTRIBUTES.NUMBER_ORDER" | translate }}
+					mat-cell.w-50(*matCellDef='let element')
+						| {{ element?.no || "N/A" }}
+					mat-footer-cell.w-50(*matFooterCellDef)
+				// Name Column
+				ng-container(matColumnDef='name')
+					mat-header-cell.w-300(*matHeaderCellDef)
+						| {{ "GENERAL.ATTRIBUTES.NAME" | translate }}
+					mat-cell.w-300(*matCellDef='let element')
+						| {{ element?.name || "N/A" }}
+					mat-footer-cell.w-300(*matFooterCellDef)
+				// Vendor Column
+				ng-container(matColumnDef='vendor')
+					mat-header-cell(*matHeaderCellDef)
+						| {{ "FINANCE.VENDOR.ATTRIBUTES.VENDOR" | translate }}
+					mat-cell(*matCellDef='let element')
+						| {{ element?.vendor?.short_name || "N/A" }}
+					mat-footer-cell(*matFooterCellDef)
+				// Unit Column
+				ng-container(matColumnDef='unit')
+					mat-header-cell(*matHeaderCellDef)
+						| {{ "GENERAL.ATTRIBUTES.UNIT" | translate }}
+					mat-cell(*matCellDef='let element')
+						| {{ element?.unit || "N/A" }}
+					mat-footer-cell(*matFooterCellDef)
+				// Amount Column
+				ng-container(matColumnDef='amount')
+					mat-header-cell.layout-align-end(*matHeaderCellDef)
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.AMOUNT" | translate }}
+					mat-cell.layout-align-end(*matCellDef='let element')
+						| {{ element?.amount | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+				// Price Column
+				ng-container(matColumnDef='price')
+					mat-header-cell.layout-align-end.w-130(*matHeaderCellDef)
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.PRICE" | translate }}
+					mat-cell.layout-align-end.w-130(*matCellDef='let element')
+						| {{ element?.price | commas }}
+					mat-footer-cell.layout-align-end.w-130(*matFooterCellDef)
+						.layout-column.text-right
+							.text-success.text-nowrap.mv-10
+								| {{ "FINANCE.PROJECT.LABELS.SUM" | translate }}
+							.text-success.text-nowrap.mv-10
+								| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_VALUE" | translate }}
+							.text-success.text-nowrap.mv-10
+								| {{ "FINANCE.PROJECT.LABELS.SUM_DISCOUNT" | translate }}
+							.text-success.text-nowrap.mv-10
+								| {{ "FINANCE.PROJECT.ATTRIBUTES.VAT" | translate }}
+								| ({{ projectPurchaseOrder?.vat_percent | commas }}%)
+							.text-success.text-nowrap.mv-10
+								| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL_INCLUDED_VAT" | translate }}
+				// Total Column
+				ng-container(matColumnDef='total')
+					mat-header-cell.layout-align-end.w-130(*matHeaderCellDef)
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+					mat-cell.layout-align-end.w-130(*matCellDef='let element')
+						| {{ ( element?.total )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end.w-130(*matFooterCellDef)
+						.layout-column.text-right
+							.text-warning.text-truncate.mv-10([matTooltip]='projectPurchaseOrder?.selected_total | commas')
+								| {{ ( projectPurchaseOrder?.selected_total || 0 )?.toFixed( 0 ) | commas }}
+							.text-warning.text-truncate.mv-10([matTooltip]='projectPurchaseOrder?.discount_value | commas')
+								| {{ ( projectPurchaseOrder?.discount_value || 0 )?.toFixed( 0 ) | commas }}
+							.text-warning.text-truncate.mv-10([matTooltip]='projectPurchaseOrder?.discount_remain | commas')
+								| {{ ( projectPurchaseOrder?.discount_remain || 0 )?.toFixed( 0 ) | commas }}
+							.text-warning.text-truncate.mv-10([matTooltip]='( projectPurchaseOrder?.discount_remain * projectPurchaseOrder?.vat_percent / 100 ) | commas')
+								| {{ ( ( projectPurchaseOrder?.discount_remain * projectPurchaseOrder?.vat_percent / 100 ) || 0 )?.toFixed( 0 ) | commas }}
+							.text-warning.text-truncate.mv-10([matTooltip]='( projectPurchaseOrder?.discount_remain * ( 1 + projectPurchaseOrder?.vat_percent / 100 ) ) | commas')
+								| {{ ( ( projectPurchaseOrder?.discount_remain * ( 1 + projectPurchaseOrder?.vat_percent / 100 ) ) || 0 )?.toFixed( 0 ) | commas }}
+				// Actions Column
+				ng-container(matColumnDef='actions')
+					mat-header-cell.w-65(*matHeaderCellDef)
+						| {{ "GENERAL.ATTRIBUTES.ACTION" | translate }}
+					mat-cell.w-65(*matCellDef='let element')
+						button(
+							plugin-button-only-icon,
+							mat-stroked-button,
+							type='button',
+							[disabled]='isSubmitting || projectPurchaseOrder?.selected_cost_items?.length <= 1',
+							(click)='deleteSelectedCostItem( element?.id )')
+							i.fa.fa-trash-alt([class.text-warn]='projectPurchaseOrder?.selected_cost_items?.length > 1')
+					mat-footer-cell.w-65(*matFooterCellDef)
+
+				mat-header-row(*matHeaderRowDef='displayedColumns')
+				mat-row(*matRowDef='let row; columns: displayedColumns;')
+				mat-footer-row(
+					*matFooterRowDef='displayedColumns',
+					[class.hide]='!dataSourcePOItem?.filteredData?.length')
+
+			mat-paginator(
+				#paginatorPOItem,
+				pageSize='30',
+				[pageSizeOptions]='[ 30, 50, 100 ]',
+				showFirstLastButtons='true')
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='projectPurchaseOrderForm?.invalid || isSubmitting')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ ( projectPurchaseOrder.id ? "GENERAL.LABELS.SAVE" : "GENERAL.LABELS.ADD" ) | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

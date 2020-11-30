@@ -1,0 +1,108 @@
+.payables.page
+	.page__content
+		.container
+			.layout-row.layout-align-start-center.mb-15
+				.layout-row.layout-fixer-5.mr-15
+					.ph-5
+						button(
+							plugin-button-only-icon,
+							mat-raised-button,
+							(click)='resetFilter(); getList();')
+							i.fa.fa-sync-alt
+					.ph-5
+						button(
+							plugin-button-only-icon,
+							mat-raised-button,
+							[disabled]='!loaded',
+							(click)='applySorter( true )')
+							i.fa.fa-sort-alpha-down(*ngIf='!isReverse')
+							i.fa.fa-sort-alpha-up(*ngIf='isReverse')
+					.ph-5
+						button(
+							mat-raised-button,
+							color='success',
+							(click)='exportExcel()')
+							i.fa.fa-download.mr-10
+							| {{ "FINANCE.PROJECT.LABELS.EXPORT" | translate }}
+					.ph-5
+						.layout-row.layout-fixer-5.mr-15
+							.ph-2.mt-20 Invoice date:
+							.ph-4
+								mat-form-field.filter-box__datepicker(
+									floatLabel='never',
+									(click)='pickerInvoiceStart?.open()')
+									mat-label
+										| {{ queryOptions?.invoice_date_begin | momentDateFormat }}
+									input(
+										matInput,
+										[(ngModel)]='queryOptions.invoice_date_begin',
+										(dateChange)='quotationRangeChange( $event )',
+										[matDatepicker]='pickerInvoiceStart',
+										readonly)
+									mat-datepicker-toggle(
+										matSuffix,
+										[for]='pickerInvoiceStart')
+									mat-datepicker(
+										#pickerInvoiceStart,
+										startView='month')
+							.ph-2.mt-20.pl-1 To
+							.ph-4
+								mat-form-field.filter-box__datepicker(
+									floatLabel='never',
+									(click)='pickerInvoiceEnd?.open()')
+									mat-label
+										| {{ queryOptions?.invoice_date_end | momentDateFormat }}
+									input(
+										matInput,
+										[(ngModel)]='queryOptions.invoice_date_end',
+										(dateChange)='quotationRangeChange( $event )',
+										[matDatepicker]='pickerInvoiceEnd',
+										readonly)
+									mat-datepicker-toggle(
+										matSuffix,
+										[for]='pickerInvoiceEnd')
+									mat-datepicker(
+										#pickerInvoiceEnd,
+										startView='month')
+					.ph-5
+						.layout-row.layout-fixer-5.mr-15
+							.ph-2.mt-20 Paid date:
+							.ph-5
+								mat-form-field.filter-box__datepicker(
+									floatLabel='never',
+									(click)='pickerPayStart?.open()')
+									mat-label
+										| {{ queryOptions?.pay_date_begin | momentDateFormat }}
+									input(
+										matInput,
+										[(ngModel)]='filters.pay_date.begin',
+										(dateChange)='customFilter()',
+										[matDatepicker]='pickerPayStart',
+										readonly)
+									mat-datepicker-toggle(
+										matSuffix,
+										[for]='pickerPayStart')
+									mat-datepicker(
+										#pickerPayStart,
+										startView='month')
+							.ph-2.mt-20.pl-1 To
+							.ph-5
+								mat-form-field.filter-box__datepicker(
+									floatLabel='never',
+									(click)='pickerPayEnd?.open()')
+									mat-label
+										| {{ queryOptions?.pay_date_end | momentDateFormat }}
+									input(
+										matInput,
+										[(ngModel)]='filters.pay_date.end',
+										(dateChange)='customFilter()',
+										[matDatepicker]='pickerPayEnd',
+										readonly)
+									mat-datepicker-toggle(
+										matSuffix,
+										[for]='pickerPayEnd')
+									mat-datepicker(
+										#pickerPayEnd,
+										startView='month').flex-auto
+
+			include blocks/table-payables.partial.pug

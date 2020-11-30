@@ -1,0 +1,73 @@
+.custom-mat-button-large {
+	min-width: 191px !important;
+	line-height: 53px !important;
+	font-size: 16px;
+
+	i {
+		font-size: 32px;
+		margin-left: 30px;
+	}
+
+	.mat-button-wrapper {
+		width: 100%;
+		text-align: start;
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		align-content: center;
+		max-width: 100%;
+		justify-content: space-between;
+	}
+}
+
+.custom-mat-input-no-padding {
+	.mat-form-field-wrapper {
+		padding-bottom: 0;
+	}
+}
+
+.custom-mat-progress-bar {
+	&.primary {
+		.mat-progress-bar-fill:after {
+			background-color: $primary;
+		}
+	}
+
+	&.accent {
+		.mat-progress-bar-fill:after {
+			background-color: $accent;
+		}
+	}
+
+	&.warn {
+		.mat-progress-bar-fill:after {
+			background-color: $warn;
+		}
+	}
+
+	&.success {
+		.mat-progress-bar-fill:after {
+			background-color: $success;
+		}
+	}
+
+	&.info {
+		.mat-progress-bar-fill:after {
+			background-color: $info;
+		}
+	}
+
+	&.warning {
+		.mat-progress-bar-fill:after {
+			background-color: $warning;
+		}
+	}
+
+	.mat-progress-bar-buffer {
+		background-color: $gray;
+	}
+
+	.mat-progress-bar-fill:after {
+		background-color: currentColor;
+	}
+}

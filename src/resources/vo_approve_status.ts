@@ -1,0 +1,5 @@
+export const VO_APPROVE_STATUS: any = {
+	WAITING_APPROVAL: 0,
+	APPROVED		: 1,
+	REJECTED		: 2,
+};

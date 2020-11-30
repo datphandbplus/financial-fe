@@ -1,0 +1,44 @@
+.text-primary {
+	color: $primary;
+}
+
+.text-accent {
+	color: $accent;
+}
+
+.text-warn {
+	color: $warn;
+}
+
+.text-success {
+	color: $success;
+}
+
+.text-warning {
+	color: $warning;
+}
+
+.bg-primary {
+	background-color: $primary;
+	color: $white !important;
+}
+
+.bg-accent {
+	background-color: $accent;
+	color: $white !important;
+}
+
+.bg-warn {
+	background-color: $warn;
+	color: $white !important;
+}
+
+.bg-success {
+	background-color: $success;
+	color: $white !important;
+}
+
+.bg-warning {
+	background-color: $warning;
+	color: $white !important;
+}

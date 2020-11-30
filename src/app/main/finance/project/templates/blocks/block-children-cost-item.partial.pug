@@ -1,0 +1,89 @@
+.block-children-cost-item.flex-noshrink
+	ng-template(
+		ngFor,
+		let-costItem,
+		let-costItemIndex='index',
+		[ngForOf]='element?.children')
+		.child-cost-item
+			.child-cost-item__list
+				.layout-row
+					// No. Column
+					mat-cell.w-70
+						| {{ ( ( index + 1 ) / 2 ) || "N/A" }}
+						| -
+						| {{ costItemIndex + 1 }}
+					// Name Column
+					mat-cell.w-300
+						mat-checkbox(
+							[(ngModel)]='costItem.checked',
+							(change)='updateSelectedList( costItem )',
+							[disabled]='!isPurchasing || !costItem?.vendor_id || costItem?.status === COST_MODIFICATION_STATUS?.WAITING || ( costItem?.status === COST_MODIFICATION_STATUS?.REJECTED && costItem?.bk_price === null )')
+							| {{ costItem?.name || "N/A" }}
+
+					// Vendor Column
+					mat-cell.w-150
+						.text-truncate.flex-auto
+							| {{ costItem?.vendor?.short_name || "N/A" }}
+						.w-40(*ngIf='isPurchasing')
+							button(
+								plugin-button-only-icon,
+								mat-stroked-button,
+								type='button',
+								[disabled]='!loaded',
+								(click)='openDialogProjectCostItem( costItem, "modify_vendor" )')
+								i.fa.fa-edit.text-success
+
+					// Unit Column
+					mat-cell
+						| {{ costItem?.unit || "N/A" }}
+
+					// Amount Column
+					mat-cell.layout-align-end
+						.layout-column.layout-align-end-end
+							div([class.text-accent]='costItem?.bk_total')
+								| {{ ( costItem?.amount || 0 )?.toFixed( 0 ) | commas }}
+							div(*ngIf='costItem?.bk_total')
+								| {{ ( costItem?.bk_amount || 0 )?.toFixed( 0 ) | commas }}
+
+					// Price Column
+					mat-cell.layout-align-end(*ngIf='!isConstruction && !isConstructionManager')
+						.layout-column.layout-align-end-end
+							div([class.text-accent]='costItem?.bk_total')
+								| {{ ( costItem?.price || 0 )?.toFixed( 0 ) | commas }}
+							div(*ngIf='costItem?.bk_total')
+								| {{ ( costItem?.bk_price || 0 )?.toFixed( 0 ) | commas }}
+
+					// Total Column
+					mat-cell.layout-align-end(*ngIf='!isConstruction && !isConstructionManager')
+						.layout-column.layout-align-end-end
+							div([class.text-accent]='costItem?.bk_total')
+								| {{ ( costItem?.total || 0 )?.toFixed( 0 ) | commas }}
+							div(*ngIf='costItem?.bk_total')
+								| {{ ( costItem?.bk_total || 0 )?.toFixed( 0 ) | commas }}
+
+					// Note Column
+					mat-cell.w-200
+						.text-center.flex-auto
+							| {{ costItem?.note || "N/A" }}
+
+					// Status Column
+					mat-cell.w-150
+						status-box(
+							[color]='costItem?.status_name?.color',
+							[status]='costItem?.status_name?.name | translate')
+
+					// Actions Column
+					mat-cell.w-65
+						action-box([disabled]='!( isPurchasing || isProcurementManager )')
+							action-button(
+								color='success',
+								icon='fa fa-edit',
+								[title]='"GENERAL.LABELS.EDIT" | translate',
+								[disabled]='!loaded || costItem?.status === COST_MODIFICATION_STATUS?.WAITING',
+								(onClick)='openDialogProjectCostItem( costItem )')
+							action-button(
+								color='warn',
+								icon='fa fa-trash',
+								[title]='"GENERAL.LABELS.DELETE" | translate',
+								[disabled]='!loaded || isProcurementManager',
+								(onClick)='deleteProjectCostItem( costItem )')

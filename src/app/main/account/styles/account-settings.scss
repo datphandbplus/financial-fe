@@ -1,0 +1,29 @@
+@import '~angular-core/lib/scss/partials/variable';
+
+.account-settings {
+	margin: 50px 200px;
+
+	.block-change-avatar {
+		&__sample {
+			border-radius: 6px;
+			width: 52px;
+			height: 52px;
+		}
+
+		&__line {
+			margin: 0 -10px;
+
+			&:before,
+			&:after {
+				content: '';
+				background-color: $gray;
+				height: 1px;
+				width: 120px;
+				display: inline-block;
+				top: -5px;
+				position: relative;
+				margin: 0 10px;
+			}
+		}
+	}
+}

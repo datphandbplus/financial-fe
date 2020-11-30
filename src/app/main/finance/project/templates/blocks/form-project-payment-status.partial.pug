@@ -1,0 +1,97 @@
+form.form-project-payment-status(
+	*ngIf='canEdit && isLiabilitiesAccountant',
+	[formGroup]='paymentStatusForm')
+	.layout-row.layout-align-start-center.mt-10.mb-20
+		.font-size-18.font-weight-500
+			| {{ "GENERAL.LABELS.STATUS" | translate | uppercase }}
+			| ({{ "FINANCE.PROJECT.LABELS.LIABILITIES_ACCOUNTANT_ONLY" | translate | uppercase }})
+		.ph-20.flex-auto
+			mat-divider
+		button(
+			*ngIf='!payment?.is_freezed',
+			mat-raised-button,
+			color='primary',
+			(click)='updateStatus()',
+			[disabled]='paymentStatusForm?.invalid || isSubmitting || isUploading')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting && !isUploading')
+						| {{ "GENERAL.LABELS.SAVE" | translate }}
+					ng-template([ngIf]='isSubmitting || isUploading')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')
+
+	.layout-row.flex-100.mb-10.layout-align-start-center
+		mat-form-field.flex-auto(
+			plugin-input-radio,
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "GENERAL.LABELS.STATUS" | translate }}
+			input.hide(matInput)
+			mat-radio-group(
+				[(ngModel)]='payment.status',
+				[formControl]='paymentStatusForm?.controls[ "status" ]',
+				[disableControl]='isSubmitting || isUploading || !isLiabilitiesAccountant || payment?.is_freezed',
+				ngDefaultControl)
+				mat-radio-button.mr-10([value]='PAYMENT_STATUS?.WAITING')
+					| {{ "FINANCE.PROJECT.LABELS.WAITING" | translate }}
+				mat-radio-button.mr-10([value]='PAYMENT_STATUS?.CONFIRMED')
+					| {{ "FINANCE.PROJECT.LABELS.CONFIRMED" | translate }}
+				mat-radio-button([value]='PAYMENT_STATUS?.PAID')
+					| {{ "FINANCE.PROJECT.LABELS.PAID" | translate }}
+
+	.layout-row.layout-wrap.layout-fixer-15
+		mat-form-field.mb-10.ph-15.flex-50(
+			plugin-input-parse-commas,
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.TOTAL" | translate }}
+			input(
+				matInput,
+				type='number',
+				step='1000',
+				min='0',
+				[value]='payment.total_real',
+				readonly)
+			span(matPrefix)
+				| {{ ( payment?.total_real?.toString() || "" ) | commas }}
+			mat-hint
+				| {{ ( payment?.total_real?.toString() || "" ) | commas }}
+		mat-form-field.mb-10.ph-15.flex-50(
+			plugin-input-parse-commas,
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "GENERAL.LABELS.VAT" | translate }}
+			input(
+				matInput,
+				type='number',
+				step='1000',
+				min='0',
+				[value]='payment.total_vat_real',
+				readonly)
+			span(matPrefix)
+				| {{ ( payment?.total_vat_real?.toString() || "" ) | commas }}
+			mat-hint
+				| {{ ( payment?.total_vat_real?.toString() || "" ) | commas }}
+			mat-error
+				error-message(
+					[label]='"GENERAL.LABELS.VAT" | translate',
+					[control]='paymentStatusForm?.controls[ "total_vat_real" ]')
+		mat-form-field.ph-15.flex-100(
+			plugin-input-parse-commas,
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.SUBTOTAL" | translate }}
+			input(
+				matInput,
+				type='number',
+				min='0',
+				readonly)
+			span(matPrefix)
+				| {{ ( ( payment?.total_real + payment?.total_vat_real )?.toString() || "" ) | commas }}

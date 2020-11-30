@@ -1,0 +1,5 @@
+options:
+  config-file: node_modules/angular-core/.sass-lint.yml
+files:
+  include: 'src/**/*.s+(a|c)ss'
+  ignore: 'src/scss/partials/icomoon.s+(a|c)ss'

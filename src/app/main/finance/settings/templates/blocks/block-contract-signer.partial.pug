@@ -1,0 +1,32 @@
+.block-contract-signer
+	.layout-row.layout-align-start-center.mb-20
+		.font-size-18.font-weight-500
+			| {{ "FINANCE.SETTINGS.LABELS.CONTRACT_SIGNER" | translate | uppercase }}
+		.ph-20.flex-auto
+			mat-divider([inset]='true')
+
+	.layout-row.layout-fixer-15
+		mat-form-field.ph-15.flex-25(
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "GENERAL.LABELS.FULL_NAME" | translate }}
+			input(
+				matInput,
+				[(ngModel)]='setting.contract_signer_full_name',
+				[placeholder]='"GENERAL.PLACEHOLDERS.FULL_NAME" | translate',
+				[formControl]='settingForm?.controls[ "contract_signer_full_name" ]',
+				[disableControl]='isUpdating || isUploading',
+				ngDefaultControl)
+		mat-form-field.ph-15.flex-25(
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "GENERAL.LABELS.TITLE" | translate }}
+			input(
+				matInput,
+				[(ngModel)]='setting.contract_signer_title',
+				[placeholder]='"GENERAL.PLACEHOLDERS.TITLE" | translate',
+				[formControl]='settingForm?.controls[ "contract_signer_title" ]',
+				[disableControl]='isUpdating || isUploading',
+				ngDefaultControl)

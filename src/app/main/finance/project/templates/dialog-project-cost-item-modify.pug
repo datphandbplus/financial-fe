@@ -1,0 +1,221 @@
+form.dialog-project-cost-item-modify.layout-column(
+	[formGroup]='costItemForm',
+	(submit)='update()')
+	h1(matDialogTitle)
+		| {{ "FINANCE.PROJECT.TITLES.EDIT_COST_ITEM" | translate }}
+		| &nbsp;-
+		| {{ costItem?.name || "N/A" }}
+
+	div(matDialogContent)
+		.layout-row.layout-wrap.layout-fixer-15
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.NAME" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='costItem.name',
+					[placeholder]='"GENERAL.PLACEHOLDERS.NAME" | translate',
+					[formControl]='costItemForm?.controls[ "name" ]',
+					[disableControl]='isSubmitting || costItem?.is_modifying_cost || costItem?.is_modifying_vendor',
+					required,
+					readonly,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.NAME" | translate',
+						[control]='costItemForm?.controls[ "name" ]')
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.UNIT" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='costItem.unit',
+					[placeholder]='"GENERAL.PLACEHOLDERS.UNIT" | translate',
+					[formControl]='costItemForm?.controls[ "unit" ]',
+					[disableControl]='isSubmitting || costItem?.is_modifying_cost || costItem?.is_modifying_vendor',
+					required,
+					readonly,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.UNIT" | translate',
+						[control]='costItemForm?.controls[ "unit" ]')
+
+		.layout-row.layout-align-start-center.mt-10.mb-20
+			.mr-20.font-size-18.font-weight-500
+				| {{ "FINANCE.PROJECT.LABELS.OLD_DATA" | translate | uppercase }}
+			mat-divider.flex-auto
+
+		.layout-row.layout-wrap.layout-fixer-15
+			mat-form-field.mb-10.ph-15.flex-33(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.AMOUNT" | translate }}
+				input(
+					matInput,
+					type='number',
+					step='1',
+					min='0',
+					[(ngModel)]='costItem.amount',
+					[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.AMOUNT" | translate',
+					[formControl]='costItemForm?.controls[ "amount" ]',
+					[disableControl]='isSubmitting || costItem?.is_modifying_vendor',
+					required,
+					readonly,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( costItem?.amount?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( costItem?.amount?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"FINANCE.PROJECT.LABELS.AMOUNT" | translate',
+						[control]='costItemForm?.controls[ "amount" ]')
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.PRICE" | translate }}
+				input(
+					matInput,
+					type='number',
+					step='1000',
+					min='0',
+					[(ngModel)]='costItem.price',
+					[formControl]='costItemForm?.controls[ "price" ]',
+					[disableControl]='isSubmitting || costItem?.is_modifying_vendor',
+					required,
+					readonly,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( costItem?.price?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( costItem?.price?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.PRICE" | translate',
+						[control]='costItemForm?.controls[ "price" ]')
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.TOTAL" | translate }}
+				input(
+					matInput,
+					type='number',
+					[(ngModel)]='costItem.total',
+					[formControl]='costItemForm?.controls[ "total" ]',
+					readonly,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( costItem?.total?.toString() || "" ) | commas }}
+
+		.layout-row.layout-align-start-center.mt-10.mb-20
+			.mr-20.font-size-18.font-weight-500
+				| {{ "FINANCE.PROJECT.LABELS.NEW_DATA" | translate | uppercase }}
+			mat-divider.flex-auto
+
+		.layout-row.layout-wrap.layout-fixer-15
+			mat-form-field.mb-10.ph-15.flex-33(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.NEW_AMOUNT" | translate }}
+				input(
+					matInput,
+					type='number',
+					step='1',
+					min='0',
+					[(ngModel)]='costItem.new_amount',
+					(ngModelChange)='updateTotal()',
+					[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.NEW_AMOUNT" | translate',
+					[formControl]='costItemForm?.controls[ "new_amount" ]',
+					[disableControl]='isSubmitting || costItem?.is_modifying_vendor',
+					required,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( costItem?.new_amount?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( costItem?.new_amount?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"FINANCE.PROJECT.LABELS.NEW_AMOUNT" | translate',
+						[control]='costItemForm?.controls[ "new_amount" ]')
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.NEW_PRICE" | translate }}
+				input(
+					matInput,
+					type='number',
+					step='1000',
+					min='0',
+					[(ngModel)]='costItem.new_price',
+					(ngModelChange)='updateTotal()',
+					[formControl]='costItemForm?.controls[ "new_price" ]',
+					[disableControl]='isSubmitting || costItem?.is_modifying_vendor',
+					required,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( costItem?.new_price?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( costItem?.new_price?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.NEW_PRICE" | translate',
+						[control]='costItemForm?.controls[ "new_price" ]')
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.NEW_TOTAL" | translate }}
+				input(
+					matInput,
+					type='number',
+					[(ngModel)]='costItem.new_total',
+					[formControl]='costItemForm?.controls[ "new_total" ]',
+					readonly,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( costItem?.new_total?.toString() || "" ) | commas }}
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='costItemForm?.invalid || isSubmitting')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ "GENERAL.LABELS.SAVE" | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

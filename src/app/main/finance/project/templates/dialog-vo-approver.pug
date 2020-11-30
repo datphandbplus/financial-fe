@@ -1,0 +1,167 @@
+form.dialog-vo-approver(
+	[formGroup]='voApproversForm',
+	(submit)='update()')
+	div(matDialogContent)
+		.layout-row.layout-align-start-center.mt-10.mb-20
+			.font-size-18.font-weight-500
+				| {{ "FINANCE.USER.LABELS.PROCUREMENT_MANAGER" | translate }}
+			.ph-20.flex-auto
+				mat-divider
+			ng-template([ngIf]='voApprovers?.procurement_manager?.can_approve')
+				mat-radio-group(
+					[(ngModel)]='voApprovers.procurement_manager.status',
+					[formControl]='voApproversForm?.controls[ "procurement_manager_status" ]',
+					[disableControl]='isSubmitting',
+					ngDefaultControl)
+					mat-radio-button.mr-10([value]='VO_APPROVE_STATUS?.APPROVED')
+						| {{ "FINANCE.PROJECT.LABELS.APPROVED" | translate }}
+					mat-radio-button([value]='VO_APPROVE_STATUS?.REJECTED')
+						| {{ "FINANCE.PROJECT.LABELS.REJECTED" | translate }}
+			ng-template([ngIf]='!voApprovers?.procurement_manager?.can_approve')
+				status-box(
+					[color]='voApprovers?.procurement_manager?.status_name?.color',
+					[status]='voApprovers?.procurement_manager?.status_name?.name | translate')
+
+		.layout-row.flex-100.mb-30.layout-align-start-center
+			mat-form-field.flex-auto(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.COMMENT" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[(ngModel)]='voApprovers.procurement_manager.comment',
+					[placeholder]='"GENERAL.PLACEHOLDERS.COMMENT" | translate',
+					[formControl]='voApproversForm?.controls[ "procurement_manager_comment" ]',
+					[disableControl]='isSubmitting || !voApprovers?.procurement_manager?.can_approve',
+					ngDefaultControl)
+
+		.layout-row.layout-align-start-center.mt-10.mb-20
+			.font-size-18.font-weight-500
+				| {{ "FINANCE.USER.LABELS.PROJECT_MANAGER" | translate }}
+			.ph-20.flex-auto
+				mat-divider
+			ng-template([ngIf]='voApprovers?.project_manager?.can_approve')
+				mat-radio-group(
+					[(ngModel)]='voApprovers.project_manager.status',
+					[formControl]='voApproversForm?.controls[ "project_manager_status" ]',
+					[disableControl]='isSubmitting',
+					ngDefaultControl)
+					mat-radio-button.mr-10([value]='VO_APPROVE_STATUS?.APPROVED')
+						| {{ "FINANCE.PROJECT.LABELS.APPROVED" | translate }}
+					mat-radio-button([value]='VO_APPROVE_STATUS?.REJECTED')
+						| {{ "FINANCE.PROJECT.LABELS.REJECTED" | translate }}
+			ng-template([ngIf]='!voApprovers?.project_manager?.can_approve')
+				status-box(
+					[color]='voApprovers?.project_manager?.status_name?.color',
+					[status]='voApprovers?.project_manager?.status_name?.name | translate')
+
+		.layout-row.flex-100.mb-30.layout-align-start-center
+			mat-form-field.flex-auto(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.COMMENT" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[(ngModel)]='voApprovers.project_manager.comment',
+					[placeholder]='"GENERAL.PLACEHOLDERS.COMMENT" | translate',
+					[formControl]='voApproversForm?.controls[ "project_manager_comment" ]',
+					[disableControl]='isSubmitting || !voApprovers?.project_manager?.can_approve',
+					ngDefaultControl)
+
+		.layout-row.layout-align-start-center.mt-10.mb-20
+			.font-size-18.font-weight-500
+				| {{ "FINANCE.USER.LABELS.SALE" | translate }}
+			.ph-20.flex-auto
+				mat-divider
+			ng-template([ngIf]='voApprovers?.sale?.can_approve')
+				mat-radio-group(
+					[(ngModel)]='voApprovers.sale.status',
+					[formControl]='voApproversForm?.controls[ "sale_status" ]',
+					[disableControl]='isSubmitting',
+					ngDefaultControl)
+					mat-radio-button.mr-10([value]='VO_APPROVE_STATUS?.APPROVED')
+						| {{ "FINANCE.PROJECT.LABELS.APPROVED" | translate }}
+					mat-radio-button([value]='VO_APPROVE_STATUS?.REJECTED')
+						| {{ "FINANCE.PROJECT.LABELS.REJECTED" | translate }}
+			ng-template([ngIf]='!voApprovers?.sale?.can_approve')
+				status-box(
+					[color]='voApprovers?.sale?.status_name?.color',
+					[status]='voApprovers?.sale?.status_name?.name | translate')
+
+		.layout-row.flex-100.layout-align-start-center
+			mat-form-field.flex-auto(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.COMMENT" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[(ngModel)]='voApprovers.sale.comment',
+					[placeholder]='"GENERAL.PLACEHOLDERS.COMMENT" | translate',
+					[formControl]='voApproversForm?.controls[ "sale_comment" ]',
+					[disableControl]='isSubmitting || !voApprovers?.sale?.can_approve',
+					ngDefaultControl)
+
+		.layout-row.layout-align-start-center.mt-10.mb-20
+			.font-size-18.font-weight-500
+				| {{ "FINANCE.USER.LABELS.CEO" | translate }}
+			.ph-20.flex-auto
+				mat-divider
+			ng-template([ngIf]='voApprovers?.ceo?.can_approve')
+				mat-radio-group(
+					[(ngModel)]='voApprovers.ceo.status',
+					[formControl]='voApproversForm?.controls[ "ceo_status" ]',
+					[disableControl]='isSubmitting',
+					ngDefaultControl)
+					mat-radio-button.mr-10([value]='VO_APPROVE_STATUS?.APPROVED')
+						| {{ "FINANCE.PROJECT.LABELS.APPROVED" | translate }}
+					mat-radio-button([value]='VO_APPROVE_STATUS?.REJECTED')
+						| {{ "FINANCE.PROJECT.LABELS.REJECTED" | translate }}
+			ng-template([ngIf]='!voApprovers?.ceo?.can_approve')
+				status-box(
+					[color]='voApprovers?.ceo?.status_name?.color',
+					[status]='voApprovers?.ceo?.status_name?.name | translate')
+
+		.layout-row.flex-100.layout-align-start-center
+			mat-form-field.flex-auto(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.COMMENT" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[(ngModel)]='voApprovers.ceo.comment',
+					[placeholder]='"GENERAL.PLACEHOLDERS.COMMENT" | translate',
+					[formControl]='voApproversForm?.controls[ "ceo_comment" ]',
+					[disableControl]='isSubmitting || !voApprovers?.ceo?.can_approve',
+					ngDefaultControl)
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='!((voApprovers.ceo.can_approve || voApprovers.project_manager.can_approve || voApprovers.procurement_manager.can_approve || voApprovers.sale.can_approve) && !isSubmitting && ((isProcurementManager && voApprovers.procurement_manager.status) || (isPM && voApprovers.project_manager.status) || (isCEO && voApprovers.ceo.status) || (isSale && voApprovers.sale.status)))')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ "GENERAL.LABELS.SAVE" | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

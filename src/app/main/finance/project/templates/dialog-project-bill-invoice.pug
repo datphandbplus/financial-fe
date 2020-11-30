@@ -1,0 +1,52 @@
+.dialog-project-bill-invoice.layout-column
+	h1(matDialogTitle)
+		| {{ "FINANCE.PROJECT.LABELS.INVOICE" | translate }}
+		| &nbsp;-
+		| {{ bill?.project_name || "N/A" }}
+
+	div(matDialogContent)
+		.layout-row.layout-wrap.layout-fixer-15
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.INVOICE_NUMBER" | translate }}
+				input(
+					matInput,
+					[value]='bill?.invoice_number',
+					readonly)
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.INVOICE_DATE" | translate }}
+				span
+					| {{ bill?.invoice_date ? ( bill?.invoice_date | momentDateFormat ) : "FINANCE.PROJECT.PLACEHOLDERS.INVOICE_DATE" | translate }}
+				input.hide(
+					matInput,
+					readonly)
+
+		.layout-column(*ngIf='bill?.invoices?.length')
+			mat-label.mb-20
+				| {{ "FINANCE.PROJECT.LABELS.INVOICE_HISTORY" | translate }}:
+			mat-form-field(
+				appearance='outline',
+				*ngFor='let invoice of bill?.invoices')
+				mat-label
+					| {{ invoice?.created_at | momentDateFormat }}
+				input(
+					matInput,
+					readonly,
+					[value]='invoice?.note || "N/A"')
+				span(matSuffix)
+					i.fa.fa-file-invoice-dollar.text-accent.font-size-30.clickable((click)='downloadInvoice( invoice?.key, invoice?.location )')
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}

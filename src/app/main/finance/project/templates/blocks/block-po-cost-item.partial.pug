@@ -1,0 +1,52 @@
+.block-po-cost-item.flex-noshrink
+	ng-template(
+		ngFor,
+		let-costItem,
+		let-costItemIndex='index',
+		[ngForOf]='element?.cost_items')
+		.po-cost-item
+			.po-cost-item__list
+				.layout-row(style='min-height: 48px')
+					// PO code Column
+					mat-cell
+
+					// PO Column
+					mat-cell
+
+					// Vendor Column
+					mat-cell
+						status-box(
+							*ngIf='costItem?.modified_status',
+							[color]='costItem?.modified_status_name?.color',
+							[status]='costItem?.modified_status_name?.name | translate')
+
+					// Name Column
+					mat-cell.w-300
+						div
+							| {{ costItem?.name || "N/A" }}
+
+					// Total Column
+					mat-cell.layout-align-end(*ngIf='!isConstruction && !isConstructionManager')
+						.text-right
+							div([class.text-success]='costItem?.old_total || costItem?.old_amount || costItem?.old_price')
+								| {{ ( costItem?.total || 0 )?.toFixed( 0 ) | commas }}
+							div(*ngIf='costItem?.old_total || costItem?.old_amount || costItem?.old_price')
+								| {{ ( costItem?.old_total || 0 )?.toFixed( 0 ) | commas }}
+
+					// VAT Column
+					mat-cell.layout-align-end(*ngIf='!isConstruction && !isConstructionManager')
+
+					// Total VAT Column
+					mat-cell(*ngIf='!isConstruction && !isConstructionManager')
+
+					// Total w VAT Column
+					mat-cell(*ngIf='!isConstruction && !isConstructionManager')
+
+					// Status Column
+					mat-cell.w-150
+						status-box(
+							[color]='costItem?.status_name?.color',
+							[status]='costItem?.status_name?.name | translate')
+
+					// Actions Column
+					mat-cell.w-65.mat-column-actions

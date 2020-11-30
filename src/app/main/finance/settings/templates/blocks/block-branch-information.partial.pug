@@ -1,0 +1,97 @@
+.block-branch-information.mb-20
+	.layout-row.layout-align-start-center.mb-20
+		.font-size-18.font-weight-500
+			| {{ "FINANCE.SETTINGS.LABELS.BRANCH_INFORMATION" | translate | uppercase }}
+		.ph-20.flex-auto
+			mat-divider([inset]='true')
+
+	.cropper.layout-row
+		.mr-65
+			img.general__logo(
+				*ngIf='!selectedFile',
+				[src]='previewLogo || "./assets/images/no-company-logo.png"')
+			#cropper-preview.cropper__preview(*ngIf='selectedFile')
+
+		.flex-auto.layout-column.layout-align-start-start
+			ng-template([ngIf]='!selectedFile')
+				.layout-row.layout-align-start-center.mb-20
+					.mr-20
+						input.hide(
+							#fileInput,
+							type='file',
+							accept='image/*',
+							(change)='onFileSelected( $event )')
+						button(
+							mat-raised-button,
+							type='button',
+							color='primary',
+							(click)='fileInput?.click()')
+							i.fa.fa-upload.mr-15
+							| {{ "GENERAL.LABELS.UPLOAD" | translate }}
+					ul.upload-hint.m-0
+						li
+							| {{ "UPLOAD_HINTS.DIMENSION" | translate }}: 240px * 240px
+						li
+							| {{ "UPLOAD_HINTS.MAX_FILE_SIZE" | translate }}:
+							| {{ ( CONSTANTS?.ALLOW_FILE_SIZE / 1024 / 1024 )?.toFixed( 0 ) | commas }}MB
+						li
+							| {{ "UPLOAD_HINTS.FILE_FORMAT" | translate }}: jpg, jpeg, png, gif
+
+				mat-form-field.mb-10(
+					floatLabel='always',
+					appearance='outline')
+					mat-label
+						| {{ "FINANCE.SETTINGS.LABELS.BRANCH_PRIMARY_COLOR" | translate }}
+					input(
+						matInput,
+						[(ngModel)]='setting.branch_primary_color',
+						[formControl]='settingForm?.controls[ "branch_primary_color" ]',
+						[disableControl]='isUpdating || isUploading',
+						[placeholder]='"FINANCE.SETTINGS.PLACEHOLDERS.BRANCH_PRIMARY_COLOR" | translate',
+						readonly,
+						required,
+						ngDefaultControl)
+					span(matSuffix)
+						.general__input-color(
+							[(colorPicker)]='setting.branch_primary_color',
+							[style.backgroundColor]='setting?.branch_primary_color',
+							[style.color]='setting?.branch_primary_color')
+
+				mat-form-field(
+					floatLabel='always',
+					appearance='outline')
+					mat-label
+						| {{ "FINANCE.SETTINGS.LABELS.BRANCH_SECONDARY_COLOR" | translate }}
+					input(
+						matInput,
+						[(ngModel)]='setting.branch_secondary_color',
+						[formControl]='settingForm?.controls[ "branch_secondary_color" ]',
+						[disableControl]='isUpdating || isUploading',
+						[placeholder]='"FINANCE.SETTINGS.PLACEHOLDERS.BRANCH_SECONDARY_COLOR" | translate',
+						required,
+						ngDefaultControl)
+					span(matSuffix)
+						.general__input-color(
+							[(colorPicker)]='setting.branch_secondary_color',
+							[style.backgroundColor]='setting?.branch_secondary_color',
+							[style.color]='setting?.branch_secondary_color')
+
+			.cropper__wrapper(*ngIf='selectedFile')
+				.h-400
+					img#cropper(src='')
+				.layout-row.mt-30.layout-fixer-5
+					.ph-5
+						button(
+							mat-raised-button,
+							type='button',
+							(click)='resetLogo()')
+							i.fa.fa-ban.mr-15
+							| {{ "GENERAL.LABELS.CANCEL" | translate }}
+					.ph-5
+						button(
+							mat-raised-button,
+							type='button',
+							color='primary',
+							(click)='changeLogo()')
+							i.fa.fa-check.mr-15
+							| {{ "GENERAL.LABELS.DONE" | translate }}

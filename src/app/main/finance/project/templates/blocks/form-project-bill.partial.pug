@@ -1,0 +1,189 @@
+form.layout-column.p-25([formGroup]='billForm')
+	div(matDialogContent)
+		.layout-row.layout-wrap.layout-fixer-15
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.NAME" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='bill.name',
+					[placeholder]='"GENERAL.PLACEHOLDERS.NAME" | translate',
+					[formControl]='billForm?.controls[ "name" ]',
+					[disableControl]='isSubmitting || isUploading',
+					[readonly]='!isPM || viewOnly',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.NAME" | translate',
+						[control]='billForm?.controls[ "name" ]')
+
+			mat-form-field.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline',
+				(click)='picker?.open()')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.EXPECTED_INVOICE_DATE" | translate }}
+				span
+					| {{ bill?.expected_invoice_date ? ( bill?.expected_invoice_date | momentDateFormat ) : "FINANCE.PROJECT.PLACEHOLDERS.EXPECTED_INVOICE_DATE" | translate }}
+				input.hide(
+					matInput,
+					[matDatepicker]='picker',
+					[(ngModel)]='bill.expected_invoice_date',
+					[formControl]='billForm?.controls[ "expected_invoice_date" ]',
+					ngDefaultControl,
+					required,
+					readonly)
+				mat-datepicker-toggle(
+					matSuffix,
+					[for]='picker')
+				mat-datepicker(
+					#picker,
+					[disabled]='isSubmitting || isUploading || !isPM || viewOnly')
+
+			select-box.mb-10.ph-15.flex-50(
+				*ngIf='!bill?.id',
+				[sort]='false',
+				[(ngModel)]='ratioPercent',
+				(selectionChange)='updateTotal()',
+				[label]='"FINANCE.PROJECT.LABELS.RATIO" | translate',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.RATIO" | translate',
+				[formControl]='billForm?.controls[ "ratio" ]',
+				[disableControl]='isSubmitting || isUploading',
+				[data]='RATIO | itemObject: "%"',
+				[readonly]='!isPM || viewOnly',
+				required,
+				ngDefaultControl)
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.TOTAL" | translate }}
+				input(
+					matInput,
+					type='number',
+					step='1000',
+					min='0',
+					[(ngModel)]='bill.total',
+					[formControl]='billForm?.controls[ "total" ]',
+					[disableControl]='isSubmitting || isUploading',
+					[readonly]='!isPM || viewOnly',
+					required,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( bill?.total?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( bill?.total?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"FINANCE.PROJECT.LABELS.TOTAL" | translate',
+						[control]='billForm?.controls[ "total" ]')
+
+			select-box.mb-10.ph-15.flex-50(
+				*ngIf='!bill?.id',
+				[sort]='false',
+				[(ngModel)]='vatPercent',
+				(selectionChange)='updateVAT()',
+				[label]='"GENERAL.LABELS.VAT_PERCENT" | translate',
+				[placeholder]='"GENERAL.PLACEHOLDERS.VAT_PERCENT" | translate',
+				[formControl]='billForm?.controls[ "vat_percent" ]',
+				[disableControl]='isSubmitting || isUploading',
+				[data]='RATIO | itemObject: "%"',
+				[readonly]='!isPM || viewOnly',
+				required,
+				ngDefaultControl)
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.VAT" | translate }}
+				input(
+					matInput,
+					type='number',
+					step='1000',
+					min='0',
+					[(ngModel)]='bill.total_vat',
+					[formControl]='billForm?.controls[ "total_vat" ]',
+					[disableControl]='isSubmitting || isUploading',
+					[readonly]='!isPM || viewOnly',
+					required,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( bill?.total_vat?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( bill?.total_vat?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.VAT" | translate',
+						[control]='billForm?.controls[ "total_vat" ]')
+
+			select-box.mb-10.ph-15.flex-50(
+				[sort]='false',
+				[translated]='true',
+				[(ngModel)]='bill.transfer_type',
+				[label]='"FINANCE.PROJECT.LABELS.TRANSFER_TYPE" | translate',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.TRANSFER_TYPE" | translate',
+				[formControl]='billForm?.controls[ "transfer_type" ]',
+				[disableControl]='isSubmitting || isUploading',
+				[data]='transferType',
+				[readonly]='!isPM || viewOnly',
+				required,
+				ngDefaultControl)
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.SUBTOTAL" | translate }}
+				input(
+					matInput,
+					type='number',
+					min='0',
+					[formControl]='billForm?.controls[ "subtotal" ]',
+					[disableControl]='isSubmitting || isUploading',
+					readonly,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( ( bill?.total + bill?.total_vat )?.toString() || "" ) | commas }}
+
+		include form-project-bill-status.partial.pug
+		include form-project-bill-finance-note.partial.pug
+		include form-project-bill-invoice.partial.pug
+
+	div(
+		matDialogActions,
+		align='end')
+		button.export-btn(
+			mat-raised-button,
+			color='success',
+			(click)='exportExcel()')
+			i.fa.fa-download.mr-10
+			| {{ "FINANCE.PROJECT.LABELS.EXPORT" | translate }}
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting || isUploading',
+			(click)='hasChange ? closeDiaglog() : onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			*ngIf='!isLiabilitiesAccountant && !isCFO && !viewOnly',
+			mat-raised-button,
+			color='primary',
+			(click)='bill?.id ? update() : create()',
+			[disabled]='billForm?.invalid || isSubmitting')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ ( bill?.id ? "GENERAL.LABELS.SAVE" : "GENERAL.LABELS.ADD" ) | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

@@ -1,0 +1,46 @@
+.form-channel(*ngIf='!channel?.exists')
+	.mb-30.font-size-32.line-height-32.font-weight-500
+		| {{ "AUTH.LOGIN.LABELS.WORKSPACE" | translate }}
+
+	form.layout-column(
+		[formGroup]='channelForm',
+		(submit)='checkChannel()')
+		mat-form-field.mb-10(
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "AUTH.LOGIN.LABELS.WORKSPACE_NAME" | translate }}
+			input(
+				matInput,
+				[placeholder]='"AUTH.LOGIN.PLACEHOLDERS.WORKSPACE_NAME" | translate',
+				[(ngModel)]='channel.id',
+				[formControl]='channelForm?.controls[ "name" ]',
+				[disableControl]='isSubmitting',
+				ngDefaultControl,
+				required)
+			div(matSuffix)
+				| .{{ ENVIRONMENT?.APP_DOMAIN }}
+			mat-error
+				error-message(
+					[label]='"AUTH.LOGIN.LABELS.WORKSPACE_NAME" | translate',
+					[control]='channelForm?.controls[ "name" ]')
+
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='channelForm?.invalid || isSubmitting')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ "GENERAL.LABELS.SUBMIT" | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')
+
+		.mt-15
+			| {{ "AUTH.LOGIN.LABELS.NO_WORKSPACE" | translate }}&nbsp;
+			span.clickable.text-primary
+				| {{ "AUTH.LOGIN.LABELS.SIGNUP_NOW" | translate }}

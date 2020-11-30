@@ -1,0 +1,27 @@
+mixin content
+	// Menu item content
+	i.direction__icon(
+		*ngIf='directions[ key ]?.data?.icon',
+		[ngClass]='directions[ key ]?.data?.icon')
+
+// Menu
+.layout-column.flex-noshrink
+	// Menu item
+	.layout-column(*ngFor='let key of keys')
+		// Menu anchor with path
+		a.layout-column(
+			*ngIf='directions[ key ]?.path',
+			matTooltipPosition='right',
+			[matTooltip]='directions[ key ]?.data?.title | translate',
+			[routerLink]='directions[ key ]?.path',
+			[routerLinkActive]='[ "active" ]')
+			// Menu item content
+			+content
+
+		// Menu anchor without path
+		a(
+			*ngIf='!directions[ key ]?.path',
+			matTooltipPosition='right',
+			[matTooltip]='directions[ key ]?.data?.title | translate')
+			// Menu item content
+			+content

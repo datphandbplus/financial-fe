@@ -1,0 +1,138 @@
+form.dialog-project-payment-approver.layout-column(
+	[formGroup]='paymentApproverForm',
+	(submit)='update()')
+	h1(matDialogTitle)
+		| {{ "FINANCE.PROJECT.TITLES.APPROVE_PAYMENT_STATUS" | translate }}
+
+	div(matDialogContent)
+		.layout-row.layout-align-start-center.mt-10.mb-20
+			.font-size-18.font-weight-500
+				| {{ "FINANCE.USER.LABELS.PROCUREMENT_MANAGER" | translate }}
+				.font-size-12.text-warning
+					| {{ "FINANCE.PROJECT.LABELS.FIRST_APPROVER_REQUIRED" | translate }}
+			.ph-20.flex-auto
+				mat-divider
+			ng-template([ngIf]='approvers?.procurement_manager?.can_approve')
+				mat-radio-group(
+					[(ngModel)]='approvers.procurement_manager.status',
+					[formControl]='paymentApproverForm?.controls[ "procurement_manager_status" ]',
+					[disableControl]='isUpdating',
+					ngDefaultControl)
+					mat-radio-button.mr-10([value]='PAYMENT_APPROVE_STATUS?.APPROVED')
+						| {{ "FINANCE.PROJECT.LABELS.APPROVED" | translate }}
+					mat-radio-button([value]='PAYMENT_APPROVE_STATUS?.REJECTED')
+							| {{ "FINANCE.PROJECT.LABELS.REJECTED" | translate }}
+			ng-template([ngIf]='!approvers?.procurement_manager?.can_approve')
+				status-box(
+					[color]='approvers?.procurement_manager?.status_name?.color',
+					[status]='approvers?.procurement_manager?.status_name?.name | translate')
+
+		.layout-row.flex-100.mb-30.layout-align-start-center
+			mat-form-field.flex-auto(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.COMMENT" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[(ngModel)]='approvers.procurement_manager.comment',
+					[placeholder]='"GENERAL.PLACEHOLDERS.COMMENT" | translate',
+					[formControl]='paymentApproverForm?.controls[ "procurement_manager_comment" ]',
+					[disableControl]='isSubmitting || !approvers?.procurement_manager?.can_approve',
+					ngDefaultControl)
+
+		.layout-row.layout-align-start-center.mt-10.mb-20
+			.font-size-18.font-weight-500
+				| {{ "FINANCE.USER.LABELS.GENERAL_ACCOUNTANT" | translate }}
+			.ph-20.flex-auto
+				mat-divider
+			ng-template([ngIf]='approvers?.general_accountant?.can_approve')
+				mat-radio-group(
+					[(ngModel)]='approvers.general_accountant.status',
+					[formControl]='paymentApproverForm?.controls[ "general_accountant_status" ]',
+					[disableControl]='isUpdating',
+					ngDefaultControl)
+					mat-radio-button.mr-10([value]='PAYMENT_APPROVE_STATUS?.APPROVED')
+						| {{ "FINANCE.PROJECT.LABELS.APPROVED" | translate }}
+					mat-radio-button([value]='PAYMENT_APPROVE_STATUS?.REJECTED')
+							| {{ "FINANCE.PROJECT.LABELS.REJECTED" | translate }}
+			ng-template([ngIf]='!approvers?.general_accountant?.can_approve')
+				status-box(
+					[color]='approvers?.general_accountant?.status_name?.color',
+					[status]='approvers?.general_accountant?.status_name?.name | translate')
+
+		.layout-row.flex-100.mb-30.layout-align-start-center
+			mat-form-field.flex-auto(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.COMMENT" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[(ngModel)]='approvers.general_accountant.comment',
+					[placeholder]='"GENERAL.PLACEHOLDERS.COMMENT" | translate',
+					[formControl]='paymentApproverForm?.controls[ "general_accountant_comment" ]',
+					[disableControl]='isSubmitting || !approvers?.general_accountant?.can_approve',
+					ngDefaultControl)
+
+		.layout-row.layout-align-start-center.mt-10.mb-20
+			.font-size-18.font-weight-500
+				| {{ "FINANCE.USER.LABELS.CFO" | translate }}
+			.ph-20.flex-auto
+				mat-divider
+			ng-template([ngIf]='approvers?.cfo?.can_approve')
+				mat-radio-group(
+					[(ngModel)]='approvers.cfo.status',
+					[formControl]='paymentApproverForm?.controls[ "cfo_status" ]',
+					[disableControl]='isUpdating',
+					ngDefaultControl)
+					mat-radio-button.mr-10([value]='PAYMENT_APPROVE_STATUS?.APPROVED')
+						| {{ "FINANCE.PROJECT.LABELS.APPROVED" | translate }}
+					mat-radio-button([value]='PAYMENT_APPROVE_STATUS?.REJECTED')
+							| {{ "FINANCE.PROJECT.LABELS.REJECTED" | translate }}
+			ng-template([ngIf]='!approvers?.cfo?.can_approve')
+				status-box(
+					[color]='approvers?.cfo?.status_name?.color',
+					[status]='approvers?.cfo?.status_name?.name | translate')
+
+		.layout-row.flex-100.mb-30.layout-align-start-center
+			mat-form-field.flex-auto(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.COMMENT" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[(ngModel)]='approvers.cfo.comment',
+					[placeholder]='"GENERAL.PLACEHOLDERS.COMMENT" | translate',
+					[formControl]='paymentApproverForm?.controls[ "cfo_comment" ]',
+					[disableControl]='isSubmitting || !approvers?.cfo?.can_approve',
+					ngDefaultControl)
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			*ngIf='canSubmit',
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='projectForm?.invalid || isSubmitting || ( isProcurementManager && approvers?.procurement_manager?.status === PAYMENT_APPROVE_STATUS?.WAITING_APPROVAL ) || ( isGeneralAccountant && approvers?.general_accountant?.status === PAYMENT_APPROVE_STATUS?.WAITING_APPROVAL ) || ( isCFO && approvers?.cfo?.status === PAYMENT_APPROVE_STATUS?.WAITING_APPROVAL )')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ "GENERAL.LABELS.SAVE" | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

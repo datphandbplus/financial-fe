@@ -1,0 +1,25 @@
+div.detail-quotation-area
+	button.export-btn(
+		mat-raised-button,
+		color='success',
+		(click)='exportExcel()')
+		i.fa.fa-download.mr-10
+		| {{ "FINANCE.PROJECT.LABELS.EXPORT" | translate }}
+
+	mat-tab-group.project-quotation.mat-elevation-z8(
+		[(selectedIndex)]='selectedTabIndex',
+		(selectedIndexChange)='tabChanged( $event )')
+		mat-tab([label]='"FINANCE.PROJECT.LABELS.OVERVIEW" | translate')
+			include blocks/tab-overview.partial.pug
+		mat-tab(
+			*ngFor='let sheet of sheets; let index = index;',
+			[label]='sheet?.name')
+			ng-template([ngIf]='selectedTabIndex === index + 1')
+				include blocks/tab-sheet.partial.pug
+		mat-tab(disabled)
+			ng-template(mat-tab-label)
+				.clickable.text-primary(
+					*ngIf='canAddSheet && !(project?.project_status === projectStatus.DONE)',
+					(click)='openDialogSheet()')
+						i.fa.fa-plus.mr-5
+						| {{ "FINANCE.PROJECT.LABELS.NEW_SHEET" | translate }}

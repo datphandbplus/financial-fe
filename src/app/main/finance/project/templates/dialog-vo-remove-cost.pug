@@ -1,0 +1,107 @@
+.dialog-vo-remove-cost
+	.layout-column
+		h1(matDialogTitle)
+			| {{ "FINANCE.PROJECT.TITLES.REMOVE_VO_ITEMS" | translate }}
+			| &nbsp;-
+			| {{ vo?.project_name || "N/A" }}
+
+		div(matDialogContent)
+			loading-overlay([visible]='!loaded')
+				mat-table(
+					#table,
+					plugin-data-table,
+					[dataSource]='dataSource',
+					[attr.data-label]='!dataSource?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+
+					// PO code Column
+					ng-container(matColumnDef='pocode')
+						mat-header-cell.w-120(*matHeaderCellDef)
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.PO_CODE" | translate }}
+						mat-cell.w-120(*matCellDef='let element')
+							ng-container(*ngIf='element?.project_purchase_order_id')
+								| {{ element?.project_purchase_order_id ? "PO" + ( element?.project_purchase_order_id | padNumber: 4 ) : "N/A" }}
+							ng-container(*ngIf='element?.is_parent')
+								| {{ "FINANCE.PROJECT.LABELS.HAD_CHILDREN" | translate }}
+
+					// Name Column
+					ng-container(matColumnDef='name')
+						mat-header-cell(*matHeaderCellDef)
+							| {{ "GENERAL.ATTRIBUTES.NAME" | translate }}
+						mat-cell(*matCellDef='let element')
+							mat-checkbox(
+								[(ngModel)]='element.checked',
+								[disabled]='element?.is_parent || element?.project_purchase_order_id',
+								(change)='updateSelectedList( element )')
+								| {{ element?.name || "N/A" }}
+
+					// unit Column
+					ng-container(matColumnDef='unit')
+						mat-header-cell.layout-align-end.w-120(*matHeaderCellDef)
+							| {{ "GENERAL.ATTRIBUTES.UNIT" | translate }}
+						mat-cell.layout-align-end.w-120(*matCellDef='let element')
+							| {{ element?.unit || "N/A" }}
+
+					// Amount Column
+					ng-container(matColumnDef='amount')
+						mat-header-cell.layout-align-end.w-120(*matHeaderCellDef)
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.AMOUNT" | translate }}
+						mat-cell.layout-align-end.w-120(*matCellDef='let element')
+							| {{ element?.amount?.toFixed( 0 ) | commas }}
+					// Price Column
+					ng-container(matColumnDef='price')
+						mat-header-cell.layout-align-end.w-120(*matHeaderCellDef)
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.PRICE" | translate }}
+						mat-cell.layout-align-end.w-120(*matCellDef='let element')
+							| {{ element?.price?.toFixed( 0 ) | commas }}
+					// Total Column
+					ng-container(matColumnDef='total')
+						mat-header-cell.layout-align-end.w-120(*matHeaderCellDef)
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+						mat-cell.layout-align-end.w-120(*matCellDef='let element')
+							| {{ element?.total?.toFixed( 0 ) | commas }}
+
+					// Filters
+					ng-container(matColumnDef='filters')
+						mat-header-cell(*matHeaderCellDef)
+							// Name Column
+							mat-cell
+								filter-box(
+									[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.SEARCH_COST_ITEMS" | translate',
+									[disabled]='!loaded',
+									[(filter)]='searchString',
+									(applyFilter)='applyFilter()')
+
+					mat-header-row(*matHeaderRowDef='displayedColumns')
+					mat-header-row(*matHeaderRowDef='[ "filters" ]')
+					mat-row(*matRowDef='let row; columns: displayedColumns;')
+
+		mat-paginator(
+			#paginator,
+			pageSize='30',
+			[pageSizeOptions]='[ 30, 50, 100 ]',
+			showFirstLastButtons='true')
+
+		div(
+			matDialogActions,
+			align='end')
+			button(
+				mat-raised-button,
+				type='button',
+				[disabled]='isSubmitting',
+				(click)='onNoClick()')
+				| {{ "GENERAL.LABELS.CANCEL" | translate }}
+			button(
+				mat-raised-button,
+				type='button',
+				color='primary',
+				(click)='update()',
+				[disabled]='isSubmitting')
+				.layout-row.layout-align-center-center
+					.flex-auto
+						ng-template([ngIf]='!isSubmitting')
+							| {{ "GENERAL.LABELS.UPDATE" | translate }}
+						ng-template([ngIf]='isSubmitting')
+							| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+					mat-spinner.ml-5(
+						*ngIf='isSubmitting',
+						diameter='20')

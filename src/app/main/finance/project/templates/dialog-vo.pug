@@ -1,0 +1,136 @@
+form.dialog-create-vo.layout-column(
+	[formGroup]='voForm',
+	(submit)='vo?.id ? update() : create()')
+	h1(matDialogTitle)
+		ng-template([ngIf]='!vo?.id')
+			| {{ "FINANCE.PROJECT.TITLES.ADD_VO" | translate }}
+		ng-template([ngIf]='vo?.id')
+			| {{ "FINANCE.PROJECT.TITLES.EDIT_VO" | translate }}
+		| &nbsp;-
+		| {{ vo?.project_name || "N/A" }}
+
+	div(matDialogContent)
+		.layout-column
+			mat-form-field(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.NAME" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='vo.name',
+					[placeholder]='"GENERAL.PLACEHOLDERS.NAME" | translate',
+					[formControl]='voForm?.controls[ "name" ]',
+					[disableControl]='isSubmitting',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.NAME" | translate',
+						[control]='voForm?.controls[ "name" ]')
+
+			mat-form-field(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.NOTE" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting',
+					[(ngModel)]='vo.note',
+					[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.NOTE" | translate',
+					[formControl]='voForm?.controls[ "note" ]',
+					ngDefaultControl)
+
+			mat-form-field(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.VAT_PERCENT" | translate }}
+				input(
+					matInput,
+					step='1',
+					min='0',
+					type='number',
+					[(ngModel)]='vo.vat_percent',
+					[formControl]='voForm?.controls[ "vat_percent" ]',
+					(ngModelChange)='updateDiscount()',
+					[disableControl]='isSubmitting',
+					ngDefaultControl)
+				span(matSuffix)
+					| %
+				span(matPrefix)
+					| {{ ( vo?.vat_percent?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( vo?.vat_percent?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.VAT_PERCENT" | translate',
+						[control]='voForm?.controls[ "vat_percent" ]')
+
+			.layout-row.layout-align-start-center.mt-10
+				.mr-20.font-size-18.font-weight-500
+					| {{ "FINANCE.PROJECT.LABELS.DISCOUNT" | translate | uppercase }}
+				mat-divider.flex-auto
+
+			select-box.mt-20(
+				[(ngModel)]='vo.discount_type',
+				(selectionChange)='updateDiscount()',
+				[label]='"FINANCE.PROJECT.LABELS.DISCOUNT_TYPE" | translate',
+				[disableControl]='isSubmitting',
+				[data]='DISCOUNT_TYPE',
+				[formControl]='voForm?.controls[ "discount_type" ]',
+				required,
+				ngDefaultControl)
+
+			mat-form-field(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_AMOUNT" | translate }}
+				input(
+					matInput,
+					type='number',
+					step='1',
+					min='0',
+					[(ngModel)]='vo.discount_amount',
+					(ngModelChange)='updateDiscount()',
+					[formControl]='voForm?.controls[ "discount_amount" ]',
+					[disableControl]='isSubmitting',
+					required,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( vo?.discount_amount?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( vo?.discount_amount?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"FINANCE.PROJECT.LABELS.DISCOUNT_AMOUNT" | translate',
+						[control]='voForm?.controls[ "discount_amount" ]')
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='voForm?.invalid || isSubmitting')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ ( vo.id ? "GENERAL.LABELS.SAVE" : "GENERAL.LABELS.ADD" ) | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

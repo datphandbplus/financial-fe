@@ -1,0 +1,157 @@
+.layout-column.p-25
+	div(matDialogContent)
+		.layout-row.layout-wrap.layout-fixer-15
+			mat-form-field.ph-15.flex-50(appearance='outline')
+				mat-label
+					| {{ "FINANCE.COST_ITEM.LABELS.PURCHASE_ORDER" | translate }}
+				input(
+					matInput,
+					readonly,
+					[value]='purchaseOrder?.name || "N/A"')
+			mat-form-field.ph-15.flex-50(appearance='outline')
+				mat-label
+					| {{ "FINANCE.VENDOR.LABELS.VENDOR" | translate }}
+				input(
+					matInput,
+					readonly,
+					[value]='purchaseOrder?.vendor?.short_name || "N/A"')
+			//- mat-form-field.ph-15.flex-25(appearance='outline')
+			//- 	mat-label
+			//- 		| {{ "GENERAL.LABELS.VAT_PERCENT" | translate }}
+			//- 	input(
+			//- 		matInput,
+			//- 		readonly,
+			//- 		[value]='purchaseOrder?.vat_percent | commas')
+			//- 	span(matSuffix)
+			//- 		| %
+			//- mat-form-field.ph-15.flex-25(appearance='outline')
+			//- 	mat-label
+			//- 		| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_TYPE" | translate }}
+			//- 	input(
+			//- 		matInput,
+			//- 		readonly,
+			//- 		[value]='purchaseOrder?.discount_type || "$"')
+			//- mat-form-field.ph-15.flex-50(appearance='outline')
+			//- 	mat-label
+			//- 		| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_AMOUNT" | translate }}
+			//- 	input(
+			//- 		matInput,
+			//- 		readonly,
+			//- 		[value]='purchaseOrder?.discount_amount | commas')
+			//- mat-form-field.ph-15.flex-50(
+			//- 	appearance='outline')
+			//- 	mat-label
+			//- 		| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_VALUE" | translate }}
+			//- 	input(
+			//- 		matInput,
+			//- 		readonly,
+			//- 		[value]='purchaseOrder?.discount_value | commas')
+			//- mat-form-field.ph-15.flex-50(
+			//- 	appearance='outline')
+			//- 	mat-label
+			//- 		| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_REMAIN" | translate }}
+			//- 	input(
+			//- 		matInput,
+			//- 		readonly,
+			//- 		[value]='purchaseOrder?.discount_remain | commas')
+
+		mat-table(
+			#table,
+			plugin-data-table,
+			[dataSource]='dataSourcePOItem',
+			[attr.data-label]='!dataSourcePOItem?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+			// status Column
+			ng-container(matColumnDef='status')
+				mat-header-cell.w-150.layout-align-center(*matHeaderCellDef)
+					| {{ "GENERAL.ATTRIBUTES.STATUS" | translate }}
+				mat-cell.w-150.layout-align-center(*matCellDef='let element')
+					status-box(
+						*ngIf='element?.modified_status',
+						[color]='element?.modified_status_name?.color',
+						[status]='element?.modified_status_name?.name | translate')
+				mat-footer-cell.w-150.layout-align-center(*matFooterCellDef)
+			// Name Column
+			ng-container(matColumnDef='name')
+				mat-header-cell.w-300(*matHeaderCellDef)
+					| {{ "GENERAL.ATTRIBUTES.NAME" | translate }}
+				mat-cell.w-300(*matCellDef='let element')
+					| {{ element?.name || "N/A" }}
+				mat-footer-cell.w-300(*matFooterCellDef)
+			// Amount Column
+			ng-container(matColumnDef='amount')
+				mat-header-cell.layout-align-end(*matHeaderCellDef)
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.AMOUNT" | translate }}
+				mat-cell.layout-align-end(*matCellDef='let element')
+					.text-right
+						div([class.text-success]='element?.old_total || element?.old_amount || element?.old_price')
+							| {{ ( element?.amount || 0 )?.toFixed( 0 ) | commas }}
+						div(*ngIf='element?.old_total || element?.old_amount || element?.old_price')
+							| {{ ( element?.old_amount || 0 )?.toFixed( 0 ) | commas }}
+				mat-footer-cell.layout-align-end(*matFooterCellDef)
+			// Price Column
+			ng-container(matColumnDef='price')
+				mat-header-cell.layout-align-end.w-130(*matHeaderCellDef)
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.PRICE" | translate }}
+				mat-cell.layout-align-end.w-130(*matCellDef='let element')
+					.text-right
+						div([class.text-success]='element?.old_total || element?.old_amount || element?.old_price')
+							| {{ ( element?.price || 0 )?.toFixed( 0 ) | commas }}
+						div(*ngIf='element?.old_total || element?.old_amount || element?.old_price')
+							| {{ ( element?.old_price || 0 )?.toFixed( 0 ) | commas }}
+				mat-footer-cell.layout-align-end.w-130(*matFooterCellDef)
+					.layout-column.text-right
+						.text-success.text-nowrap.mv-10
+							| {{ "FINANCE.PROJECT.LABELS.SUM" | translate }}
+						.text-success.text-nowrap.mv-10
+							| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_VALUE" | translate }}
+						.text-success.text-nowrap.mv-10
+							| {{ "FINANCE.PROJECT.LABELS.SUM_DISCOUNT" | translate }}
+						.text-success.text-nowrap.mv-10
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.VAT" | translate }}
+							| ({{ purchaseOrder?.vat_percent | commas }}%)
+						.text-success.text-nowrap.mv-10
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL_INCLUDED_VAT" | translate }}
+			// Total Column
+			ng-container(matColumnDef='total')
+				mat-header-cell.layout-align-end.w-130(*matHeaderCellDef)
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+				mat-cell.layout-align-end.w-130(*matCellDef='let element')
+					.text-right
+						div([class.text-success]='element?.old_total || element?.old_amount || element?.old_price')
+							| {{ ( element?.total || 0 )?.toFixed( 0 ) | commas }}
+						div(*ngIf='element?.old_total || element?.old_amount || element?.old_price')
+							| {{ ( element?.old_total || 0 )?.toFixed( 0 ) | commas }}
+				mat-footer-cell.layout-align-end.w-130(*matFooterCellDef)
+					.layout-column.text-right
+						.text-warning.text-truncate.mv-10([matTooltip]='purchaseOrder?.total | commas')
+							| {{ ( purchaseOrder?.total || 0 )?.toFixed( 0 ) | commas }}
+						.text-warning.text-truncate.mv-10([matTooltip]='purchaseOrder?.discount_value | commas')
+							| {{ ( purchaseOrder?.discount_value || 0 )?.toFixed( 0 ) | commas }}
+						.text-warning.text-truncate.mv-10([matTooltip]='purchaseOrder?.discount_remain | commas')
+							| {{ ( purchaseOrder?.discount_remain || 0 )?.toFixed( 0 ) | commas }}
+						.text-warning.text-truncate.mv-10([matTooltip]='( purchaseOrder?.discount_remain * purchaseOrder?.vat_percent / 100 ) | commas')
+							| {{ ( ( purchaseOrder?.discount_remain * purchaseOrder?.vat_percent / 100 ) || 0 )?.toFixed( 0 ) | commas }}
+						.text-warning.text-truncate.mv-10([matTooltip]='( purchaseOrder?.discount_remain * ( 1 + purchaseOrder?.vat_percent / 100 ) ) | commas')
+							| {{ ( ( purchaseOrder?.discount_remain * ( 1 + purchaseOrder?.vat_percent / 100 ) ) || 0 )?.toFixed( 0 ) | commas }}
+
+			mat-header-row(*matHeaderRowDef='displayedColumns')
+			mat-row(*matRowDef='let row; columns: displayedColumns;')
+			mat-footer-row(
+				*matFooterRowDef='displayedColumns',
+				[class.hide]='!dataSourcePOItem?.filteredData?.length')
+
+		mat-paginator(
+			#paginatorPOItem,
+			pageSize='30',
+			[pageSizeOptions]='[ 30, 50, 100 ]',
+			showFirstLastButtons='true')
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}

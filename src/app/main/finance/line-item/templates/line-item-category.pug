@@ -1,0 +1,28 @@
+.line-item-category
+	.layout-row.layout-align-start-center.mb-15
+		.layout-row.layout-fixer-5.mr-15
+			.ph-5
+				button(
+					plugin-button-only-icon,
+					mat-raised-button,
+					[disabled]='!loaded || isDeleting',
+					(click)='resetFilter(); getList();')
+					i.fa.fa-sync-alt
+			.ph-5
+				button(
+					plugin-button-only-icon,
+					mat-raised-button,
+					[disabled]='!loaded || isDeleting',
+					(click)='applySorter( true )')
+					i.fa.fa-sort-alpha-down(*ngIf='!isReverse')
+					i.fa.fa-sort-alpha-up(*ngIf='isReverse')
+		.flex-auto
+		.layout-row
+			button(
+				mat-raised-button,
+				color='primary',
+				[disabled]='!loaded || isDeleting',
+				(click)='openDialog()')
+				i.fa.fa-plus.mr-15
+				| {{ "FINANCE.LINE_ITEM_CATEGORY.LABELS.NEW_LINE_ITEM_CATEGORY" | translate }}
+	include blocks/table-line-item-category.partial.pug

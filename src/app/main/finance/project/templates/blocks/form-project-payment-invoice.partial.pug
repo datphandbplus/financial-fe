@@ -1,0 +1,101 @@
+form.form-project-payment-invoice.mb-10(
+	*ngIf='isPurchasing && payment?.status === PAYMENT_STATUS?.WAITING && !viewOnly',
+	[formGroup]='paymentInvoiceForm')
+	.layout-row.layout-align-start-center.mt-10.mb-20
+		.font-size-18.font-weight-500
+			| {{ "FINANCE.PROJECT.LABELS.INVOICE" | translate | uppercase }}
+		.ph-20.flex-auto
+			mat-divider
+		button(
+			mat-raised-button,
+			color='primary',
+			(click)='updateInvoice()',
+			[disabled]='paymentInvoiceForm?.invalid || isSubmitting || isUploading || !canUploadInvoice')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting && !isUploading')
+						| {{ "GENERAL.LABELS.SAVE" | translate }}
+					ng-template([ngIf]='isSubmitting || isUploading')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')
+
+	.layout-row.layout-wrap.layout-fixer-15
+		mat-form-field.ph-15.flex-50(
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.INVOICE_NUMBER" | translate }}
+			input(
+				matInput,
+				[(ngModel)]='payment.invoice_number',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.INVOICE_NUMBER" | translate',
+				[formControl]='paymentInvoiceForm?.controls[ "invoice_number" ]',
+				[disableControl]='isSubmitting || isUploading',
+				[readonly]='!canUploadInvoice',
+				required,
+				ngDefaultControl)
+			mat-error
+				error-message(
+					[label]='"FINANCE.PROJECT.LABELS.INVOICE_NUMBER" | translate',
+					[control]='paymentInvoiceForm?.controls[ "invoice_number" ]')
+
+		mat-form-field.ph-15.flex-50(
+			floatLabel='always',
+			appearance='outline',
+			(click)='invoicePicker?.open()')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.INVOICE_DATE" | translate }}
+			span
+				| {{ payment?.invoice_date ? ( payment?.invoice_date | momentDateFormat ) : "FINANCE.PROJECT.PLACEHOLDERS.INVOICE_DATE" | translate }}
+			input.hide(
+				matInput,
+				[matDatepicker]='invoicePicker',
+				[(ngModel)]='payment.invoice_date',
+				[formControl]='paymentInvoiceForm?.controls[ "invoice_date" ]',
+				ngDefaultControl,
+				required,
+				readonly)
+			mat-datepicker-toggle(
+				matSuffix,
+				[for]='invoicePicker')
+			mat-datepicker(
+				#invoicePicker,
+				[disabled]='isSubmitting || isUploading || !canUploadInvoice')
+
+		mat-form-field.ph-15.flex-100.mt-10(
+			*ngIf='payment?.new_invoice',
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.INVOICE_NOTE" | translate }}
+			textarea(
+				matInput,
+				[(ngModel)]='payment.new_invoice.note',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.INVOICE_NOTE" | translate',
+				[formControl]='paymentInvoiceForm?.controls[ "invoice_note" ]',
+				[disableControl]='isSubmitting || isUploading',
+				ngDefaultControl)
+
+	upload-box(
+		[label]='"FINANCE.PROJECT.LABELS.INVOICE" | translate',
+		[disabled]='!canUploadInvoice',
+		[uploading]='isUploading',
+		(onFileSelected)='onInvoiceFileSelected( $event )')
+
+	.layout-column(*ngIf='payment?.invoices?.length')
+		mat-label.mb-20
+			| {{ "FINANCE.PROJECT.LABELS.INVOICE_HISTORY" | translate }}:
+		.layout-column
+			mat-form-field(
+				appearance='outline',
+				*ngFor='let invoice of payment?.invoices; let index = index; let last = last;')
+				mat-label
+					| {{ invoice?.created_at | momentDateFormat }}
+				input(
+					matInput,
+					readonly,
+					[value]='invoice?.note || "N/A"')
+				span(matSuffix)
+					i.fa.fa-file-invoice-dollar.text-accent.font-size-30.clickable((click)='downloadInvoice( invoice?.key, invoice?.location )')

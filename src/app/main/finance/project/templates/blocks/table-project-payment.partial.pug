@@ -1,0 +1,368 @@
+mat-card.table-project-payment
+	.layout-row.layout-align-start-center.mb-15
+		.layout-row.layout-fixer-5.mr-15
+			.ph-5
+				button(
+					plugin-button-only-icon,
+					mat-raised-button,
+					[disabled]='!loaded ',
+					(click)='getList(); filters = {};')
+					i.fa.fa-sync-alt
+
+	div([fullscreen]='".mat-column-actions"')
+		loading-overlay([visible]='!loaded')
+			mat-table(
+				#paymentSort="matSort",
+				plugin-data-table,
+				matSort,
+				[dataSource]='dataSource',
+				[attr.data-label]='!dataSource?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+				// PO Column
+				ng-container(matColumnDef='po')
+					mat-header-cell.w-120(*matHeaderCellDef, mat-sort-header='po_name')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.PO" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.w-120(*matCellDef='let element')
+						| {{ element?.po_name || "N/A" }}
+					mat-footer-cell.w-120(*matFooterCellDef)
+						.text-success
+							| {{ "FINANCE.PROJECT.LABELS.TOTAL" | translate }}
+				// Vendor Column
+				ng-container(matColumnDef='vendor')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='name')
+						| {{ "FINANCE.VENDOR.ATTRIBUTES.VENDOR" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell(*matCellDef='let element')
+						.layout-row.layout-align-start-center
+							.text-truncate(
+								[ngClass]='{ "text-strike": element?.is_disabled }',
+								[matTooltip]='element?.name + " - " + element?.vendor_name')
+								| {{ element?.vendor_name || "N/A" }}
+							i.fa.fa-info-circle.note-icon(
+								*ngIf='element?.finance_note?.length',
+								[matTooltip]='element?.finance_note',
+								matTooltipPosition='above')
+					mat-footer-cell(*matFooterCellDef)
+				// Amount Column
+				ng-container(matColumnDef='amount')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='planed')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.AMOUNT" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						.text-truncate([matTooltip]='element?.planed | commas')
+							| {{ element?.planed?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+						.text-warning.text-truncate([matTooltip]='footerRow?.amount | commas')
+							| {{ ( footerRow?.amount || 0 )?.toFixed( 0 ) | commas }}
+				// VAT Column
+				ng-container(matColumnDef='vat')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='planed_vat')
+						| {{ "GENERAL.ATTRIBUTES.VAT" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						.text-truncate([matTooltip]='element?.planed_vat | commas')
+							| {{ ( element?.planed_vat || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+						.text-warning.text-truncate([matTooltip]='footerRow?.vat | commas')
+							| {{ ( footerRow?.vat || 0 )?.toFixed( 0 ) | commas }}
+				// Total Column
+				ng-container(matColumnDef='total')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='planed_with_vat')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						.text-truncate([matTooltip]='element?.planed_with_vat | commas')
+							| {{ ( element?.planed_with_vat || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+						.text-warning.text-truncate([matTooltip]='( footerRow?.total ) | commas')
+							| {{ ( footerRow?.total || 0 )?.toFixed( 0 ) | commas }}
+				// Invoice Date Column
+				ng-container(matColumnDef='invoice_date')
+					mat-header-cell.w-90(*matHeaderCellDef, mat-sort-header='invoice_date')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.INVOICE_DATE" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.w-90(*matCellDef='let element')
+						| {{ element?.invoice_date | momentDateFormat }}
+					mat-footer-cell.w-90(*matFooterCellDef)
+				// Pay Date Column
+				ng-container(matColumnDef='pay_date')
+					mat-header-cell.w-90(*matHeaderCellDef, mat-sort-header='pay_date')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.PAY_DATE" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.w-90(*matCellDef='let element')
+						.layout-column
+							div
+								| {{ element?.pay_date | momentDateFormat }}
+							div(*ngIf='element?.pay_date')
+								| (
+								span([ngClass]='{ "text-warn": element?.count_day < 0, "text-success": element?.count_day >= 0 }')
+									| {{ ( element?.count_day || 0 )?.toFixed( 0 ) | commas }}
+									| {{ "GENERAL.LABELS.DAYS" | translate | lowercase }}
+								| )
+					mat-footer-cell.w-90(*matFooterCellDef)
+				// Procedure Column
+				ng-container(matColumnDef='procedure')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='total_procedures')
+						.text-center.flex-auto
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.PROCEDURE" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+					mat-cell.layout-align-center(*matCellDef='let element')
+						| {{ element?.total_procedures ? ( element?.confirmed_procedures + '/' + element?.total_procedures ) : 0 }}
+					mat-footer-cell(*matFooterCellDef)
+				// Status Column
+				ng-container(matColumnDef='status')
+					mat-header-cell.w-120(*matHeaderCellDef, mat-sort-header='status')
+						.text-center.flex-auto
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.PAYMENT_STATUS" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+					mat-cell.w-120(*matCellDef='let element')
+						status-box(
+							[color]='element?.status_name?.color',
+							[status]='element?.status_name?.name | translate')
+					mat-footer-cell.w-120(*matFooterCellDef)
+				// Approve Status Column
+				ng-container(matColumnDef='approve_status')
+					mat-header-cell.w-120(*matHeaderCellDef, mat-sort-header='approve_status')
+						.text-center.flex-auto
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.APPROVE_STATUS" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+					mat-cell.w-120(*matCellDef='let element')
+						.layout-column.flex-auto
+							status-box(
+								[color]='element?.approve_status_name?.color',
+								[status]='element?.approve_status_name?.name | translate')
+							.text-center.font-size-12.mt-3(*ngIf='!element?.approvers_process?.is_done')
+								span.text-warning
+									| {{ ( element?.approvers_process?.waiting || 0 )?.toFixed( 0 ) | commas }}
+								| &nbsp;/&nbsp;
+								span.text-success
+									| {{ ( element?.approvers_process?.approved || 0 )?.toFixed( 0 ) | commas }}
+								| &nbsp;/&nbsp;
+								span.text-warn
+									| {{ ( element?.approvers_process?.rejected || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.w-120(*matFooterCellDef)
+				// Invoice Column
+				ng-container(matColumnDef='invoice')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='invoice')
+						.text-center.flex-auto
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.INVOICE" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+					mat-cell(*matCellDef='let element')
+						.text-center.flex-auto
+							ng-template([ngIf]='!element?.invoice')
+								| --
+							img.cursor(
+								width='28',
+								*ngIf='element?.invoice',
+								src='./assets/images/invoice.png',
+								(click)='openDialogInvoiceHistory( element )')
+					mat-footer-cell(*matFooterCellDef)
+				// Payment Order Column
+				ng-container(matColumnDef='payment_order')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='payment_order')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.PAYMENT_ORDER" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell(*matCellDef='let element')
+						ng-template([ngIf]='!element?.payment_order')
+							| --
+						img.cursor(
+							width='28',
+							*ngIf='element?.payment_order',
+							src='./assets/images/invoice.png',
+							(click)='openDialogOrderHistory( element )')
+					mat-footer-cell(*matFooterCellDef)
+				// Actions Column
+				ng-container(matColumnDef='actions')
+					mat-header-cell.w-65(*matHeaderCellDef)
+						| {{ "GENERAL.ATTRIBUTES.ACTION" | translate }}
+					mat-cell.w-65(*matCellDef='let element')
+						action-box([disabled]='!canManageBill')
+							// View only
+							//- ng-template([ngIf]='element?.approve_status === PAYMENT_APPROVE_STATUS?.APPROVED || element?.status === PAYMENT_STATUS?.PAID')
+							action-button(
+								color='accent',
+								icon='fa fa-eye',
+								[title]='"GENERAL.LABELS.VIEW" | translate',
+								[disabled]='!loaded',
+								(onClick)='openDialog( element )')
+							ng-template([ngIf]='element?.status !== PAYMENT_STATUS?.PAID')
+								// isPurchasing
+								ng-template([ngIf]='isPurchasing')
+									action-button(
+										color='accent',
+										icon='icon icon-approval',
+										[title]='"FINANCE.PROJECT.LABELS.GET_APPROVAL" | translate',
+										[disabled]='!loaded || ( element?.approve_status !== PAYMENT_APPROVE_STATUS?.PROCESSING && element?.approve_status !== PAYMENT_APPROVE_STATUS?.CANCELLED ) || element?.status !== PAYMENT_STATUS?.WAITING || element?.approve_status === PAYMENT_APPROVE_STATUS?.APPROVED || element?.is_freezed',
+										(onClick)='confirmUpdateApproveStatus( element, "waiting_approval" )')
+									action-button(
+										color='accent',
+										icon='icon icon-checklist',
+										[title]='"FINANCE.PROJECT.LABELS.APPROVE" | translate',
+										[disabled]='!loaded || ( element?.approve_status !== PAYMENT_APPROVE_STATUS?.WAITING_APPROVAL && element?.approve_status !== PAYMENT_APPROVE_STATUS?.REJECTED ) || element?.status !== PAYMENT_STATUS?.WAITING || element?.approve_status === PAYMENT_APPROVE_STATUS?.APPROVED || element?.is_freezed',
+										(onClick)='openDialog( element )')
+									//- action-button(
+									//- 	color='warn',
+									//- 	icon='fa fa-ban',
+									//- 	[title]='"GENERAL.LABELS.CANCEL" | translate',
+									//- 	[disabled]='!loaded || ( element?.approve_status !== PAYMENT_APPROVE_STATUS?.WAITING_APPROVAL && element?.approve_status !== PAYMENT_APPROVE_STATUS?.REJECTED ) || element?.status !== PAYMENT_STATUS?.WAITING || element?.approve_status === PAYMENT_APPROVE_STATUS?.APPROVED',
+									//- 	(onClick)='confirmUpdateApproveStatus( element, "cancel" )')
+									action-button(
+										color='accent',
+										icon='fa fa-file-upload',
+										[title]='"GENERAL.LABELS.UPLOAD" | translate',
+										[disabled]='!loaded || element?.is_disabled || element?.approve_status === PAYMENT_APPROVE_STATUS?.WAITING_APPROVAL || element?.approve_status === PAYMENT_APPROVE_STATUS?.REJECTED || element?.status !== PAYMENT_STATUS?.WAITING || element?.approve_status === PAYMENT_APPROVE_STATUS?.APPROVED || element?.is_freezed',
+										(onClick)='openDialog( element )')
+									action-button(
+										color='warn',
+										icon='fa fa-trash',
+										[title]='"GENERAL.LABELS.DELETE" | translate',
+										[disabled]='!loaded || element?.payment_orders?.length || element?.approve_status === PAYMENT_APPROVE_STATUS?.WAITING_APPROVAL || element?.approve_status === PAYMENT_APPROVE_STATUS?.REJECTED || element?.status !== PAYMENT_STATUS?.WAITING || element?.approve_status === PAYMENT_APPROVE_STATUS?.APPROVED || element?.is_freezed',
+										(onClick)='delete( element )')
+
+								// isCEO or isPurchasing
+								action-button(
+									*ngIf='isCEO || isPurchasing',
+									color='warn',
+									icon='fa fa-ban',
+									[title]='"GENERAL.LABELS.CANCEL" | translate',
+									[disabled]='!loaded || ( !isCEO && element?.approve_status !== PAYMENT_APPROVE_STATUS?.WAITING_APPROVAL && element?.approve_status !== PAYMENT_APPROVE_STATUS?.REJECTED ) || ( isCEO && ( element?.approve_status !== PAYMENT_APPROVE_STATUS?.APPROVED || element?.status !== PAYMENT_STATUS?.WAITING ) ) || element?.is_freezed',
+									(onClick)='confirmUpdateApproveStatus( element, "cancel" )')
+
+								// isProcurementManager
+								action-button(
+									*ngIf='isProcurementManager',
+									color='accent',
+									icon='icon icon-checklist',
+									[title]='"FINANCE.PROJECT.LABELS.APPROVE" | translate',
+									[disabled]='!loaded || element?.status !== PAYMENT_STATUS?.WAITING || !( element?.approve_status === PAYMENT_APPROVE_STATUS?.WAITING_APPROVAL || element?.approve_status === PAYMENT_APPROVE_STATUS?.REJECTED ) || element?.is_freezed',
+									(onClick)='openDialog( element )')
+
+								// isCFO or isGeneralAccountant
+								action-button(
+									*ngIf='isCFO || isGeneralAccountant',
+									color='accent',
+									icon='icon icon-checklist',
+									[title]='"FINANCE.PROJECT.LABELS.APPROVE" | translate',
+									[disabled]='!loaded || element?.is_disabled || element?.status !== PAYMENT_STATUS?.WAITING || element?.approve_status === PAYMENT_APPROVE_STATUS?.APPROVED || element?.is_freezed',
+									(onClick)='openDialog( element )')
+
+								// isCFO or isLiabilitiesAccountant
+								action-button(
+									*ngIf='isCFO || isLiabilitiesAccountant',
+									color='accent',
+									icon='fa fa-file-upload',
+									[title]='"GENERAL.LABELS.UPLOAD" | translate',
+									[disabled]='!loaded || element?.is_disabled || element?.approve_status !== PAYMENT_APPROVE_STATUS?.APPROVED || element?.is_freezed',
+									(onClick)='openDialog( element )')
+
+							// Not isPurchasing
+							//- action-button(
+							//- 	*ngIf='!isPurchasing',
+							//- 	color='accent',
+							//- 	icon='fa fa-file-upload',
+							//- 	[title]='"GENERAL.LABELS.UPLOAD" | translate',
+							//- 	[disabled]='!loaded || element?.is_disabled || element?.approve_status === PAYMENT_APPROVE_STATUS?.APPROVED',
+							//- 	(onClick)='openDialog( element )')
+					mat-footer-cell.w-65(*matFooterCellDef)
+
+				// Filters
+				ng-container(matColumnDef='filters')
+					mat-header-cell(*matHeaderCellDef)
+						// PO Column
+						mat-cell.w-120
+							filter-box(
+								type='filter',
+								fieldName='po_name',
+								[disabled]='!loaded',
+								[data]='filteredPO',
+								multiple='true',
+								[(filter)]='filters[ "po_name" ]',
+								(applyFilter)='customFilter()',
+								(click)='activeFilter = "po_name"')
+						// Vendor Column
+						mat-cell
+							filter-box(
+								type='filter',
+								fieldName='vendor_name',
+								[disabled]='!loaded',
+								[data]='filteredVendor',
+								multiple='true',
+								[(filter)]='filters[ "vendor_name" ]',
+								(applyFilter)='customFilter()',
+								(click)='activeFilter = "vendor_name"')
+						// Amount Column
+						mat-cell
+							filter-box(
+								[(filter)]='searchQueries.planed',
+								(applyFilter)='customFilter()',
+								[disabled]='!loaded')
+						// VAT Column
+						mat-cell
+							filter-box(
+								[(filter)]='searchQueries.planed_vat',
+								(applyFilter)='customFilter()',
+								[disabled]='!loaded')
+						// Total
+						mat-cell
+							filter-box(
+								[(filter)]='searchQueries.planed_with_vat',
+								(applyFilter)='customFilter()',
+								[disabled]='!loaded')
+						// Invoice Date Column
+						mat-cell.w-90
+						// Pay Date Column
+						mat-cell.w-90
+						// Procedure Column
+						mat-cell
+						// Status Column
+						mat-cell.w-120
+							filter-box(
+								type='filter',
+								translated='true',
+								multiple='true',
+								[(filter)]='filters[ "status_name.id" ]',
+								(applyFilter)='customFilter()',
+								[disabled]='!loaded',
+								[data]='payableStatus',
+								(click)='activeFilter = "status_name"',
+								ngDefaultControl)
+						// Approve Status Column
+						mat-cell.w-120
+						// Invoice Column
+						mat-cell
+						// Payment Order Column
+						mat-cell
+						// Actions Column
+						mat-cell.w-65
+					mat-footer-cell(*matFooterCellDef)
+
+				mat-header-row(*matHeaderRowDef='displayedColumns')
+				mat-header-row(*matHeaderRowDef='[ "filters" ]')
+				mat-row(
+					*matRowDef='let row; columns: displayedColumns;',
+					[ngClass]='{ "active-row": row?.id === activePaymentId }')
+				mat-footer-row(
+					footerRowInTop,
+					*matFooterRowDef='displayedColumns',
+					[class.hide]='!dataSource?.filteredData?.length')
+				mat-footer-row(
+					*matFooterRowDef='displayedColumns',
+					[class.hide]='!dataSource?.filteredData?.length')
+
+			mat-paginator(
+				#paginator,
+				pageSize='30',
+				[pageSizeOptions]='[ 30, 50, 100 ]',
+				showFirstLastButtons='true')

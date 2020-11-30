@@ -1,0 +1,116 @@
+form.dialog-project-quotation-discount.layout-column(
+	[formGroup]='projectQuotationDiscountForm',
+	(submit)='update()')
+	h1(matDialogTitle)
+		| {{ "FINANCE.PROJECT.TITLES.QUOTATION_DISCOUNT" | translate }}
+		| &nbsp;-
+		| {{ project?.name || "N/A" }}
+
+	div(matDialogContent)
+		.layout-row.layout-wrap.layout-fixer-15.mb-10
+			mat-form-field.ph-15.flex-100(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.TOTAL" | translate }}
+				input(
+					matInput,
+					type='number',
+					[value]='project.subtotal',
+					readonly,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( project?.subtotal?.toString() || "" ) | commas }}
+
+			select-box.ph-15.flex-30(
+				[(ngModel)]='project.discount_type',
+				(selectionChange)='updateDiscount()',
+				[label]='"FINANCE.PROJECT.LABELS.DISCOUNT_TYPE" | translate',
+				[disableControl]='isSubmitting',
+				[data]='DISCOUNT_TYPE',
+				[formControl]='projectQuotationDiscountForm?.controls[ "discount_type" ]',
+				required,
+				ngDefaultControl)
+
+			mat-form-field.ph-15.flex-30(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_AMOUNT" | translate }}
+				input(
+					matInput,
+					type='number',
+					step='1',
+					min='0',
+					[(ngModel)]='project.discount_amount',
+					(ngModelChange)='updateDiscount()',
+					[formControl]='projectQuotationDiscountForm?.controls[ "discount_amount" ]',
+					[disableControl]='isSubmitting',
+					required,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( project?.discount_amount?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( project?.discount_value?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"FINANCE.PROJECT.LABELS.DISCOUNT_AMOUNT" | translate',
+						[control]='projectQuotationDiscountForm?.controls[ "discount_amount" ]')
+
+			mat-form-field.ph-15.flex-40(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_VALUE" | translate }}
+				input(
+					matInput,
+					type='number',
+					[(ngModel)]='project.discount_value',
+					[formControl]='projectQuotationDiscountForm?.controls[ "discount_value" ]',
+					readonly,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( project?.discount_value?.toString() || "" ) | commas }}
+
+			mat-form-field.ph-15.flex-100(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_REMAIN" | translate }}
+				input(
+					matInput,
+					type='number',
+					[(ngModel)]='project.discount_remain',
+					[formControl]='projectQuotationDiscountForm?.controls[ "discount_remain" ]',
+					readonly,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( project?.discount_remain?.toString() || "" ) | commas }}
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='projectQuotationDiscountForm?.invalid || isSubmitting')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ "GENERAL.LABELS.SAVE" | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

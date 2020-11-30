@@ -1,0 +1,38 @@
+form.form-project-bill-finance-note(
+	*ngIf='isCFO || isLiabilitiesAccountant',
+	[formGroup]='billFinanceNote')
+	.layout-row.layout-align-start-center.mt-10.mb-20
+		.font-size-18.font-weight-500
+			| {{ "FINANCE.PROJECT.LABELS.NOTE" | translate | uppercase }}
+			| ({{ "FINANCE.PROJECT.LABELS.LIABILITIES_ACCOUNTANT_ONLY" | translate | uppercase }})
+		.ph-20.flex-auto
+			mat-divider
+		button(
+			*ngIf='!viewOnly',
+			mat-raised-button,
+			color='primary',
+			(click)='updateFinanceNote()',
+			[disabled]='billFinanceNote?.invalid || isSubmitting || isUploading')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting && !isUploading')
+						| {{ "GENERAL.LABELS.SAVE" | translate }}
+					ng-template([ngIf]='isSubmitting || isUploading')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')
+	.layout-column.mb-30
+		mat-form-field(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.DESCRIPTION" | translate }}
+				textarea(
+					matInput,
+					rows='4',
+					[(ngModel)]='bill.finance_note',
+					[placeholder]='"GENERAL.PLACEHOLDERS.DESCRIPTION" | translate',
+					[formControl]='billFinanceNote?.controls[ "finance_note" ]',
+					[disableControl]='isSubmitting || isUploading || !isLiabilitiesAccountant || viewOnly',
+					ngDefaultControl)

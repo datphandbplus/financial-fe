@@ -1,0 +1,77 @@
+.table-procedure.p-25(*ngIf='procedureIndex === -1')
+	div(matDialogContent)
+		mat-table.mb-20(
+			#table,
+			plugin-data-table,
+			[dataSource]='dataSource',
+			[attr.data-label]='!dataSource?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+			// No Column
+			ng-container(matColumnDef='no')
+				mat-header-cell.w-50(*matHeaderCellDef)
+					| {{ "GENERAL.ATTRIBUTES.NUMBER_ORDER" | translate }}
+				mat-cell.w-50(*matCellDef='let element; let i = index')
+					| {{ i + 1 }}
+					ng-template([ngIf]='!element?.created_at')
+						| *
+			// Procedure Column
+			ng-container(matColumnDef='procedure')
+				mat-header-cell(*matHeaderCellDef)
+					| {{ "GENERAL.ATTRIBUTES.NAME" | translate }}
+				mat-cell.clickable(
+					*matCellDef='let element',
+					(click)='procedureIndex = element?.temp_id')
+					.font-weight-500
+						| {{ element?.name || "N/A" }}
+			// Status Column
+			ng-container(matColumnDef='status')
+				mat-header-cell.w-150(*matHeaderCellDef)
+					.text-center.flex-auto
+						| {{ "GENERAL.ATTRIBUTES.STATUS" | translate }}
+				mat-cell.w-150(*matCellDef='let element')
+					status-box(
+						[color]='element?.status_name?.color',
+						[status]='element?.status_name?.name | translate')
+			// Deadline Column
+			ng-container(matColumnDef='deadline')
+				mat-header-cell.w-100(*matHeaderCellDef)
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.DEADLINE" | translate }}
+				mat-cell.w-100(*matCellDef='let element')
+					| {{ element?.deadline | momentDateFormat }}
+			// Document Column
+			ng-container(matColumnDef='document')
+				mat-header-cell.w-80(*matHeaderCellDef)
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.PROOF" | translate }}
+				mat-cell.w-80(*matCellDef='let element')
+					ng-template([ngIf]='element?.proof')
+						i.fa.fa-file-invoice.text-accent.font-size-30.clickable((click)='downloadProcedure( element?.proof?.key, element?.proof?.location )')
+
+			mat-header-row(*matHeaderRowDef='displayedColumns')
+			mat-row(*matRowDef='let row; columns: displayedColumns;')
+
+	div(
+		matDialogActions,
+		align='end')
+		button.export-btn(
+			mat-raised-button,
+			color='success',
+			(click)='exportExcel()')
+			i.fa.fa-download.mr-10
+			| {{ "FINANCE.PROJECT.LABELS.EXPORT" | translate }}
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting || isUploading',
+			(click)='hasChange ? closeDiaglog() : onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			color='accent',
+			*ngIf='!isLiabilitiesAccountant && !isCFO && !isProcurementManager',
+			(click)='addProcedure()',
+			[disabled]='isSubmitting || isUploading || viewOnly')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					| {{ "GENERAL.LABELS.ADD" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

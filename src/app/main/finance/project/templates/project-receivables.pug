@@ -1,0 +1,26 @@
+div.detail-receivable-area
+	button.export-btn(
+		mat-raised-button,
+		color='success',
+		(click)='exportExcel()')
+		i.fa.fa-download.mr-10
+		| {{ "FINANCE.PROJECT.LABELS.EXPORT" | translate }}
+
+	mat-tab-group.mat-elevation-z8.project-receivables.mb-20(
+		[(selectedIndex)]='selectedTabIndex',
+		(selectedIndexChange)='tabChanged( $event )')
+		mat-tab([label]='"FINANCE.PROJECT.LABELS.RECEIVABLES" | translate')
+			ng-template([ngIf]='selectedTabIndex === 0')
+				include blocks/table-project-bill.partial.pug
+		mat-tab(
+			[label]='"FINANCE.PROJECT.LABELS.RECEIVABLES_PLAN" | translate',
+			*ngIf='isCEO || isCFO || isPM')
+			ng-template([ngIf]='selectedTabIndex === 1')
+				include blocks/table-project-bill-plan.partial.pug
+
+ng-template([ngIf]='loaded')
+	project-overview(
+		[projectId]='projectId',
+		[project]='project',
+		[needApprove]='true',
+		[loaded]='loaded')

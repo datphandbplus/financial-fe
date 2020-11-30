@@ -1,0 +1,70 @@
+.block-change-avatar.layout-row.mb-50.cropper
+	.mr-65
+		avatar-box(
+			*ngIf='!selectedFile',
+			size='240',
+			[lazy]='false',
+			[source]='updateAccount?.avatar || updateAccount?.lezo_employee?.avatar',
+			[defaultAvatar]='"./assets/images/no-avatar.jpg"',
+			[title]='updateAccount?.full_name || updateAccount?.lezo_employee?.avatar')
+		#cropper-preview.cropper__preview(*ngIf='selectedFile')
+	.flex-auto.layout-column.layout-align-start-start
+		ng-template([ngIf]='!selectedFile')
+			.layout-row.layout-align-start-center.mb-20
+				.mr-20
+					input.hide(
+						#fileInput,
+						type='file',
+						accept='image/*',
+						(change)='onFileSelected( $event )')
+					button(
+						mat-raised-button,
+						type='button',
+						color='primary',
+						(click)='fileInput?.click()')
+						i.fa.fa-upload.mr-15
+						| {{ "GENERAL.LABELS.UPLOAD" | translate }}
+				ul.upload-hint.m-0
+					li
+						| {{ "UPLOAD_HINTS.DIMENSION" | translate }}: 240px * 240px
+					li
+						| {{ "UPLOAD_HINTS.MAX_FILE_SIZE" | translate }}:
+						| {{ ( CONSTANTS?.ALLOW_FILE_SIZE / 1024 / 1024 )?.toFixed( 0 ) | commas }}MB
+					li
+						| {{ "UPLOAD_HINTS.FILE_FORMAT" | translate }}: jpg, jpeg, png, gif
+
+			.mb-20
+				.block-change-avatar__line {{ "GENERAL.LABELS.OR" | translate | uppercase }}
+				.text-center {{ "ACCOUNT.MESSAGES.CHOOSE_AVAILABLE_AVATAR" | translate }}
+
+			.layout-row.layout-fixer-10.mb-20
+				.ph-10.cursor(
+					*ngFor='let i of [ 1, 2, 3, 4 ]',
+					(click)='changeAvatar( "./assets/images/avatar-sample-" + i + ".png" )')
+					img.block-change-avatar__sample([src]='"./assets/images/avatar-sample-" + i + ".png"')
+
+			.layout-row.layout-fixer-10
+				.ph-10.cursor(
+					*ngFor='let i of [ 5, 6, 7, 8 ]',
+					(click)='changeAvatar( "./assets/images/avatar-sample-" + i + ".png" )')
+					img.block-change-avatar__sample([src]='"./assets/images/avatar-sample-" + i + ".png"')
+
+		.cropper__wrapper(*ngIf='selectedFile')
+			.h-400
+				img#cropper(src='')
+			.layout-row.mt-30.layout-fixer-5
+				.ph-5
+					button(
+						mat-raised-button,
+						type='button',
+						(click)='resetAvatar()')
+						i.fa.fa-ban.mr-15
+						| {{ "GENERAL.LABELS.CANCEL" | translate }}
+				.ph-5
+					button(
+						mat-raised-button,
+						type='button',
+						color='primary',
+						(click)='changeAvatar()')
+						i.fa.fa-check.mr-15
+						| {{ "GENERAL.LABELS.DONE" | translate }}

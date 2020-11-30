@@ -1,0 +1,13 @@
+.project-vo
+	project-vo-list(
+		[projectId]='projectId',
+		[project]='project',
+		(onChooseVo)='currentVO = $event',
+		*ngIf='!currentVO')
+
+	project-vo-detail(
+		[projectId]='projectId',
+		[project]='project',
+		[currentVO]='currentVO',
+		(onBack)='currentVO = null',
+		*ngIf='currentVO')

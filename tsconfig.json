@@ -1,0 +1,28 @@
+{
+  "extends": "./node_modules/angular-core/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "@app": [ "app" ],
+      "@app/*": [ "app/*" ],
+      "@core": [ "app/@core" ],
+      "@core/*": [ "app/@core/*" ],
+      "@error": [ "app/error" ],
+      "@error/*": [ "app/error/*" ],
+      "@main": [ "app/main" ],
+      "@main/*": [ "app/main/*" ],
+      "@account": [ "app/main/account" ],
+      "@account/*": [ "app/main/account/*" ],
+      "@auth": [ "app/main/auth" ],
+      "@auth/*": [ "app/main/auth/*" ],
+      "@ext": [ "app/main/ext" ],
+      "@ext/*": [ "app/main/ext/*" ],
+      "@finance": [ "app/main/finance" ],
+      "@finance/*": [ "app/main/finance/*" ],
+      "@environments": [ "environments" ],
+      "@environments/*": [ "environments/*" ],
+      "@resources": [ "resources" ],
+      "@resources/*": [ "resources/*" ]
+    }
+  }
+}

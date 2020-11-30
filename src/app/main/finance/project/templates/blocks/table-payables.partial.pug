@@ -1,0 +1,194 @@
+.table-payables.mat-elevation-z8
+	loading-overlay([visible]='!loaded')
+		mat-table(
+			#table,
+			plugin-data-table,
+			matSort,
+			[dataSource]='dataSource',
+			[attr.data-label]='!dataSource?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+			// PO Column
+			ng-container(matColumnDef='po')
+				mat-header-cell.w-120(*matHeaderCellDef, mat-sort-header='po_name')
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.PO" | translate }}
+					| &nbsp;
+					i.fa.fa-sort
+				mat-cell.w-120(*matCellDef='let element')
+					.font-weight-500
+						| {{ element?.po_name || "N/A" }}
+				mat-footer-cell.w-120(*matFooterCellDef)
+			// Project Column
+			ng-container(matColumnDef='project')
+				mat-header-cell.w-400(*matHeaderCellDef, mat-sort-header='name')
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.PROJECT" | translate }}
+					| &nbsp;
+					i.fa.fa-sort
+				mat-cell.w-400.clickable(
+					*matCellDef='let element',
+					(click)='navigateViewProjectDetail( element?.project, { tab: "payables", payment_id: element?.id } )')
+					.font-weight-500
+						| {{ element?.name + " - " + element?.project?.name || "N/A" }}
+				mat-footer-cell.w-400(*matFooterCellDef)
+			// Vendor Column
+			ng-container(matColumnDef='vendor')
+				mat-header-cell(*matHeaderCellDef, mat-sort-header='vendor_name')
+					| {{ "FINANCE.VENDOR.ATTRIBUTES.VENDOR" | translate }}
+					| &nbsp;
+					i.fa.fa-sort
+				mat-cell(*matCellDef='let element')
+					span([class.text-strike]='element?.vendor?.is_disabled')
+						| {{ element?.vendor_name || "N/A" }}
+				mat-footer-cell(*matFooterCellDef)
+			// AIC Column
+			ng-container(matColumnDef='aic')
+				mat-header-cell(*matHeaderCellDef, mat-sort-header='manager_name')
+					| {{ "FINANCE.USER.ATTRIBUTES.PM" | translate }}
+					| &nbsp;
+					i.fa.fa-sort
+				mat-cell(*matCellDef='let element')
+					.layout-row.layout-align-start-center
+						avatar-box.mr-5(
+							size='24',
+							*ngIf='element?.project?.user',
+							[source]='element?.project?.user?.avatar',
+							[title]='element?.project?.user?.full_name')
+						span([class.text-strike]='element?.project?.user?.is_disabled')
+							| {{ element?.project?.user?.full_name || "N/A" }}
+				mat-footer-cell(*matFooterCellDef)
+					mat-footer-cell(*matFooterCellDef)
+					.text-success
+						| {{ "FINANCE.PROJECT.LABELS.TOTAL" | translate }}
+			// Amount Column
+			ng-container(matColumnDef='amount')
+				mat-header-cell(*matHeaderCellDef, mat-sort-header='total')
+					.text-center.flex-auto
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.AMOUNT" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+				mat-cell.layout-align-end(*matCellDef='let element')
+					.text-truncate([matTooltip]='element?.total | commas')
+						| {{ ( element?.total || 0 )?.toFixed( 0 ) | commas }}
+				mat-footer-cell.layout-align-end(*matFooterCellDef)
+					.text-warning.text-truncate([matTooltip]='footerRow?.total | commas')
+						| {{ ( footerRow?.total || 0 )?.toFixed( 0 ) | commas }}
+			// Invoice Date Column
+			ng-container(matColumnDef='invoice_date')
+				mat-header-cell.w-120(*matHeaderCellDef, mat-sort-header='invoice_date')
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.INVOICE_DATE" | translate }}
+					| &nbsp;
+					i.fa.fa-sort
+				mat-cell.w-120(*matCellDef='let element')
+					| {{ element?.invoice_date | momentDateFormat }}
+				mat-footer-cell.w-120(*matFooterCellDef)
+			// Pay Date Column
+			ng-container(matColumnDef='pay_date')
+				mat-header-cell.w-120(*matHeaderCellDef, mat-sort-header='pay_date')
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.PAY_DATE" | translate }}
+					| &nbsp;
+					i.fa.fa-sort
+				mat-cell.w-120(*matCellDef='let element')
+					.layout-column
+						div
+							| {{ element?.pay_date | momentDateFormat }}
+						div(*ngIf='element?.pay_date')
+							| (
+							span([ngClass]='{ "text-warn": element?.count_day < 0, "text-success": element?.count_day >= 0 }')
+								| {{ ( element?.count_day || 0 )?.toFixed( 0 ) | commas }}
+								| {{ "GENERAL.LABELS.DAYS" | translate | lowercase }}
+							| )
+				mat-footer-cell.w-120(*matFooterCellDef)
+			// Status Column
+			ng-container(matColumnDef='status')
+				mat-header-cell.w-150(*matHeaderCellDef, mat-sort-header='status')
+					.text-center.flex-auto
+						| {{ "GENERAL.ATTRIBUTES.STATUS" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+				mat-cell.w-150(*matCellDef='let element')
+					status-box(
+						[color]='element?.status_name?.color',
+						[status]='element?.status_name?.name | translate')
+				mat-footer-cell.w-150(*matFooterCellDef)
+
+			// Filters
+			ng-container(matColumnDef='filters')
+				mat-header-cell(*matHeaderCellDef)
+					// PO Column
+					mat-cell.w-120
+						filter-box(
+							type='filter',
+							fieldName='po_name',
+							[disabled]='!loaded',
+							[data]='filteredPO',
+							multiple='true',
+							[(filter)]='filters[ "po_name" ]',
+							(applyFilter)='customFilter()')
+					// Project Column
+					mat-cell.w-400
+						filter-box(
+							type='filter',
+							multiple='true',
+							[(filter)]='filters[ "project.id" ]',
+							(applyFilter)='customFilter()',
+							[disabled]='!loaded',
+							[data]='dataSource?.data | partition: "project"')
+					// Vendor Column
+					mat-cell
+						filter-box(
+							type='filter',
+							fieldName='short_name',
+							[disabled]='!loaded',
+							[data]='dataSource?.data | partition: "project_purchase_order.vendor"',
+							multiple='true',
+							[(filter)]='filters[ "project_purchase_order.vendor.id" ]',
+							(applyFilter)='customFilter()')
+					// AIC Column
+					mat-cell(*ngIf='!isPM')
+						filter-box(
+							type='filter',
+							fieldName='full_name',
+							fieldSubName='email',
+							fieldImage='avatar',
+							[disabled]='!loaded',
+							[data]='dataSource?.data | partition: "project.user"',
+							multiple='true',
+							[(filter)]='filters[ "project.user.id" ]',
+							(applyFilter)='customFilter()')
+					// Amount Column
+					mat-cell
+						filter-box(
+							[(filter)]='searchQueries.total',
+							(applyFilter)='customFilter()',
+							[disabled]='!loaded')
+					// Invoice Date Column
+					mat-cell.w-120
+					// Pay Date Column
+					mat-cell.w-120
+					// Status Column
+					mat-cell.w-150
+						filter-box(
+							type='filter',
+							translated='true',
+							multiple='true',
+							[(filter)]='filters[ "status_name.id" ]',
+							(applyFilter)='customFilter()',
+							[disabled]='!loaded',
+							[data]='payableStatus',
+							ngDefaultControl)
+				mat-footer-cell(*matFooterCellDef)
+
+			mat-header-row(*matHeaderRowDef='displayedColumns')
+			mat-header-row(*matHeaderRowDef='[ "filters" ]')
+			mat-row(*matRowDef='let row; columns: displayedColumns;')
+			mat-footer-row(
+				footerRowInTop,
+				*matFooterRowDef='displayedColumns',
+				[class.hide]='!dataSource?.filteredData?.length')
+			mat-footer-row(
+				*matFooterRowDef='displayedColumns',
+				[class.hide]='!dataSource?.filteredData?.length')
+
+		mat-paginator(
+			#paginator,
+			pageSize='30',
+			[pageSizeOptions]='[ 30, 50, 100 ]',
+			showFirstLastButtons='true')

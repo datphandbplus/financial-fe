@@ -1,0 +1,161 @@
+mat-card.table-project-bill-plan
+	.layout-row.layout-fixer-10
+		.flex-auto
+			.layout-row.layout-align-end
+				.flex-auto
+					mat-form-field.ph-10(appearance='outline')
+						mat-label
+							| {{ "FINANCE.PROJECT.LABELS.APPROVER" | translate }}
+						input.font-size-18(
+							matInput,
+							readonly,
+							[value]='project?.bill_plan_approver?.full_name ? project?.bill_plan_approver?.full_name : "N/A"')
+					mat-form-field.project-detail__input-status.ph-10(
+						appearance='outline',
+						[style.color]='project?.bill_plan_status_name?.color')
+						mat-label
+							| {{ "FINANCE.PROJECT.LABELS.BILL_PLAN_STATUS" | translate }}
+						input.font-size-18(
+							matInput,
+							readonly,
+							[value]='project?.bill_plan_status_name?.name ? ( project?.bill_plan_status_name?.name | translate ) : "N/A"')
+						span(matSuffix)
+							i.icon.icon-waiting.text-accent.font-size-18(
+								*ngIf='project?.bill_plan_status === PLAN_STATUS?.PROCESSING',
+								[matTooltip]='project?.bill_plan_comment')
+							i.icon.icon-waiting.text-warning.font-size-18(
+								*ngIf='project?.bill_plan_status === PLAN_STATUS?.WAITING_APPROVAL',
+								[matTooltip]='project?.bill_plan_comment')
+							i.icon.icon-stamp.text-success.font-size-18(
+								*ngIf='project?.bill_plan_status === PLAN_STATUS?.APPROVED',
+								[matTooltip]='project?.bill_plan_comment')
+							i.icon.icon-stamp-times.text-warn.font-size-18(
+								*ngIf='project?.bill_plan_status === PLAN_STATUS?.REJECTED',
+								[matTooltip]='project?.bill_plan_comment')
+							i.fa.fa-ban.text-warn.font-size-18(
+								*ngIf='project?.bill_plan_status === PLAN_STATUS?.CANCELLED',
+								[matTooltip]='project?.bill_plan_comment')
+				.flex-auto
+					.layout-row.layout-align-end
+						ng-container(*ngIf='project?.bill_plan_status === PLAN_STATUS?.WAITING_APPROVAL && (isCEO || isCFO)')
+							.ph-10
+								button.custom-mat-button-large(
+									mat-raised-button,
+									color='accent',
+									[disabled]='project?.bill_plan_status === PLAN_STATUS?.APPROVED',
+									(click)='confirmUpdatePlanProject( "approve" )')
+									| {{ "FINANCE.PROJECT.LABELS.APPROVE" | translate }}
+									i.icon.icon-stamp
+							.ph-10
+								button.custom-mat-button-large(
+									mat-raised-button,
+									color='warn',
+									[disabled]='project?.bill_plan_status === PLAN_STATUS?.REJECTED',
+									(click)='confirmUpdatePlanProject( "reject" )')
+									| {{ "FINANCE.PROJECT.LABELS.REJECT" | translate }}
+									i.icon.icon-stamp-times
+						ng-container(*ngIf='project?.bill_plan_status !== PLAN_STATUS?.APPROVED && isPM')
+							.ph-10
+								button.custom-mat-button-large(
+									mat-raised-button,
+									color='accent',
+									[disabled]='project?.quotation_status !== QUOTATION_STATUS?.APPROVED || project?.bill_plan_status === PLAN_STATUS?.WAITING_APPROVAL || !billPlanDataSource?.filteredData?.length',
+									(click)='confirmUpdatePlanProject( "waiting_approval" )')
+									| {{ "FINANCE.PROJECT.LABELS.GET_APPROVAL" | translate }}
+									i.icon.icon-approval
+							.ph-10
+								button.custom-mat-button-large(
+									mat-raised-button,
+									color='warn',
+									[disabled]='project?.bill_plan_status === PLAN_STATUS?.CANCELLED || project?.bill_plan_status === PLAN_STATUS?.REJECTED || project?.bill_plan_status === PLAN_STATUS?.PROCESSING',
+									(click)='confirmUpdatePlanProject( "cancel" )')
+									| {{ "GENERAL.LABELS.CANCEL" | translate }}
+									i.fa.fa-ban
+
+			.layout-row.mb-15
+				.flex-auto
+					.ph-10
+						button(
+							plugin-button-only-icon,
+							mat-raised-button,
+							[disabled]='!loaded ',
+							(click)='getListPlan()')
+							i.fa.fa-sync-alt
+				.flex-auto(*ngIf='isPM && project?.bill_plan_status !== PLAN_STATUS?.APPROVED && project?.bill_plan_status !== PLAN_STATUS?.WAITING_APPROVAL')
+					.layout-row.layout-align-end
+						.ph-10
+							button(
+								mat-raised-button,
+								color='primary',
+								[disabled]='project?.quotation_status !== QUOTATION_STATUS?.APPROVED || !loaded',
+								(click)='openDialogProjectBillPlan()')
+								i.fa.fa-plus.mr-15
+								| {{ "FINANCE.PROJECT.LABELS.NEW_BILL_PLAN" | translate }}
+
+	div([fullscreen]='".mat-column-actions"')
+		loading-overlay([visible]='!loaded')
+			mat-table(
+				#billPlanSort="matSort",
+				plugin-data-table,
+				matSort,
+				[dataSource]='billPlanDataSource',
+				[attr.data-label]='!billPlanDataSource?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+				// Name Column
+				ng-container(matColumnDef='name')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='name')
+						| {{ "GENERAL.ATTRIBUTES.NAME" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell(*matCellDef='let element')
+						| {{ element?.name || "N/A" }}
+				// target_date Column
+				ng-container(matColumnDef='target_date')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='target_date')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.TARGET_DATE" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell(*matCellDef='let element')
+						| {{ element?.target_date | momentDateFormat }}
+				// target_percent Column
+				ng-container(matColumnDef='target_percent')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='target_percent')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.TARGET_PERCENT" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						| {{ ( element?.target_percent || 0 )?.toFixed( 0 ) | commas }}%
+				// note Column
+				ng-container(matColumnDef='note')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='note')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.NOTE" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell(*matCellDef='let element')
+						| {{ element?.note || "N/A" }}
+				// Actions Column
+				ng-container(matColumnDef='actions')
+					mat-header-cell.w-65(*matHeaderCellDef)
+						| {{ "GENERAL.ATTRIBUTES.ACTION" | translate }}
+					mat-cell.w-65(*matCellDef='let element')
+						action-box([disabled]='!isPM || project?.bill_plan_status === PLAN_STATUS?.APPROVED || project?.bill_plan_status === PLAN_STATUS?.WAITING_APPROVAL')
+							action-button(
+								color='success',
+								icon='fa fa-edit',
+								[title]='"GENERAL.LABELS.EDIT" | translate',
+								[disabled]='!loaded',
+								(onClick)='openDialogProjectBillPlan( element )')
+							action-button(
+								color='warn',
+								icon='fa fa-trash',
+								[title]='"GENERAL.LABELS.DELETE" | translate',
+								[disabled]='!loaded',
+								(onClick)='deleteProjectBillPlan( element )')
+
+				mat-header-row(*matHeaderRowDef='billPlanDisplayedColumns')
+				mat-row(*matRowDef='let row; columns: billPlanDisplayedColumns;')
+
+			mat-paginator(
+				#paginatorBillPlan,
+				pageSize='30',
+				[pageSizeOptions]='[ 30, 50, 100 ]',
+				showFirstLastButtons='true')

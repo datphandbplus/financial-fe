@@ -1,0 +1,6 @@
+export const HASH: any = {
+	EXPIRE_DAYS			: 30, // 30 days,
+	AUTHORIZED_KEY		: '_v',
+	STORAGE_HASH_KEY	: '0b79bab50daca910b000d4f1a2b675d604257e42',
+	PASSWORD_HASH_KEY	: 'In4E1s3KvVAyWhZS4yARylbadeYqYPxM65Nc2V8z',
+};

@@ -1,0 +1,240 @@
+mat-card.table-purchasing-list
+	.layout-row.mb-15.layout-fixer-10
+		.flex-auto
+			.layout-row
+				.ph-10
+					button(
+						plugin-button-only-icon,
+						mat-raised-button,
+						[disabled]='!loaded',
+						(click)='getList();')
+						i.fa.fa-sync-alt
+				.ph-10
+					button(
+						plugin-button-only-icon,
+						mat-raised-button,
+						[disabled]='!loaded || !isChecked()',
+						(click)='checkAll();')
+						i.fas.fa-check-square
+				.ph-10
+					button(
+						mat-raised-button,
+						color='success',
+						(click)='exportExcelPurchasing()')
+						i.fa.fa-download
+						| {{ "FINANCE.PROJECT.LABELS.EXPORT" | translate }}
+
+		.flex-auto(*ngIf='isPurchasing')
+			.layout-row.layout-align-end
+				.ph-10
+					button(
+						mat-raised-button,
+						color='accent',
+						[disabled]='!loaded || !isChecked()',
+						(click)='openDialogProjectPurchaseOrder()')
+						i.fa.fa-plus.mr-15
+						| {{ "FINANCE.COST_ITEM.LABELS.MAKE_PURCHASE_ORDER" | translate }}
+				.ph-10
+					button(
+						mat-raised-button,
+						color='primary',
+						[disabled]='!loaded',
+						(click)='openDialogProjectCostItem()')
+						i.fa.fa-plus.mr-15
+						| {{ "FINANCE.COST_ITEM.LABELS.NEW_COST_ITEM" | translate }}
+
+	loading-overlay([visible]='!loaded')
+		mat-table(
+			plugin-data-table,
+			[dataSource]='dataSourcePurchasing',
+			[attr.data-label]='!dataSourcePurchasing?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+			// No. Column
+			ng-container(matColumnDef='no')
+				mat-header-cell.w-70(*matHeaderCellDef)
+					| {{ "GENERAL.ATTRIBUTES.NUMBER_ORDER" | translate }}
+				mat-cell.w-70(*matCellDef='let index = index')
+					| {{ ( index / 2 ) + 1 }}
+				mat-footer-cell.w-70(*matFooterCellDef)
+			// Name Column
+			ng-container(matColumnDef='name')
+				mat-header-cell.w-300(*matHeaderCellDef)
+					.text-center.flex-auto
+						| {{ "GENERAL.ATTRIBUTES.NAME" | translate }}
+				mat-cell.w-300(*matCellDef='let element')
+					.cursor(
+						*ngIf='element?.is_parent',
+						(click)='showChildrenCostsDetail( element )')
+						span.mr-10.font-size-18
+							i.fa.fa-angle-down(*ngIf='!element?.show_detail_row')
+							i.fa.fa-angle-up(*ngIf='element?.show_detail_row')
+						span.font-weight-500
+							| {{ element?.name || "N/A" }}
+					mat-checkbox(
+						*ngIf='!element?.is_parent',
+						[(ngModel)]='element.checked',
+						(change)='updateSelectedList( element )',
+						[disabled]='!isPurchasing || !element?.vendor_id || element?.status === COST_MODIFICATION_STATUS?.WAITING || ( element?.is_extra && element?.bk_price === null )')
+						| {{ element?.name || "N/A" }}
+				mat-footer-cell.w-300(*matFooterCellDef)
+			// Vendor Column
+			ng-container(matColumnDef='vendor')
+				mat-header-cell.w-150(*matHeaderCellDef)
+					| {{ "FINANCE.VENDOR.ATTRIBUTES.VENDOR" | translate }}
+				mat-cell.w-150(*matCellDef='let element')
+					ng-container(*ngIf='!element?.is_parent')
+						.text-truncate.flex-auto
+							| {{ element?.vendor?.short_name || "N/A" }}
+						.w-40(*ngIf='isPurchasing')
+							button(
+								plugin-button-only-icon,
+								mat-stroked-button,
+								type='button',
+								[disabled]='!loaded',
+								(click)='openDialogProjectCostItem( element, "modify_vendor" )')
+								i.fa.fa-edit.text-success
+				mat-footer-cell.w-150(*matFooterCellDef)
+			// Unit Column
+			ng-container(matColumnDef='unit')
+				mat-header-cell(*matHeaderCellDef)
+					| {{ "GENERAL.ATTRIBUTES.UNIT" | translate }}
+				mat-cell(*matCellDef='let element')
+					ng-container(*ngIf='!element?.is_parent')
+						| {{ element?.unit || "N/A" }}
+				mat-footer-cell(*matFooterCellDef)
+			// Amount Column
+			ng-container(matColumnDef='amount')
+				mat-header-cell.layout-align-end(*matHeaderCellDef)
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.AMOUNT" | translate }}
+				mat-cell.layout-align-end(*matCellDef='let element')
+					.layout-column.layout-align-end-end(*ngIf='!element?.is_parent')
+						div([class.text-accent]='element?.bk_total')
+							| {{ ( element?.amount || 0 )?.toFixed( 0 ) | commas }}
+						div(*ngIf='element?.bk_total && !element?.is_parent')
+							| {{ ( element?.bk_amount || 0 )?.toFixed( 0 ) | commas }}
+					.layout-column.layout-align-end-end(*ngIf='element?.is_parent')
+						| {{ ( element?.count_child || 0 ) | commas }}
+						| &nbsp;{{ "FINANCE.PROJECT.LABELS.ITEMS" | translate }}
+				mat-footer-cell.layout-align-end(*matFooterCellDef)
+			// Price Column
+			ng-container(matColumnDef='price')
+				mat-header-cell.layout-align-end(*matHeaderCellDef)
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.PRICE" | translate }}
+				mat-cell.layout-align-end(*matCellDef='let element')
+					.layout-column.layout-align-end-end
+						div([class.text-accent]='element?.bk_total')
+							ng-container(*ngIf='!element?.is_parent')
+								| {{ ( element?.price || 0 )?.toFixed( 0 ) | commas }}
+							ng-container(*ngIf='element?.is_parent')
+								| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL_PARENT" | translate }}
+						div(*ngIf='element?.bk_total && !element?.is_parent')
+							ng-container(*ngIf='!element?.is_parent')
+								| {{ ( element?.bk_price || 0 )?.toFixed( 0 ) | commas }}
+						div.text-warning(*ngIf='element?.is_parent && ( element?.total - element?.total_children ) < 0')
+							| {{ "FINANCE.PROJECT.LABELS.REMAIN" | translate }}
+						div.text-success(*ngIf='element?.is_parent && ( element?.total - element?.total_children ) >= 0')
+							| {{ "FINANCE.PROJECT.LABELS.REMAIN" | translate }}
+				mat-footer-cell.layout-align-end(*matFooterCellDef)
+					.text-success
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+			// Total Column
+			ng-container(matColumnDef='total')
+				mat-header-cell.layout-align-end(*matHeaderCellDef)
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+				mat-cell.layout-align-end(*matCellDef='let element')
+					.layout-column.layout-align-end-end
+						div([class.text-accent]='element?.bk_total')
+							| {{ ( element?.total || 0 )?.toFixed( 0 ) | commas }}
+						div(*ngIf='element?.bk_total && !element?.is_parent')
+							| {{ ( element?.bk_total || 0 )?.toFixed( 0 ) | commas }}
+						div.text-warning(*ngIf='element?.is_parent && ( element?.total - element?.total_children ) < 0')
+							| {{ ( ( element?.total - element?.total_children ) || 0 )?.toFixed( 0 ) | commas }}
+						div.text-success(*ngIf='element?.is_parent && ( element?.total - element?.total_children ) >= 0')
+							| {{ ( ( element?.total - element?.total_children ) || 0 )?.toFixed( 0 ) | commas }}
+				mat-footer-cell.layout-align-end(*matFooterCellDef)
+					.text-warning.text-truncate([matTooltip]='footerRow?.total | commas')
+						| {{ ( footerRow?.total || 0 )?.toFixed( 0 ) | commas }}
+			// Status Column
+			ng-container(matColumnDef='status')
+				mat-header-cell.w-150(*matHeaderCellDef)
+					.text-center.flex-auto
+						| {{ "FINANCE.COST_ITEM.ATTRIBUTES.STATUS" | translate }}
+				mat-cell.w-150(*matCellDef='let element')
+					status-box(
+						*ngIf='!element?.is_parent',
+						[color]='element?.status_name?.color',
+						[status]='element?.status_name?.name | translate')
+				mat-footer-cell.w-150(*matFooterCellDef)
+			// Note Column
+			ng-container(matColumnDef='note')
+				mat-header-cell.w-200(*matHeaderCellDef)
+					.text-center.flex-auto
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.NOTE" | translate }}
+				mat-cell.w-200(*matCellDef='let element')
+					.text-center.flex-auto
+						| {{ element?.note || "N/A" }}
+				mat-footer-cell.w-200(*matFooterCellDef)
+			// Actions Column
+			ng-container(matColumnDef='actions')
+				mat-header-cell.w-65(*matHeaderCellDef)
+					| {{ "GENERAL.ATTRIBUTES.ACTION" | translate }}
+				mat-cell.w-65(*matCellDef='let element')
+					action-box([disabled]='!( isPurchasing || isProcurementManager )')
+						action-button(
+							color='success',
+							icon='fa fa-edit',
+							[title]='"GENERAL.LABELS.EDIT" | translate',
+							[disabled]='!loaded || element?.status === COST_MODIFICATION_STATUS?.WAITING || element?.is_parent',
+							(onClick)='openDialogProjectCostItem( element )')
+						action-button(
+							color='warning',
+							icon='icon icon-add-child',
+							[title]='"GENERAL.LABELS.ADD_CHILD" | translate',
+							[disabled]='!loaded || isProcurementManager || element?.status === COST_MODIFICATION_STATUS?.WAITING || ( element?.is_extra && element?.bk_price === null )',
+							(onClick)='openChildProjectCostItem( element )')
+						action-button(
+							color='warn',
+							icon='fa fa-trash',
+							[title]='"GENERAL.LABELS.DELETE" | translate',
+							[disabled]='!loaded || isProcurementManager || !element?.is_extra || element?.is_parent',
+							(onClick)='deleteProjectCostItem( element )')
+				mat-footer-cell.w-65(*matFooterCellDef)
+
+			ng-container(matColumnDef='detailExpand')
+				mat-cell(
+					*matCellDef='let element; let index = index;',
+					style='padding: 0')
+					include block-children-cost-item.partial.pug
+
+			// Filters
+			ng-container(matColumnDef='filters')
+				mat-header-cell(*matHeaderCellDef)
+					// Name Column
+					mat-cell
+						filter-box(
+							[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.SEARCH_PURCHASING_ITEMS" | translate',
+							[disabled]='!loaded',
+							[(filter)]='searchString',
+							(applyFilter)='applyFilterPurchasing()')
+
+			mat-header-row(*matHeaderRowDef='displayedColumns')
+			mat-header-row(
+				*matHeaderRowDef='[ "filters" ]',
+				[class.hide]='isChecked() || selected')
+			mat-row(*matRowDef='let row; columns: displayedColumns;')
+			mat-row.detail-row(
+				*matRowDef='let row; columns: [ "detailExpand" ]; when: isExpansionDetailRow;',
+				[@detailExpand]='row?.parent_info?.show_detail_row ? "expanded" : "collapsed"',
+				[class.unscrollable]='row?.id && detailRowScrollable[ "COST_" + row?.id ]')
+			mat-footer-row(
+				footerRowInTop,
+				*matFooterRowDef='displayedColumns',
+				[class.hide]='!dataSourcePurchasing?.filteredData?.length || isConstruction || isConstructionManager')
+			mat-footer-row(
+				*matFooterRowDef='displayedColumns',
+				[class.hide]='!dataSourcePurchasing?.filteredData?.length || isConstruction || isConstructionManager')
+
+		collapse-paginator(
+			(paginatorRef)='paginatorPurchasing = $event',
+			pageSize='30',
+			[pageSizeOptions]='[ 30, 50, 100 ]',
+			showFirstLastButtons='true')

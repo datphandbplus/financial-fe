@@ -1,0 +1,118 @@
+form.dialog-user.layout-column(
+	[formGroup]='userForm',
+	(submit)='data ? update() : create()')
+	h1(matDialogTitle)
+		ng-template([ngIf]='!data')
+			| {{ "FINANCE.USER.TITLES.ADD_USER" | translate }}
+		ng-template([ngIf]='data')
+			| {{ "FINANCE.USER.TITLES.EDIT_USER" | translate }}
+
+	div(matDialogContent)
+		.layout-column
+			select-box.mb-10(
+				matInput,
+				fieldName='full_name',
+				fieldSubName='email',
+				*ngIf='hasLezoApp && !data',
+				[disableControl]='isSubmitting',
+				[(ngModel)]='user.lezo_employee_id',
+				[label]='"FINANCE.USER.LABELS.LINK_WITH_LEZO_EMPLOYEE" | translate',
+				[placeholder]='"FINANCE.USER.PLACEHOLDERS.EMPLOYEE" | translate',
+				[formControl]='userForm?.controls[ "lezo_employee_id" ]',
+				[data]='lezoEmployeeService?.getAll()',
+				(selectionOptionChange)='onLezoEmployeeChange( $event )',
+				ngDefaultControl)
+
+			mat-form-field.mb-10(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.FULL_NAME" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='user.full_name',
+					[readonly]='hasLezoApp && user.lezo_employee_id',
+					[placeholder]='"GENERAL.PLACEHOLDERS.FULL_NAME" | translate',
+					[formControl]='userForm?.controls[ "full_name" ]',
+					[disableControl]='isSubmitting',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.FULL_NAME" | translate',
+						[control]='userForm?.controls[ "full_name" ]')
+
+			mat-form-field.mb-10(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.EMAIL" | translate }}
+				input(
+					matInput,
+					rows='5',
+					[readonly]='!!data || ( hasLezoApp && user.lezo_employee_id )',
+					[disableControl]='isSubmitting',
+					[(ngModel)]='user.email',
+					[placeholder]='"GENERAL.PLACEHOLDERS.EMAIL" | translate',
+					[formControl]='userForm?.controls[ "email" ]',
+					ngDefaultControl,
+					required)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.EMAIL" | translate',
+						[control]='userForm?.controls[ "email" ]')
+
+			select-box.mb-10(
+				matInput,
+				fieldKey='key',
+				[init]='!!data',
+				[disableControl]='isSubmitting',
+				[(ngModel)]='user.role_key',
+				[label]='"FINANCE.USER.LABELS.ROLE" | translate',
+				[placeholder]='"FINANCE.USER.PLACEHOLDERS.ROLE" | translate',
+				[formControl]='userForm?.controls[ "role_key" ]',
+				[data]='loadUserRoles()',
+				ngDefaultControl,
+				required)
+
+			mat-form-field(
+				plugin-input-radio,
+				*ngIf='!user?.id',
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.USER.LABELS.SEND_ACTIVATION_EMAIL" | translate }}
+				input.hide(matInput)
+				mat-radio-group(
+					[(ngModel)]='user.is_send_activation',
+					[formControl]='userForm?.controls[ "is_send_activation" ]',
+					[disableControl]='isSubmitting',
+					ngDefaultControl)
+					mat-radio-button.mr-40([value]='true')
+						| {{ "GENERAL.LABELS.SEND_NOW" | translate }}
+					mat-radio-button([value]='false')
+						| {{ "GENERAL.LABELS.DISCARD" | translate }}
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='userForm?.invalid || isSubmitting')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ ( data ? "GENERAL.LABELS.SAVE" : "GENERAL.LABELS.ADD" ) | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

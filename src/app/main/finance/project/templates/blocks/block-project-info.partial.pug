@@ -1,0 +1,162 @@
+.block-project-info.layout-row.layout-align-start-center.layout-fixer-15.layout-wrap.flex-85
+	mat-form-field.flex-25.ph-15(appearance='outline')
+		mat-label
+			| {{ "FINANCE.PROJECT.LABELS.PROJECT_CODE" | translate }}
+		input(
+			matInput,
+			readonly,
+			[value]='project?.project_code || "N/A"')
+
+	mat-form-field.flex-25.ph-15(appearance='outline')
+		mat-label
+			| {{ "FINANCE.CLIENT.LABELS.CLIENT" | translate }}
+		input(
+			matInput,
+			readonly,
+			[value]='project?.client?.short_name || "N/A"')
+
+	mat-form-field.flex-25.ph-15(appearance='outline')
+		mat-label
+			| {{ "FINANCE.PROJECT.LABELS.CONTACT_PERSON" | translate }}
+		input(
+			matInput,
+			readonly,
+			[value]='project?.contact || "N/A"')
+
+	mat-form-field.flex-25.ph-15(appearance='outline')
+		mat-label
+			| {{ "FINANCE.CLIENT.LABELS.ADDRESS" | translate }}
+		input(
+			matInput,
+			readonly,
+			[value]='project?.address || "N/A"')
+
+	mat-form-field.flex-25.ph-15(appearance='outline')
+		mat-label
+			| {{ "FINANCE.USER.LABELS.PM" | translate }}
+		input(
+			matInput,
+			readonly,
+			[value]='project?.user?.full_name || "N/A"')
+		span(matSuffix)
+			i.icon.icon-waiting.text-warning.font-size-18(
+				*ngIf='approverStatus?.pm?.status === QUOTATION_STATUS?.WAITING_APPROVAL',
+				[matTooltip]='approverStatus?.pm?.comment')
+			i.icon.icon-stamp.text-success.font-size-18(
+				*ngIf='approverStatus?.pm?.status === QUOTATION_STATUS?.APPROVED',
+				[matTooltip]='approverStatus?.pm?.comment')
+			i.icon.icon-stamp-times.text-warn.font-size-18(
+				*ngIf='approverStatus?.pm?.status === QUOTATION_STATUS?.REJECTED',
+				[matTooltip]='approverStatus?.pm?.comment')
+
+	mat-form-field.flex-25.ph-15(appearance='outline')
+		mat-label
+			| {{ "FINANCE.USER.LABELS.SALE" | translate }}
+		input(
+			matInput,
+			readonly,
+			[value]='project?.saler?.full_name || "N/A"')
+		span(matSuffix)
+			i.icon.icon-waiting.text-warning.font-size-18(
+				*ngIf='approverStatus?.sale?.status === QUOTATION_STATUS?.WAITING_APPROVAL',
+				[matTooltip]='approverStatus?.sale?.comment')
+			i.icon.icon-stamp.text-success.font-size-18(
+				*ngIf='approverStatus?.sale?.status === QUOTATION_STATUS?.APPROVED',
+				[matTooltip]='approverStatus?.sale?.comment')
+			i.icon.icon-stamp-times.text-warn.font-size-18(
+				*ngIf='approverStatus?.sale?.status === QUOTATION_STATUS?.REJECTED',
+				[matTooltip]='approverStatus?.sale?.comment')
+
+	mat-form-field.flex-25.ph-15(appearance='outline')
+		mat-label
+			| {{ "FINANCE.USER.LABELS.PROCUREMENT_MANAGER" | translate }}
+		input(
+			matInput,
+			readonly,
+			[value]='project?.procurement_manager?.full_name || "N/A"')
+		span(matSuffix)
+			i.icon.icon-waiting.text-warning.font-size-18(
+				*ngIf='approverStatus?.procurement_manager?.status === QUOTATION_STATUS?.WAITING_APPROVAL',
+				[matTooltip]='approverStatus?.procurement_manager?.comment')
+			i.icon.icon-stamp.text-success.font-size-18(
+				*ngIf='approverStatus?.procurement_manager?.status === QUOTATION_STATUS?.APPROVED',
+				[matTooltip]='approverStatus?.procurement_manager?.comment')
+			i.icon.icon-stamp-times.text-warn.font-size-18(
+				*ngIf='approverStatus?.procurement_manager?.status === QUOTATION_STATUS?.REJECTED',
+				[matTooltip]='approverStatus?.procurement_manager?.comment')
+
+	mat-form-field.flex-25.ph-15(appearance='outline')
+		mat-label
+			| {{ "FINANCE.USER.LABELS.QS" | translate }}
+		input(
+			matInput,
+			readonly,
+			[value]='project?.qs?.full_name || "N/A"')
+
+	mat-form-field.flex-25.ph-15(appearance='outline')
+		mat-label
+			| {{ "FINANCE.USER.LABELS.PURCHASING" | translate }}
+		input(
+			matInput,
+			readonly,
+			[value]='project?.purchaser?.full_name || "N/A"')
+
+	mat-form-field.flex-25.ph-15(appearance='outline')
+		mat-label
+			| {{ "FINANCE.USER.LABELS.CONSTRUCTION" | translate }}
+		input(
+			matInput,
+			readonly,
+			[value]='project?.constructor?.full_name || "N/A"')
+
+	mat-form-field.flex-25.ph-15(appearance='outline')
+		mat-label
+			| {{ "FINANCE.PROJECT.LABELS.PROJECT_TIME" | translate }}
+		input(
+			matInput,
+			readonly,
+			[value]='project?.project_start && project?.project_end ? ( ( project?.project_start | momentDateFormat ) + " - " + ( project?.project_end | momentDateFormat ) ) : "N/A"')
+
+	mat-form-field.flex-25.ph-15(appearance='outline')
+		mat-label
+			| {{ "FINANCE.PROJECT.LABELS.QUOTATION_DATE" | translate }}
+		input(
+			matInput,
+			readonly,
+			[value]='project?.quotation_date ? ( project?.quotation_date | momentDateFormat ) : "N/A"')
+
+	mat-form-field.flex-25.ph-15(appearance='outline')
+		mat-label
+			| {{ "FINANCE.PROJECT.LABELS.MINIMUM_PAYMENT_PERIOD" | translate }}
+		input(
+			matInput,
+			readonly,
+			[value]='project?.valid_duration ? ( project?.valid_duration + " " + ( "GENERAL.LABELS.DAYS" | translate | lowercase ) ) : "N/A"')
+
+	mat-form-field.flex-25.ph-15(appearance='outline')
+		mat-label
+			| {{ "FINANCE.PROJECT.LABELS.EXCHANGE_RATE" | translate }}
+		input(
+			matInput,
+			readonly,
+			[value]='"1 " + ( "GENERAL.LABELS.MONEY_UNIT" | translate ) + " = " + ( project?.exchange_rate | commas )')
+
+	mat-form-field.flex-25.ph-15.project-detail__input-status(
+		appearance='outline',
+		[style.color]='project?.quotation_status_name?.color')
+		mat-label
+			| {{ "FINANCE.PROJECT.LABELS.QUOTATION_STATUS" | translate }}
+		input(
+			matInput,
+			readonly,
+			[value]='project?.quotation_status_name?.name ? ( project?.quotation_status_name?.name | translate ) : "N/A"')
+
+	mat-form-field.flex-25.ph-15.project-detail__input-status(
+		appearance='outline',
+		[style.color]='project?.project_status_name?.color')
+		mat-label
+			| {{ "FINANCE.PROJECT.LABELS.PROJECT_STATUS" | translate }}
+		input(
+			matInput,
+			readonly,
+			[value]='project?.project_status_name?.name ? ( project?.project_status_name?.name | translate ) : "N/A"')

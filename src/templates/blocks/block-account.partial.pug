@@ -1,0 +1,28 @@
+.block-account.header__account
+	button.header__account-btn-menu(
+		mat-button,
+		[matMenuTriggerFor]='accountMenu',
+		(menuClosed)='isAccountMenuOpened = false',
+		(menuOpened)='isAccountMenuOpened = true')
+		.layout-row.layout-align-start-center
+			.text-right.mr-10.line-height-16
+				.header__account-fullname.font-weight-500
+					| {{ account?.full_name || account?.lezo_employee?.full_name || "N/A" }}
+				.header__account-email.font-size-12
+					| {{ account?.user_role?.name || "N/A" }}
+			avatar-box.mr-10(
+				size='32',
+				[lazy]='false',
+				[source]='account?.avatar || account?.lezo_employee?.avatar',
+				[title]='account?.full_name || account?.lezo_employee?.full_name')
+			i.fa([ngClass]='{ "fa-angle-down": !isAccountMenuOpened, "fa-angle-up": isAccountMenuOpened }')
+	mat-menu(#accountMenu='matMenu')
+		button(
+			mat-menu-item,
+			(click)='navigateToAccountSettings()')
+			| {{ "ACCOUNT.LABELS.ACCOUNT_SETTINGS" | translate }}
+		mat-divider
+		button(
+			mat-menu-item,
+			(click)='navigateToLogout()')
+			| {{ "GENERAL.LABELS.LOGOUT" | translate }}

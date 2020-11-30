@@ -1,0 +1,168 @@
+mat-card.tab-vo
+	.layout-row.pb-15.layout-fixer-10.layout-align-end
+		.flex-auto
+			.ph-10
+				button(
+					plugin-button-only-icon,
+					mat-raised-button,
+					[disabled]='!loaded',
+					(click)='getVODetailCost()')
+					i.fa.fa-sync-alt
+		.flex-auto
+			.layout-row.layout-align-end
+				.ph-10
+					button(
+						mat-raised-button,
+						[disabled]='!isQS || !loaded || currentVO?.status === PROJECT_VO_STATUS?.APPROVED || currentVO?.status === PROJECT_VO_STATUS?.WAITING_APPROVAL',
+						color='primary',
+						(click)='downloadCost()')
+						i.fa.fa-download.mr-15
+						| {{ "FINANCE.LINE_ITEM.LABELS.DOWNLOAD_TEMPLATE" | translate }}
+				.ph-10
+					button(
+						mat-raised-button,
+						[disabled]='!isQS || !loaded || currentVO?.status === PROJECT_VO_STATUS?.APPROVED || currentVO?.status === PROJECT_VO_STATUS?.WAITING_APPROVAL || project?.project_status === projectStatus.DONE',
+						color='primary',
+						(click)='openDialogUploadCostFile()')
+						i.fa.fa-upload.mr-15
+						| {{ "FINANCE.COST_ITEM.LABELS.IMPORT_COST_ITEMS" | translate }}
+				.ph-10
+					button(
+						mat-raised-button,
+						[disabled]='!isQS || !loaded || currentVO?.status === PROJECT_VO_STATUS?.APPROVED || currentVO?.status === PROJECT_VO_STATUS?.WAITING_APPROVAL || project?.project_status === projectStatus.DONE',
+						color='primary',
+						(click)='openDialogProjectCostItem()')
+						i.fa.fa-plus.mr-15
+						| {{ "FINANCE.COST_ITEM.LABELS.NEW_COST_ITEM" | translate }}
+				.ph-10
+					button(
+						mat-raised-button,
+						[disabled]='!isQS || !loaded || currentVO?.status === PROJECT_VO_STATUS?.APPROVED || currentVO?.status === PROJECT_VO_STATUS?.WAITING_APPROVAL || project?.project_status === projectStatus.DONE',
+						color='warn',
+						(click)='openDialogRemoveCost()')
+						i.fa.fa-trash.mr-15
+						| {{ "FINANCE.COST_ITEM.LABELS.REMOVE_COST_ITEMS" | translate }}
+
+	div([fullscreen]='".mat-column-actions"')
+		loading-overlay([visible]='!loaded')
+			mat-table(
+				#table,
+				plugin-data-table,
+				matSort,
+				[dataSource]='dataSourceLine',
+				[attr.data-label]='!dataSourceLine?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+
+				// Status Column
+				ng-container(matColumnDef='status')
+					mat-header-cell.w-150(*matHeaderCellDef, mat-sort-header='status')
+						.text-center.flex-auto
+							| {{ "GENERAL.ATTRIBUTES.STATUS" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+					mat-cell.w-150(*matCellDef='let element')
+						status-box(
+							[color]='element?.status_name?.color',
+							[status]='element?.status_name?.name | translate')
+					mat-footer-cell.w-150(*matFooterCellDef)
+
+				// name Column
+				ng-container(matColumnDef='name')
+					mat-header-cell.w-300(*matHeaderCellDef, mat-sort-header='name')
+						| {{ "GENERAL.ATTRIBUTES.NAME" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.w-300(*matCellDef='let element')
+						| {{ element?.name }}
+					mat-footer-cell.w-300(*matFooterCellDef)
+
+				// description Column
+				ng-container(matColumnDef='description')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='description')
+						| {{ "GENERAL.ATTRIBUTES.DESCRIPTION" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell(*matCellDef='let element')
+						| {{ element?.description }}
+					mat-footer-cell(*matFooterCellDef)
+
+				// unit Column
+				ng-container(matColumnDef='unit')
+					mat-header-cell.w-70(*matHeaderCellDef, mat-sort-header='unit')
+						| {{ "GENERAL.ATTRIBUTES.UNIT" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.w-70(*matCellDef='let element')
+						| {{ element?.unit }}
+					mat-footer-cell.w-70(*matFooterCellDef)
+
+				// Amount Column
+				ng-container(matColumnDef='amount')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='final_amount')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.AMOUNT" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						| {{ ( element?.final_amount || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+
+				// Price Column
+				ng-container(matColumnDef='price')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='final_price')
+						| {{ "GENERAL.ATTRIBUTES.PRICE" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						| {{ ( element?.final_price || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+						| {{ "FINANCE.PROJECT.LABELS.VO_SUBTOTAL" | translate }}
+
+				// total Column
+				ng-container(matColumnDef='total')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='total')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						| {{ ( element?.total || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+						.text-success(*ngIf='footer?.total_diff_vo_line >= 0')
+							| {{ ( footer?.total_diff_vo_line || 0 )?.toFixed( 0 ) | commas }}
+						.text-warning(*ngIf='footer?.total_diff_vo_line < 0')
+							| {{ ( footer?.total_diff_vo_line || 0 )?.toFixed( 0 ) | commas }}
+
+				// note Column
+				ng-container(matColumnDef='note')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='note')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.NOTE" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell(*matCellDef='let element')
+						| {{ element?.note }}
+					mat-footer-cell(*matFooterCellDef)
+
+				// actions Column
+				ng-container(matColumnDef='actions')
+					mat-header-cell.w-65(*matHeaderCellDef)
+						| {{ "GENERAL.ATTRIBUTES.ACTION" | translate }}
+					mat-cell.w-65(*matCellDef='let element')
+						action-box(*ngIf='isQS')
+							action-button(
+								color='warn',
+								[disabled]='!loaded || currentVO?.status === PROJECT_VO_STATUS?.APPROVED || currentVO?.status === PROJECT_VO_STATUS?.WAITING_APPROVAL || project?.project_status === projectStatus.DONE',
+								icon='fa fa-trash',
+								[title]='"GENERAL.LABELS.DELETE" | translate',
+								(onClick)='deleteProjectCostItem( element )')
+					mat-footer-cell.w-65(*matFooterCellDef)
+
+				mat-header-row(*matHeaderRowDef='lineColumn')
+				mat-row(*matRowDef='let row; columns: lineColumn;')
+				mat-footer-row(
+					footerRowInTop,
+					*matFooterRowDef='lineColumn',
+					[class.hide]='!dataSourceLine?.filteredData?.length')
+
+			mat-paginator(
+				#paginatorLine,
+				pageSize='30',
+				[pageSizeOptions]='[ 30, 50, 100 ]',
+				showFirstLastButtons='true')

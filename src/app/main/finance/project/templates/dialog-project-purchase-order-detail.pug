@@ -1,0 +1,135 @@
+div.wrapper-table
+ div(matDialogContent)
+    .layout-row.layout-wrap.layout-fixer-15
+        mat-form-field.mb-10.ph-15.flex-50(
+            floatLabel='always',
+            appearance='outline')
+            mat-label
+                | {{ "FINANCE.COST_ITEM.LABELS.PURCHASE_ORDER" | translate }}
+            input(
+                matInput,
+                [value]='data.element?.name',
+                [placeholder]='"FINANCE.COST_ITEM.PLACEHOLDERS.PURCHASE_ORDER" | translate',
+                readonly,
+                ngDefaultControl)
+        mat-form-field.mb-10.ph-15.flex-50(
+            floatLabel='always',
+            appearance='outline')
+            mat-label
+                | {{ "FINANCE.VENDOR.ATTRIBUTES.VENDOR" | translate }}
+            input(
+                matInput,
+                [value]='( data.element.vendor?.short_name ) || "N/A"',
+                [placeholder]='"FINANCE.VENDOR.ATTRIBUTES.VENDOR" | translate',
+                readonly,
+                ngDefaultControl)
+        mat-table.mb-20(
+            #table,
+            plugin-data-table,
+            [dataSource]='dataSource?.data',
+         )
+            // No Column
+            ng-container(matColumnDef='no')
+                mat-header-cell.w-50(*matHeaderCellDef)
+                    | {{ "GENERAL.ATTRIBUTES.NUMBER_ORDER" | translate }}
+                mat-cell.w-50(*matCellDef='let element; let i = index')
+                    | {{ i + 1 }}
+                    ng-template([ngIf]='!element?.created_at')
+                mat-footer-cell(*matFooterCellDef)
+                        | *
+            // Name Column
+            ng-container(matColumnDef='name')
+                mat-header-cell.w-250(*matHeaderCellDef)
+                    | {{ "GENERAL.ATTRIBUTES.ITEM_COST" | translate }}
+                mat-cell.w-250(*matCellDef='let element; let i = index')
+                    .font-weight-500
+                        | {{ element?.name || "N/A" }}
+                mat-footer-cell(*matFooterCellDef)
+            // Amount
+            ng-container(matColumnDef='amount')
+              mat-header-cell.w-100(*matHeaderCellDef)
+                  | {{ "GENERAL.ATTRIBUTES.AMOUNT" | translate }}
+              mat-cell.w-100(*matCellDef='let element; let i = index')
+                  .font-weight-500
+                      | {{ element?.amount || "N/A" }}
+              mat-footer-cell(*matFooterCellDef)
+            // Amount
+            ng-container(matColumnDef='unit')
+                mat-header-cell.w-100(*matHeaderCellDef)
+                    | {{ "GENERAL.ATTRIBUTES.UNIT" | translate }}
+                mat-cell.w-100(*matCellDef='let element; let i = index')
+                    .font-weight-500
+                        | {{ element?.unit || "N/A" }}
+                mat-footer-cell(*matFooterCellDef)
+            // Price
+            ng-container(matColumnDef='price')
+                mat-header-cell.w-100(*matHeaderCellDef)
+                    | {{ "GENERAL.ATTRIBUTES.PRICE" | translate }}
+                mat-cell.w-100(*matCellDef='let element; let i = index')
+                    .font-weight-500
+                        | {{ ((element?.price)?.toFixed( 0 ) | commas) || "N/A" }}
+                mat-footer-cell(*matFooterCellDef)
+            // Total Column
+            ng-container(matColumnDef='total')
+                mat-header-cell.w-100(*matHeaderCellDef)
+                    | {{ "GENERAL.ATTRIBUTES.TOTAL" | translate }}
+                mat-cell.w-100(*matCellDef='let element; let i = index')
+                    .font-weight-500
+                        | {{ ((element?.total)?.toFixed( 0 ) | commas)  || "N/A" }}
+                mat-footer-cell.w-100.layout-align-end(*matFooterCellDef)
+                    .layout-column.text-right
+                        .text-warning.text-nowrap.mv-10
+            // Status Column
+            ng-container(matColumnDef='status')
+                mat-header-cell.w-150(*matHeaderCellDef)
+                    .text-center.flex-auto
+                        | {{ "FINANCE.COST_ITEM.ATTRIBUTES.STATUS" | translate }}
+                mat-cell.w-150(*matCellDef='let element')
+                    .layout-column.flex-auto
+                        status-box(
+                            [color]='element?.status_name?.color',
+                            [status]='element?.status_name?.name | translate')
+                        .text-center.font-size-12.mt-3(*ngIf='!element?.approvers_process?.is_done')
+                            span.text-warning
+                                | {{ ( element?.approvers_process?.waiting?.count || 0 )?.toFixed( 0 ) | commas }}
+                            | &nbsp;/&nbsp;
+                            span.text-success
+                                | {{ ( element?.approvers_process?.approved?.count || 0 )?.toFixed( 0 ) | commas }}
+                            | &nbsp;/&nbsp;
+                            span.text-warn
+                                | {{ ( element?.approvers_process?.rejected?.count || 0 )?.toFixed( 0 ) | commas }}
+                mat-footer-cell(*matFooterCellDef)
+            mat-header-row(*matHeaderRowDef='displayedColumns')
+            mat-row(*matRowDef='let row; columns: displayedColumns;')
+ div.total-table.d-flex
+     div.w-350
+     div.w-200
+         div.text-success.text-nowrap.mv-10
+             | TOTAL
+         div.text-success.text-nowrap.mv-10
+             | Discount Money
+         div.text-success.text-nowrap.mv-10
+             | SUM(After discount)
+         div.text-success.text-nowrap.mv-10
+             | TOTAL({{(data.element?.vat_percent)}} %)
+         div.text-success.text-nowrap.mv-10
+             | Total (included VAT)
+     div.w-200
+         div.text-warn.text-warning.mv-10
+             | {{(data.element?.total)?.toFixed( 0 ) | commas }}
+         div.text-warn.text-warning.mv-10
+             | {{ ( data?.discount_value || 0 )?.toFixed( 0 ) | commas }}
+         div.text-warn.text-warning.mv-10
+             | {{ ( data.element?.total - data?.discount_value || 0 )?.toFixed( 0 ) | commas }}
+         div.text-warning.text-nowrap.mv-10
+             | {{(data.element?.total_vat)?.toFixed( 0 ) | commas }}
+         div.text-warning.text-nowrap.mv-10
+             | {{(data.element?.subtotal)?.toFixed( 0 ) | commas }}
+div(
+    matDialogActions,
+    align='end')
+    button(
+        mat-raised-button,
+        type='button',
+        (click)='onNoClick()')
+        | {{ "GENERAL.LABELS.CANCEL" | translate }}

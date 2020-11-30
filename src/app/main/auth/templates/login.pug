@@ -1,0 +1,10 @@
+.login.layout-column.flex-noshrink
+	.mv-100.layout-column.layout-align-center-center.flex-noshrink
+		mat-card.mat-elevation-z6.w-400
+			img.mb-20(
+				[lazyLoad]='ENVIRONMENT?.APP_LOGO_BLUE',
+				width='120')
+			include blocks/form-channel.partial.pug
+			include blocks/form-login.partial.pug
+			include blocks/form-forgot-password.partial.pug
+	copyright

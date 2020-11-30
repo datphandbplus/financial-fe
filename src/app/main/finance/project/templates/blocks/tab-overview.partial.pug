@@ -1,0 +1,162 @@
+mat-card.tab-overview
+	.layout-row.layout-align-end.mb-15.layout-fixer-10(*ngIf='!isLiabilitiesAccountant && !isCFO && canAddSheet')
+		.ph-10
+			button(
+				mat-raised-button,
+				color='warning',
+				(click)='openDialogQuotationDiscount()',
+				[disabled]='!loaded || project?.project_status === projectStatus.DONE')
+				i.fa.fa-tags.mr-15
+				| {{ "FINANCE.PROJECT.LABELS.DISCOUNT" | translate }}
+		.ph-10
+			button(
+				mat-raised-button,
+				color='primary',
+				(click)='download()')
+				i.fa.fa-download.mr-15
+				| {{ "FINANCE.LINE_ITEM.LABELS.DOWNLOAD_TEMPLATE" | translate }}
+		.ph-10
+			button(
+				mat-raised-button,
+				color='primary',
+				(click)='openDialogUploadFile()',
+				[disabled]='project?.project_status === projectStatus.DONE')
+				i.fa.fa-upload.mr-15
+				| {{ "FINANCE.LINE_ITEM.LABELS.IMPORT_LINE_ITEMS" | translate }}
+
+	div([fullscreen]='".mat-column-actions"')
+		loading-overlay([visible]='!loaded')
+			mat-table(
+				#table,
+				plugin-data-table,
+				matSort,
+				[dataSource]='dataSource',
+				[attr.data-label]='!dataSource?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+				// Sheet Column
+				ng-container(matColumnDef='sheet')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='name')
+						.w-30
+							| {{ "GENERAL.ATTRIBUTES.NUMBER_ORDER" | translate }}
+						.ph-5
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.SHEET" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+					mat-cell(*matCellDef='let element; let index = index;')
+						.w-30
+							| {{ index + 1 }}
+						.ph-5
+							| {{ element?.name || "N/A" }}
+					mat-footer-cell(*matFooterCellDef)
+				// Description Column
+				ng-container(matColumnDef='description')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='description')
+						| {{ "GENERAL.ATTRIBUTES.DESCRIPTION" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell(*matCellDef='let element')
+						| {{ element?.description || "N/A" }}
+					mat-footer-cell(*matFooterCellDef)
+				// Note Column
+				ng-container(matColumnDef='note')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='note')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.NOTE" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell(*matCellDef='let element')
+						| {{ element?.note || "N/A" }}
+					mat-footer-cell(*matFooterCellDef)
+						.layout-column
+							.text-warning.text-nowrap.mv-10
+								| {{ "FINANCE.PROJECT.ATTRIBUTES.SUBTOTAL" | translate }}
+							.text-warning.text-nowrap.mv-10
+								| {{ "FINANCE.PROJECT.ATTRIBUTES.DISCOUNT" | translate }}
+							.text-warning.text-nowrap.mv-10
+								| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL_EXCLUDED_VAT" | translate }}
+							.text-warning.text-nowrap.mv-10
+								| {{ "FINANCE.PROJECT.ATTRIBUTES.VAT" | translate }}
+							.text-warning.text-nowrap.mv-10
+								| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL_INCLUDED_VAT" | translate }}
+							ng-container(*ngIf='voList?.length')
+								.text-nowrap.mt-20.mb-10
+									| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL_VO_EXCLUDED_VAT" | translate }}
+								.text-nowrap.mv-10
+									| {{ "FINANCE.PROJECT.ATTRIBUTES.VO_VAT" | translate }}
+								.text-nowrap.mv-10
+									| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL_VO_INCLUDED_VAT" | translate }}
+								.text-success.text-nowrap.mt-20.mb-10
+									| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL_UPDATED_EXCLUDED_VAT" | translate }}
+								.text-success.text-nowrap.mv-10
+									| {{ "FINANCE.PROJECT.ATTRIBUTES.UPDATED_VAT" | translate }}
+								.text-success.text-nowrap.mv-10
+									| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL_UPDATED_INCLUDED_VAT" | translate }}
+				// Price Column
+				ng-container(matColumnDef='price')
+					mat-header-cell.w-200.layout-align-end(*matHeaderCellDef, mat-sort-header='sheet_total')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.PRICE" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.w-200.layout-align-end(*matCellDef='let element')
+						.text-truncate([matTooltip]='element?.sheet_total | commas')
+							| {{ ( element?.sheet_total || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.w-200.layout-align-end(*matFooterCellDef)
+						.layout-column.text-right
+							.text-warning.text-truncate.mv-10([matTooltip]='overviewFooterRow?.subtotal | commas')
+								| {{ ( overviewFooterRow?.subtotal || 0 )?.toFixed( 0 ) | commas }}
+							.text-warning.text-truncate.mv-10([matTooltip]='overviewFooterRow?.discount_value | commas')
+								| {{ ( overviewFooterRow?.discount_value || 0 )?.toFixed( 0 ) | commas }}
+							.text-warning.text-truncate.mv-10([matTooltip]='overviewFooterRow?.total | commas')
+								| {{ ( overviewFooterRow?.total || 0 )?.toFixed( 0 ) | commas }}
+							.text-warning.text-truncate.mv-10([matTooltip]='overviewFooterRow?.vat | commas')
+								| {{ ( overviewFooterRow?.vat || 0 )?.toFixed( 0 ) | commas }}
+							.text-warning.text-truncate.mv-10([matTooltip]='overviewFooterRow?.total_with_vat | commas')
+								| {{ ( overviewFooterRow?.total_with_vat || 0 )?.toFixed( 0 ) | commas }}
+							ng-container(*ngIf='voList?.length')
+								.text-truncate.mt-20.mb-10([matTooltip]='overviewFooterRow?.total_vo_wo_vat | commas')
+									| {{ ( overviewFooterRow?.total_vo_wo_vat || 0 )?.toFixed( 0 ) | commas }}
+								.text-truncate.mv-10([matTooltip]='overviewFooterRow?.vo_vat | commas')
+									| {{ ( overviewFooterRow?.vo_vat || 0 )?.toFixed( 0 ) | commas }}
+								.text-truncate.mv-10([matTooltip]='overviewFooterRow?.total_vo_w_vat | commas')
+									| {{ ( overviewFooterRow?.total_vo_w_vat || 0 )?.toFixed( 0 ) | commas }}
+								.text-success.text-truncate.mt-20.mb-10([matTooltip]='( overviewFooterRow?.total + overviewFooterRow?.total_vo_wo_vat ) | commas')
+									| {{ ( ( overviewFooterRow?.total + overviewFooterRow?.total_vo_wo_vat ) || 0 )?.toFixed( 0 ) | commas }}
+								.text-success.text-truncate.mv-10([matTooltip]='( overviewFooterRow?.vat + overviewFooterRow?.vo_vat ) | commas')
+									| {{ ( ( overviewFooterRow?.vat + overviewFooterRow?.vo_vat ) || 0 )?.toFixed( 0 ) | commas }}
+								.text-success.text-truncate.mv-10([matTooltip]='( overviewFooterRow?.total_with_vat + overviewFooterRow?.total_vo_w_vat ) | commas')
+									| {{ ( ( overviewFooterRow?.total_with_vat + overviewFooterRow?.total_vo_w_vat ) || 0 )?.toFixed( 0 ) | commas }}
+				// Actions Column
+				ng-container(matColumnDef='actions')
+					mat-header-cell.w-65(*matHeaderCellDef)
+						| {{ "GENERAL.ATTRIBUTES.ACTION" | translate }}
+					mat-cell.w-65(*matCellDef='let element')
+						action-box([disabled]='!canAddSheet && !canManageProject')
+							action-button(
+								color='success',
+								icon='fa fa-edit',
+								[title]='"GENERAL.LABELS.EDIT" | translate',
+								[disabled]='!loaded || isDeleting || project?.project_status === projectStatus.DONE',
+								(onClick)='openDialogSheet( element )')
+							action-button(
+								color='warn',
+								icon='fa fa-trash',
+								[title]='"GENERAL.LABELS.DELETE" | translate',
+								[disabled]='!loaded || isDeleting || project?.project_status === projectStatus.DONE',
+								(onClick)='deleteSheet( element )')
+					mat-footer-cell.w-65(*matFooterCellDef)
+
+				mat-header-row(*matHeaderRowDef='overviewDisplayedColumns')
+				mat-row(*matRowDef='let row; columns: overviewDisplayedColumns;')
+				mat-footer-row(
+					*matFooterRowDef='overviewDisplayedColumns',
+					[class.hide]='!dataSource?.filteredData?.length')
+
+			mat-paginator(
+				#paginator,
+				pageSize='30',
+				[pageSizeOptions]='[ 30, 50, 100 ]',
+				showFirstLastButtons='true')
+
+	.layout-column.mt-20
+		b.mb-20(style='text-decoration: underline')
+			| {{ "GENERAL.LABELS.QUOTATION_NOTE" | translate }}:
+		i
+			| {{ project?.quotation_note }}

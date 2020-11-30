@@ -1,0 +1,14 @@
+.vendor-setting.page
+	sidebar
+		sidebar-item(
+			[routerLinkActive]='[ "active" ]',
+			[routerLink]='"/finance/vendor/list"')
+			| {{ "FINANCE.VENDOR.LABELS.VENDOR" | translate }}
+		sidebar-item(
+			[routerLinkActive]='[ "active" ]',
+			[routerLink]='"/finance/vendor/category"')
+			| {{ "FINANCE.VENDOR_CATEGORY.LABELS.VENDOR_CATEGORY" | translate }}
+
+	.page__content
+		.container
+			router-outlet

@@ -1,0 +1,204 @@
+mat-card.table-project-receivables
+	.layout-row.layout-align-start-center.mb-15
+		.layout-row.layout-fixer-5.mr-15
+			.ph-5
+				button(
+					plugin-button-only-icon,
+					mat-raised-button,
+					[disabled]='!loaded ',
+					(click)='getList()')
+					i.fa.fa-sync-alt
+		.flex-auto
+		.layout-row(*ngIf='isPM')
+			button(
+				mat-raised-button,
+				color='primary',
+				(click)='openDialog()',
+				[disabled]='!canManageBill')
+				i.fa.fa-plus.mr-15
+				| {{ "FINANCE.PROJECT.LABELS.NEW_BILL" | translate }}
+
+	div([fullscreen]='".mat-column-actions"')
+		loading-overlay([visible]='!loaded')
+			mat-table(
+				#billSort="matSort",
+				plugin-data-table,
+				matSort,
+				[dataSource]='dataSource',
+				[attr.data-label]='!dataSource?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+				// Item Column
+				ng-container(matColumnDef='item')
+					mat-header-cell.w-200(*matHeaderCellDef, mat-sort-header='name')
+						| {{ "GENERAL.ATTRIBUTES.ITEM" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.w-200(*matCellDef='let element')
+						.font-weight-500
+							| {{ element?.name || "N/A" }}
+						i.fa.fa-info-circle.note-icon(
+							*ngIf='element?.finance_note?.length',
+							[matTooltip]='element?.finance_note',
+							matTooltipPosition='above')
+					mat-footer-cell.w-200(*matFooterCellDef)
+						.text-success
+							| {{ "FINANCE.PROJECT.LABELS.TOTAL" | translate }}
+				// Total Column
+				ng-container(matColumnDef='total')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='received')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						.text-truncate([matTooltip]='element?.total | commas')
+							| {{ ( element?.received || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+						.text-warning.text-truncate([matTooltip]='footerRow?.total | commas')
+							| {{ ( footerRow?.total || 0 )?.toFixed( 0 ) | commas }}
+				// VAT Column
+				ng-container(matColumnDef='vat')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='received_vat')
+						| {{ "GENERAL.ATTRIBUTES.VAT" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						.text-truncate([matTooltip]='element?.total_vat | commas')
+							| {{ ( element?.received_vat || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+						.text-warning.text-truncate([matTooltip]='footerRow?.total_vat | commas')
+							| {{ ( footerRow?.total_vat || 0 )?.toFixed( 0 ) | commas }}
+				// Sum Column
+				ng-container(matColumnDef='sum')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='sum')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.SUM" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						.text-truncate([matTooltip]='( element?.total + element?.total_vat ) | commas')
+							| {{ (( element?.received + element?.received_vat ) || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+						.text-warning.text-truncate([matTooltip]='( footerRow?.total + footerRow?.total_vat ) | commas')
+							| {{ ( footerRow?.total + footerRow?.total_vat || 0 )?.toFixed( 0 ) | commas }}
+				// Expected Invoice Date Column
+				ng-container(matColumnDef='expected_invoice_date')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='expected_invoice_date')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.EXPECTED_INVOICE_DATE" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell(*matCellDef='let element')
+						| {{ element?.expected_invoice_date | momentDateFormat }}
+					mat-footer-cell(*matFooterCellDef)
+				// Receivable Date Column
+				ng-container(matColumnDef='receivable_date')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='receivable_date')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.RECEIVABLE_DATE" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell(*matCellDef='let element')
+						.layout-column
+							div
+								| {{ element?.receivable_date | momentDateFormat }}
+							div(*ngIf='element?.receivable_date')
+								| (
+								span([ngClass]='{ "text-warn": element?.count_day <= 0, "text-success": element?.count_day > 0 }')
+									| {{ ( element?.count_day || 0 )?.toFixed( 0 ) | commas }}
+									| {{ "GENERAL.LABELS.DAYS" | translate | lowercase }}
+								| )
+					mat-footer-cell(*matFooterCellDef)
+				// Procedure Column
+				ng-container(matColumnDef='procedure')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='total_procedures')
+						.text-center.flex-auto
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.PROCEDURE" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+					mat-cell.layout-align-center(*matCellDef='let element')
+						| {{ element?.total_procedures ? ( element?.confirmed_procedures + '/' + element?.total_procedures ) : 0 }}
+					mat-footer-cell(*matFooterCellDef)
+				// Status Column
+				ng-container(matColumnDef='status')
+					mat-header-cell.w-150(*matHeaderCellDef, mat-sort-header='status')
+						.text-center.flex-auto
+							| {{ "GENERAL.ATTRIBUTES.STATUS" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+					mat-cell.w-150(*matCellDef='let element')
+						status-box(
+							[color]='element?.status_name?.color',
+							[status]='element?.status_name?.name | translate')
+					mat-footer-cell.w-150(*matFooterCellDef)
+				// Invoice Column
+				ng-container(matColumnDef='invoice')
+					mat-header-cell(*matHeaderCellDef)
+						.text-center.flex-auto
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.INVOICE" | translate }}
+					mat-cell(*matCellDef='let element')
+						.text-center.flex-auto
+							ng-template([ngIf]='!element?.invoice')
+								| --
+							img.cursor(
+								width='28',
+								*ngIf='element?.invoice',
+								src='./assets/images/invoice.png',
+								(click)='openDialogInvoiceHistory( element )')
+					mat-footer-cell(*matFooterCellDef)
+				// Created At Column
+				ng-container(matColumnDef='created_at')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='created_at')
+						| {{ "GENERAL.ATTRIBUTES.CREATED_AT" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell(*matCellDef='let element')
+						| {{ element?.created_at | momentDateFormat }}
+					mat-footer-cell(*matFooterCellDef)
+				// Actions Column
+				ng-container(matColumnDef='actions')
+					mat-header-cell.w-65(*matHeaderCellDef)
+						| {{ "GENERAL.ATTRIBUTES.ACTION" | translate }}
+					mat-cell.w-65(*matCellDef='let element')
+						action-box([disabled]='!canManageBill')
+							ng-template([ngIf]='isPM && element?.status !== BILL_STATUS?.MONEY_COLLECTED')
+								action-button(
+									color='success',
+									icon='fa fa-edit',
+									[title]='"GENERAL.LABELS.EDIT" | translate',
+									[disabled]='!loaded || element?.status !== BILL_STATUS?.WAITING',
+									(onClick)='openDialog( element )')
+								action-button(
+									color='warn',
+									icon='fa fa-trash',
+									[title]='"GENERAL.LABELS.DELETE" | translate',
+									[disabled]='!loaded || element?.status !== BILL_STATUS?.WAITING || element?.invoices?.length',
+									(onClick)='delete( element )')
+							action-button(
+								*ngIf='( isCFO || isLiabilitiesAccountant) && element?.status !== BILL_STATUS?.MONEY_COLLECTED',
+								color='accent',
+								icon='fa fa-file-upload',
+								[title]='"GENERAL.LABELS.UPLOAD" | translate',
+								[disabled]='!loaded',
+								(onClick)='openDialog( element )')
+							action-button(
+								*ngIf='element?.status === BILL_STATUS?.MONEY_COLLECTED',
+								color='accent',
+								icon='fa fa-eye',
+								[title]='"GENERAL.LABELS.VIEW" | translate',
+								[disabled]='!loaded',
+								(onClick)='openDialog( element )')
+					mat-footer-cell.w-65(*matFooterCellDef)
+
+				mat-header-row(*matHeaderRowDef='displayedColumns')
+				mat-row(
+					*matRowDef='let row; columns: displayedColumns;',
+					[ngClass]='{ "active-row": row?.id === activeBillId }')
+				mat-footer-row(
+					footerRowInTop,
+					*matFooterRowDef='displayedColumns',
+					[class.hide]='!dataSource?.filteredData?.length')
+				mat-footer-row(
+					*matFooterRowDef='displayedColumns',
+					[class.hide]='!dataSource?.filteredData?.length')
+
+			mat-paginator(
+				#paginator,
+				pageSize='30',
+				[pageSizeOptions]='[ 30, 50, 100 ]',
+				showFirstLastButtons='true')

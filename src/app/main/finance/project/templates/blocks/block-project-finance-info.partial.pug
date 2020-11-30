@@ -1,0 +1,50 @@
+mat-card.mat-elevation-z8.mb-30.block-project-finance-info
+	.mb-20.text-primary.font-weight-500.font-size-18
+		| {{ "FINANCE.PROJECT.LABELS.FINANE_STATISTICS" | translate | uppercase }}
+	.layout-row.layout-fixer-15
+		mat-form-field.flex-25.ph-15(
+			plugin-input-no-padding,
+			appearance='outline')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.TOTAL_LINE_ITEM" | translate }}
+			input(
+				matInput,
+				readonly,
+				[value]='( totalLineItem || 0 )?.toFixed() | commas')
+
+		mat-form-field.flex-25.ph-15(
+			plugin-input-no-padding,
+			appearance='outline')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.TOTAL_COST_ITEM" | translate }}
+			input(
+				matInput,
+				readonly,
+				[value]='( totalBaseCostItem || 0 )?.toFixed() | commas')
+
+		mat-form-field.flex-25.ph-15(
+			plugin-input-no-padding,
+			appearance='outline')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.TOTAL_EXTRA_FEE" | translate }}
+			input(
+				matInput,
+				readonly,
+				[value]='( (totalSum.total  + totalListPurchasing - subTotalItemCostVo) || 0 )?.toFixed() | commas')
+			span(
+				matSuffix,
+				[ngClass]='{"text-success": (totalSum.total  + totalListPurchasing - subTotalItemCostVo) < 0, "text-warn": (totalSum.total  + totalListPurchasing - subTotalItemCostVo) >= 0 }')
+				| ({{ (totalSum.total  + totalListPurchasing - subTotalItemCostVo)/subTotalItemCostVo * 100 | commas }}%)
+				//| {{subTotalItemCostVo}} | {{totalListPurchasing}} | {{totalSum.total}}
+
+		mat-form-field.flex-25.ph-15(
+			plugin-input-no-padding,
+			appearance='outline')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.TOTAL_EXTRA_FEE_PENDING" | translate }}
+			input(
+				matInput,
+				readonly,
+				[value]='( totalCostPending || 0 )?.toFixed() | commas')
+			span(matSuffix)
+				| ({{ totalCostPending / ( totalBaseCostItem || 1 ) * 100 | commas }}%)

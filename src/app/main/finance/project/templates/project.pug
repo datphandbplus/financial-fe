@@ -1,0 +1,76 @@
+.project.page
+	.page__content
+		.container
+			.layout-row.layout-align-start-center.mb-15
+				.layout-row.layout-fixer-5.mr-15
+					.ph-5
+						button(
+							plugin-button-only-icon,
+							mat-raised-button,
+							[disabled]='!loaded || isDeleting',
+							(click)='resetFilter(); getList();')
+							i.fa.fa-sync-alt
+					.ph-5
+						button(
+							plugin-button-only-icon,
+							mat-raised-button,
+							[disabled]='!loaded || isDeleting',
+							(click)='applySorter( true )')
+							i.fa.fa-sort-alpha-down(*ngIf='!isReverse')
+							i.fa.fa-sort-alpha-up(*ngIf='isReverse')
+					.ph-5
+						mat-form-field.filter-box__datepicker(
+							floatLabel='never',
+							(click)='pickerStart?.open()')
+							mat-label
+								| {{ queryOptions?.begin | momentDateFormat }}
+							input(
+								matInput,
+								[(ngModel)]='queryOptions.begin',
+								(dateChange)='quotationRangeChange( $event )',
+								[max]='queryOptions?.end?.format()',
+								[matDatepicker]='pickerStart',
+								readonly)
+							mat-datepicker-toggle(
+								matSuffix,
+								[for]='pickerStart')
+							mat-datepicker(
+								#pickerStart,
+								startView='month')
+					.ph-5
+						mat-form-field.filter-box__datepicker(
+							floatLabel='never',
+							(click)='pickerEnd?.open()')
+							mat-label
+								| {{ queryOptions?.end | momentDateFormat }}
+							input(
+								matInput,
+								[(ngModel)]='queryOptions.end',
+								(dateChange)='quotationRangeChange( $event )',
+								[min]='queryOptions?.begin?.format()',
+								[matDatepicker]='pickerEnd',
+								readonly)
+							mat-datepicker-toggle(
+								matSuffix,
+								[for]='pickerEnd')
+							mat-datepicker(
+								#pickerEnd,
+								startView='month')
+				.flex-auto
+				.layout-row
+					button(
+						*ngIf='canAdd',
+						mat-raised-button,
+						color='primary',
+						[disabled]='!loaded || isDeleting',
+						(click)='openDialog()')
+						i.fa.fa-plus.mr-15
+						| {{ "FINANCE.PROJECT.LABELS.NEW_PROJECT" | translate }}
+					span &nbsp;&nbsp;&nbsp;
+					button(
+						mat-raised-button,
+						color='success',
+						(click)='exportExcel()')
+						i.fa.fa-download.mr-10
+						| {{ "FINANCE.PROJECT.LABELS.EXPORT" | translate }}
+			include blocks/table-project.partial.pug

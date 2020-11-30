@@ -1,0 +1,45 @@
+ng-template([ngIf]='!account || !viewLoaded')
+	include ../../../../templates/blocks/block-splash-screen.partial.pug
+
+ng-template([ngIf]='account && viewLoaded')
+	mat-drawer-container.drawer.flex-noshrink.layout-column(autosize)
+		mat-drawer-content.flex-noshrink.layout-column
+			header.header.layout-row.layout-align-start-center.pv-15.ph-30.mat-elevation-z6
+				img.mr-20(
+					[lazyLoad]='ENVIRONMENT?.APP_LOGO_BLUE',
+					width='42')
+				.font-size-24.font-weight-500.flex-auto.layout-column
+					| {{ "ACCOUNT.LABELS.ACCOUNT_SETTINGS" | translate }}
+					.font-size-12.text-accent.clickable((click)='navigateToHomepage()')
+						i.fa.fa-arrow-left.mr-5
+						| {{ "GENERAL.LABELS.BACK_TO_HOME" | translate }}
+				include ../../../../templates/blocks/block-account.partial.pug
+
+			mat-card.account-settings.mat-elevation-z8
+				include blocks/block-change-avatar.partial.pug
+				include blocks/form-change-password.partial.pug
+				.layout-row.layout-align-end.mt-30.layout-fixer-5
+					.ph-5
+						button(
+							mat-raised-button,
+							[disabled]='isUploading || isSubmitting || isUpdating || selectedFile',
+							(click)='resetAccountSettings()')
+							i.fa.fa-sync-alt.mr-15
+							| {{ "GENERAL.LABELS.REFRESH" | translate }}
+					.ph-5
+						button(
+							mat-raised-button,
+							type='button',
+							color='primary',
+							[disabled]='isUploading || isSubmitting || isUpdating || selectedFile',
+							(click)='updateAccountSettings()')
+							.layout-row.layout-align-center-center
+								.flex-auto
+									ng-template([ngIf]='!isUploading')
+										i.fa.fa-save.mr-15
+										| {{ "GENERAL.LABELS.SAVE" | translate }}
+									ng-template([ngIf]='isUploading')
+										| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+								mat-spinner.ml-5(
+									*ngIf='isUploading',
+									diameter='20')

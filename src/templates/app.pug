@@ -1,0 +1,3 @@
+section.app.flex-noshrink.layout-column
+	router-outlet((activate)='onRouterOutletActivate( $event )')
+	ng-template([ngIf]='!account || !viewLoaded')

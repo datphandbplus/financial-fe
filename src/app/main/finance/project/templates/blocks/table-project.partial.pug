@@ -1,0 +1,226 @@
+.table-project.mat-elevation-z8
+	loading-overlay([visible]='!loaded')
+		mat-table(
+			#table,
+			plugin-data-table,
+			matSort,
+			[dataSource]='dataSource',
+			[attr.data-label]='!dataSource?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+			// Project Code
+			ng-container(matColumnDef='project_code')
+				mat-header-cell.w-150(*matHeaderCellDef)
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.PROJECT_CODE" | translate }}
+				mat-cell.w-150.clickable(
+					*matCellDef='let element',
+					(click)='navigateViewProjectDetail( element )')
+					.font-weight-500
+						| {{ element?.project_code || "N/A" }}
+				mat-footer-cell.w-150(*matFooterCellDef)
+			// Project Column
+			ng-container(matColumnDef='project')
+				mat-header-cell.w-300(*matHeaderCellDef, mat-sort-header='name')
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.PROJECT" | translate }}
+					| &nbsp;
+					i.fa.fa-sort
+				mat-cell.w-300.clickable(
+					*matCellDef='let element',
+					(click)='navigateViewProjectDetail( element )')
+					.font-weight-500
+						| {{ element?.name || "N/A" }}
+					i.fa.fa-info-circle.note-icon(
+						*ngIf='hasLezoApp && element?.lezo_project_id',
+						[matTooltip]='"FINANCE.PROJECT.LABELS.LINKED_WITH_LEZO_PROJECT" | translate')
+				mat-footer-cell.w-300(*matFooterCellDef)
+			// Client Column
+			ng-container(matColumnDef='client')
+				mat-header-cell(*matHeaderCellDef, mat-sort-header='client_name')
+					| {{ "FINANCE.CLIENT.ATTRIBUTES.CLIENT" | translate }}
+					| &nbsp;
+					i.fa.fa-sort
+				mat-cell(*matCellDef='let element')
+					span([class.text-strike]='element?.client?.is_disabled')
+						| {{ element?.client_name || "N/A" }}
+				mat-footer-cell(*matFooterCellDef)
+			// AIC Column
+			ng-container(matColumnDef='aic')
+				mat-header-cell(*matHeaderCellDef, mat-sort-header='project_manager_name')
+					| {{ "FINANCE.USER.ATTRIBUTES.PM" | translate }}
+					| &nbsp;
+					i.fa.fa-sort
+				mat-cell(*matCellDef='let element')
+					.layout-row.layout-align-start-center
+						avatar-box.mr-5(
+							size='24',
+							[source]='element?.user?.avatar',
+							[title]='element?.user?.full_name')
+						span([class.text-strike]='element?.user?.is_disabled')
+							| {{ element?.user?.full_name || "N/A" }}
+				mat-footer-cell(*matFooterCellDef)
+					.text-success(*ngIf='!isHideQuotation')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+			// Total Value Vat Column
+			ng-container(matColumnDef='total_value_vat')
+				mat-header-cell(*matHeaderCellDef, mat-sort-header='total_line')
+					.text-center.flex-auto
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL_VALUE_VAT" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+				mat-cell.layout-align-end(*matCellDef='let element')
+					.layout-align-end-end.text-truncate([matTooltip]='element?.total_line | commas')
+						| {{ element?.total_line?.toFixed( 0 ) | commas }}
+				mat-footer-cell.layout-align-end(*matFooterCellDef)
+					.text-success(*ngIf='!isHideQuotation')
+						| {{ footerRow?.total?.toFixed( 0 ) | commas }}
+			// Received Vat Column
+			ng-container(matColumnDef='received_vat')
+				mat-header-cell(*matHeaderCellDef, mat-sort-header='total_bill')
+					.text-center.flex-auto
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.RECEIVED_VAT" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+				mat-cell.layout-align-end(*matCellDef='let element')
+					.layout-align-end-end.text-truncate([matTooltip]='element?.total_bill | commas')
+						| {{ element?.total_bill?.toFixed( 0 ) | commas }}
+				mat-footer-cell.layout-align-end(*matFooterCellDef)
+					.text-success(*ngIf='!isHideQuotation')
+						| {{ footerRow?.total_bill?.toFixed( 0 ) | commas }}
+			// Quotation Status Column
+			ng-container(matColumnDef='quotation_status')
+				mat-header-cell.w-120(*matHeaderCellDef, mat-sort-header='quotation_status')
+					.text-center.flex-auto
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.QUOTATION_STATUS" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+				mat-cell.w-120(*matCellDef='let element')
+					status-box(
+						[color]='element?.quotation_status_name?.color',
+						[status]='element?.quotation_status_name?.name | translate')
+				mat-footer-cell.w-120(*matFooterCellDef)
+			// Project Status Column
+			ng-container(matColumnDef='project_status')
+				mat-header-cell.w-120(*matHeaderCellDef, mat-sort-header='project_status')
+					.text-center.flex-auto
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.PROJECT_STATUS" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+				mat-cell.w-120(*matCellDef='let element')
+					status-box(
+						[color]='element?.project_status_name?.color',
+						[status]='element?.project_status_name?.name | translate')
+				mat-footer-cell.w-120(*matFooterCellDef)
+			// Actions Column
+			ng-container(matColumnDef='actions')
+				mat-header-cell.w-65(*matHeaderCellDef)
+					| {{ "GENERAL.ATTRIBUTES.ACTION" | translate }}
+				mat-cell.w-65(*matCellDef='let element')
+					action-box([disabled]='!canEdit( element )')
+						action-button(
+							color='success',
+							icon='fa fa-edit',
+							[title]='"GENERAL.LABELS.EDIT" | translate',
+							[disabled]='!loaded || isDeleting',
+							(onClick)='openDialog( element )')
+						action-button(
+							color='warn',
+							icon='fa fa-trash',
+							[title]='"GENERAL.LABELS.DELETE" | translate',
+							[disabled]='!loaded || isDeleting',
+							(onClick)='delete( element )')
+				mat-footer-cell.w-65(*matFooterCellDef)
+
+			// Filters
+			ng-container(matColumnDef='filters')
+				mat-header-cell(*matHeaderCellDef)
+					// Project Code
+					mat-cell.w-150
+						filter-box(
+							[disabled]='!loaded || isDeleting',
+							[(filter)]='searchQueries.project_code',
+							(applyFilter)='customFilter()')
+					// Project Column
+					mat-cell.w-300
+						filter-box(
+							[disabled]='!loaded || isDeleting',
+							[(filter)]='searchQueries.name',
+							(applyFilter)='customFilter()')
+					// Client Column
+					mat-cell
+						filter-box(
+							type='filter',
+							fieldName='short_name',
+							multiple='true',
+							[disabled]='!loaded || isDeleting',
+							[data]='dataSource?.data | partition: "client"',
+							[(filter)]='filters[ "client.id" ]',
+							(applyFilter)='customFilter()')
+					// AIC Column
+					mat-cell
+						filter-box(
+							type='filter',
+							fieldName='full_name',
+							fieldSubName='email',
+							multiple='true',
+							fieldImage='avatar',
+							[disabled]='!loaded || isDeleting',
+							[data]='dataSource?.data | partition: "user"',
+							[(filter)]='filters[ "user.id" ]',
+							(applyFilter)='customFilter()')
+					// Total Value Vat Column
+					mat-cell(*ngIf='!isHideQuotation')
+						filter-box(
+							type='range',
+							[(filter)]='filters.total_line',
+							[min]='0',
+							[max]='( dataSource?.data | max: "total_line" ) || 1000',
+							(applyFilter)='customFilter()',
+							[disabled]='!loaded')
+					// Received Vat Column
+					mat-cell(*ngIf='!isHideQuotation')
+						filter-box(
+							type='range',
+							[(filter)]='filters.total_bill',
+							[min]='0',
+							[max]='( dataSource?.data | max: "total_bill" ) || 1000',
+							(applyFilter)='customFilter()',
+							[disabled]='!loaded')
+					// Quotation Status Column
+					mat-cell.w-120
+						filter-box(
+							type='filter',
+							multiple='true',
+							translated='true',
+							[(filter)]='filters[ "quotation_status_name.id" ]',
+							(applyFilter)='customFilter()',
+							[disabled]='!loaded || isDeleting',
+							[data]='quotationStatus',
+							ngDefaultControl)
+					// Project Status Column
+					mat-cell.w-120
+						filter-box(
+							type='filter',
+							multiple='true',
+							translated='true',
+							[(filter)]='filters[ "project_status_name.id" ]',
+							(applyFilter)='customFilter()',
+							[disabled]='!loaded || isDeleting',
+							[data]='projectStatus',
+							ngDefaultControl)
+					// Actions Column
+					mat-cell.w-65
+
+			mat-header-row(*matHeaderRowDef='displayedColumns')
+			mat-header-row(*matHeaderRowDef='[ "filters" ]')
+			mat-row(*matRowDef='let row; columns: displayedColumns;')
+			mat-footer-row(
+				footerRowInTop,
+				*matFooterRowDef='displayedColumns',
+				[class.hide]='!dataSource?.filteredData?.length || isHideQuotation')
+			mat-footer-row(
+				*matFooterRowDef='displayedColumns',
+				[class.hide]='!dataSource?.filteredData?.length || isHideQuotation')
+
+		mat-paginator(
+			#paginator,
+			pageSize='30',
+			[pageSizeOptions]='[ 30, 50, 100 ]',
+			showFirstLastButtons='true')

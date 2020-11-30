@@ -1,0 +1,112 @@
+.table-client.mat-elevation-z8
+	loading-overlay([visible]='!loaded')
+		mat-table(
+			#table,
+			plugin-data-table,
+			matSort,
+			[dataSource]='dataSource',
+			[attr.data-label]='!dataSource?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+			// Name Column
+			ng-container(matColumnDef='name')
+				mat-header-cell(*matHeaderCellDef, mat-sort-header='name')
+					| {{ "FINANCE.CLIENT.ATTRIBUTES.CLIENT" | translate }}
+					| &nbsp;
+					i.fa.fa-sort
+				mat-cell(*matCellDef='let element')
+					.font-weight-500
+						| {{ element?.name || "N/A" }}
+					i.fa.fa-info-circle.note-icon(
+						*ngIf='hasLezoApp && element?.lezo_client_id',
+						[matTooltip]='"FINANCE.CLIENT.LABELS.LINKED_WITH_LEZO_CLIENT" | translate')
+			// Tax Column
+			ng-container(matColumnDef='tax')
+				mat-header-cell(*matHeaderCellDef, mat-sort-header='tax')
+					| {{ "GENERAL.ATTRIBUTES.TAX" | translate }}
+					| &nbsp;
+					i.fa.fa-sort
+				mat-cell(*matCellDef='let element')
+					| {{ element?.tax || "N/A" }}
+			// Phone Column
+			ng-container(matColumnDef='phone')
+				mat-header-cell(*matHeaderCellDef, mat-sort-header='phone')
+					| {{ "GENERAL.ATTRIBUTES.PHONE" | translate }}
+					| &nbsp;
+					i.fa.fa-sort
+				mat-cell(*matCellDef='let element')
+					| {{ element?.phone || "N/A" }}
+			// Status Column
+			ng-container(matColumnDef='status')
+				mat-header-cell(*matHeaderCellDef, mat-sort-header='status')
+					.ph-10
+						| {{ "GENERAL.ATTRIBUTES.STATUS" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+				mat-cell(*matCellDef='let element')
+					mat-slide-toggle.ph-10(
+						[checked]='!element?.is_disabled',
+						[disabled]='!loaded || isSubmitting',
+						(change)='element.is_disabled = !element.is_disabled; toggleStatus( element );')
+					span
+						| {{ ( element?.is_disabled ? "GENERAL.LABELS.DISABLED" : "GENERAL.LABELS.ACTIVATED" ) | translate }}
+			// Actions Column
+			ng-container(matColumnDef='actions')
+				mat-header-cell.w-65(*matHeaderCellDef)
+					| {{ "GENERAL.ATTRIBUTES.ACTION" | translate }}
+				mat-cell.w-65(*matCellDef='let element')
+					action-box
+						action-button(
+							color='success',
+							icon='fa fa-edit',
+							[title]='"GENERAL.LABELS.EDIT" | translate',
+							[disabled]='!loaded || isSubmitting',
+							(onClick)='openDialog( element )')
+						action-button(
+							color='warn',
+							icon='fa fa-trash',
+							[title]='"GENERAL.LABELS.DELETE" | translate',
+							[disabled]='!loaded || isSubmitting',
+							(onClick)='delete( element )')
+
+			// Filters
+			ng-container(matColumnDef='filters')
+				mat-header-cell(*matHeaderCellDef)
+					// Name Column
+					mat-cell
+						filter-box(
+							[disabled]='!loaded || isSubmitting',
+							[(filter)]='searchQueries.name',
+							(applyFilter)='applyFilter()')
+					// Tax Column
+					mat-cell
+						filter-box(
+							[disabled]='!loaded || isSubmitting',
+							[(filter)]='searchQueries.tax',
+							(applyFilter)='applyFilter()')
+					// Phone Column
+					mat-cell
+						filter-box(
+							[disabled]='!loaded || isSubmitting',
+							[(filter)]='searchQueries.phone',
+							(applyFilter)='applyFilter()')
+					// Status Column
+					mat-cell
+						filter-box(
+							type='filter',
+							translated='true',
+							[disabled]='!loaded || isSubmitting',
+							[(filter)]='filters.is_disabled',
+							[emptyLabel]='"GENERAL.LABELS.ALL_STATUS" | translate',
+							[data]='[ { id: false, name: "GENERAL.LABELS.ACTIVATED" }, { id: true, name: "GENERAL.LABELS.DISABLED" } ]',
+							(applyFilter)='applyFilter()')
+					// Actions Column
+					mat-cell.w-65
+
+			mat-header-row(*matHeaderRowDef='displayedColumns')
+			mat-header-row(*matHeaderRowDef='[ "filters" ]')
+			mat-row(*matRowDef='let row; columns: displayedColumns;')
+
+		mat-paginator(
+			#paginator,
+			pageSize='30',
+			[pageSizeOptions]='[ 30, 50, 100 ]',
+			showFirstLastButtons='true')

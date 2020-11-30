@@ -1,0 +1,73 @@
+.row {
+  display: flex;
+  flex-grow: 1;
+}
+
+.col-1 {
+  flex-grow: 1;
+}
+
+.col-2 {
+  width: 550px;
+}
+
+.col-4{
+  width: 48px;
+}
+
+.col-3 {
+  width: 100%;
+}
+
+.my-note{
+}
+.divme{
+  display: inline-flex;
+}
+.vo-color {
+  background-color: rgb(199,199,199);
+  height: 22px;
+  width: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  top: 6px;
+  left: -2px;
+}
+
+.real-receivable-color {
+  background-color: rgb(83,184,35);
+  height: 22px;
+  width: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  top: 6px;
+  left: -2px;
+}
+
+.plan-payable-color {
+  background-color: #fd8631;
+  height: 22px;
+  width: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  top: 6px;
+  left: -2px;
+}
+
+.margin-span {
+  margin-right: 15px;
+  margin-top: 4px;
+  color: #666666;
+  font-size: 9pt;
+}
+.my-hide{
+  position: absolute;
+  top: 115px;
+  width: 500px;
+  height: 50px;
+  background: white;
+}
+
+.kkk{
+  margin-top: -8px;
+}

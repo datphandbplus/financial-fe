@@ -1,0 +1,38 @@
+.dialog-upload-file.mb-10
+	h1(matDialogTitle)
+		ng-template([ngIf]='uploadFileDestination === "cost"')
+			| {{ "FINANCE.PROJECT.TITLES.IMPORT_COST_FILE" | translate }}
+		ng-template([ngIf]='uploadFileDestination === "line"')
+			| {{ "FINANCE.PROJECT.TITLES.IMPORT_LINE_FILE" | translate }}
+
+	upload-box(
+		[allowExtensions]='[ ".xls", ".xlsx" ]',
+		[allowFormats]='[ "application/ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ]',
+		[label]='"FINANCE.PROJECT.LABELS.IMPORT_FILE" | translate',
+		[disabled]='isUploading',
+		(onFileSelected)='onFileSelected( $event )')
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isUploading',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			(click)='onUpload()',
+			[disabled]='isUploading || !fileLocation')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isUploading')
+						| {{ "FINANCE.PROJECT.LABELS.IMPORT" | translate }}
+					ng-template([ngIf]='isUploading')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isUploading',
+					diameter='20')

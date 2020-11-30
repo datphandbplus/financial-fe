@@ -1,0 +1,88 @@
+.dashboard.page
+	.page__content
+		.container
+			.layout-row.layout-align-start-center.filters.mb-15
+				.layout-row.layout-align-start-center.mr-20
+					.mr-10.text-primary.font-weight-600
+						| {{ "GENERAL.LABELS.FILTERED_BY_DATE" | translate }}:
+					filter-box.ph-5.w-220(
+						type='datepicker',
+						rangeMode='true',
+						[(filter)]='filters.date',
+						(applyFilter)='getColumnChartData(); getProjectStatistic(); getProjectStatisticRRP();',
+						[disabled]='!loaded')
+				.layout-row.layout-align-start-center
+					.mr-10.text-primary.font-weight-600
+						| {{ "FINANCE.PROJECT.LABELS.FILTERED_BY_PROJECT" | translate }}:
+					filter-box.ph-5.w-300(
+						type='filter',
+						fieldName='short_name',
+						multiple='true',
+						[(filter)]='filters.client_ids',
+						(applyFilter)='onClientChange()',
+						[placeholder]='"FINANCE.CLIENT.PLACEHOLDERS.CLIENT" | translate',
+						[disabled]='!loaded',
+						[data]='clients')
+					filter-box.ph-5.w-300(
+						type='filter',
+						multiple='true',
+						[(filter)]='filters.project_ids',
+						(applyFilter)='getColumnChartData(); getProjectStatistic(); getProjectStatisticRRP();',
+						[disabled]='!loaded',
+						[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.PROJECT" | translate',
+						[data]='filteredProjects')
+
+			.layout-row.layout-align-space-between
+				mat-radio-group.pt-20(
+					[(ngModel)]='chartViewType',
+					(change)='chartViewChange( $event )',
+					ngDefaultControl)
+					mat-radio-button.mr-15([value]='REAL_AND_PLAN')
+						| {{ "FINANCE.PROJECT.LABELS.GROSS_REAL_AND_PLAN" | translate }}
+					mat-radio-button.mr-15([value]='REAL_ONLY')
+						| {{ "FINANCE.PROJECT.LABELS.SEPARATE_REVENUE_AND_EXPENDITURE" | translate }}
+				.mv-15
+					mat-button-toggle-group(
+						[(ngModel)]='filters.type',
+						(change)='getColumnChartData(); getProjectStatistic(); getProjectStatisticRRP();')
+						mat-button-toggle(value='week')
+							| {{ "GENERAL.LABELS.WEEK" | translate }}
+						mat-button-toggle(value='month')
+							| {{ "GENERAL.LABELS.MONTH" | translate }}
+
+			mat-card.mat-elevation-z8
+				canvas(
+					baseChart,
+					[labels]='chartLabels',
+					[datasets]='chartDatasets',
+					[colors]='chartColors',
+					[options]='chartOptions',
+					legend='true',
+					chartType='line')
+
+			mat-card.mat-elevation-z8.mt-20
+				canvas(
+					baseChart,
+					[labels]='rrpChartLabels',
+					[datasets]='rrpChartDatasets',
+					[colors]='rrpChartColors',
+					[options]='rrpChartOptions',
+					legend='true',
+					chartType='line')
+
+			mat-card.mat-elevation-z8.mt-20
+				div.kkk
+					canvas(
+						baseChart,
+						[labels]='columnChartSettings.labels',
+						[datasets]='columnChartSettings.datasets',
+						[colors]='columnChartSettings.colors',
+						[options]='columnChartSettings.options',
+						legend='true',
+						chartType='bar')
+				div.text-center.my-note
+					div.divme
+						div.real-receivable-color
+						span.margin-span Total Line
+						div.plan-payable-color
+						span.margin-span Total Bill

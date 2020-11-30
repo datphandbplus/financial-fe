@@ -1,0 +1,174 @@
+.tab-sheet-bill
+	.layout-row.layout-align-end.mb-15(*ngIf='canAddSheet')
+		button(
+			mat-raised-button,
+			color='primary',
+			[disabled]='project?.project_status === projectStatus.DONE',
+			(click)='openDialogProjectLineItem()')
+			i.fa.fa-plus.mr-15
+			| {{ "FINANCE.LINE_ITEM.LABELS.NEW_LINE_ITEM" | translate }}
+
+	div([fullscreen]='".mat-column-actions"')
+		loading-overlay([visible]='!loadedSheetDetail')
+			.scrollable.only-x
+				div([ngStyle]='{ minWidth: lineItemDataSource[ selectedTabIndex - 1 ]?.filteredData?.length ? "1740px": "auto" }')
+					mat-table(
+						#table,
+						plugin-data-table,
+						[dataSource]='lineItemDataSource[ selectedTabIndex - 1 ]',
+						[attr.data-label]='!lineItemDataSource[ selectedTabIndex - 1 ]?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+						// Name Column
+						ng-container(matColumnDef='name', sticky)
+							mat-header-cell.w-300.sort-col(*matHeaderCellDef, (click)='sortSheets( selectedTabIndex - 1, "name" )')
+								.w-30
+									| {{ "GENERAL.ATTRIBUTES.NUMBER_ORDER" | translate }}
+								.ph-5
+									| {{ "GENERAL.ATTRIBUTES.NAME" | translate }}
+									| &nbsp;
+									i.fa.fa-sort(*ngIf='sortArrays.name === 0')
+									i.fa.fa-arrow-up(*ngIf='sortArrays.name === 1')
+									i.fa.fa-arrow-down(*ngIf='sortArrays.name === -1')
+							mat-cell.w-300.cursor(
+								*matCellDef='let element',
+								(click)='showGroupDetail( element )')
+								.layout-row.layout-align-start-center.layout-fixer-15
+									span.mr-10.font-size-18
+										i.fa.fa-angle-down(*ngIf='!element?.show_detail_row')
+										i.fa.fa-angle-up(*ngIf='element?.show_detail_row')
+									.font-weight-500
+										| {{ element?.group }}
+							mat-footer-cell.w-300(*matFooterCellDef)
+								.text-success
+									| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+
+						// Description Column
+						ng-container(matColumnDef='description')
+							mat-header-cell.w-300.sort-col(*matHeaderCellDef, (click)='sortSheets( selectedTabIndex - 1, "description" )')
+								| {{ "GENERAL.ATTRIBUTES.DESCRIPTION" | translate }}
+								| &nbsp;
+								i.fa.fa-sort(*ngIf='sortArrays.description === 0')
+								i.fa.fa-arrow-up(*ngIf='sortArrays.description === 1')
+								i.fa.fa-arrow-down(*ngIf='sortArrays.description === -1')
+							mat-cell.w-300(*matCellDef='let element')
+							mat-footer-cell.w-300(*matFooterCellDef)
+
+						// Image Column
+						ng-container(matColumnDef='image')
+							mat-header-cell(*matHeaderCellDef)
+								| {{ "FINANCE.PROJECT.ATTRIBUTES.IMAGE" | translate }}
+							mat-cell(*matCellDef='let element')
+							mat-footer-cell(*matFooterCellDef)
+
+						// Unit Column
+						ng-container(matColumnDef='unit')
+							mat-header-cell.sort-col(*matHeaderCellDef, (click)='sortSheets( selectedTabIndex - 1, "unit" )')
+								| {{ "GENERAL.ATTRIBUTES.UNIT" | translate }}
+								| &nbsp;
+								i.fa.fa-sort(*ngIf='sortArrays.unit === 0')
+								i.fa.fa-arrow-up(*ngIf='sortArrays.unit === 1')
+								i.fa.fa-arrow-down(*ngIf='sortArrays.unit === -1')
+							mat-cell(*matCellDef='let element')
+							mat-footer-cell(*matFooterCellDef)
+
+						// Amount Column
+						ng-container(matColumnDef='amount')
+							mat-header-cell.layout-align-end.sort-col(*matHeaderCellDef, (click)='sortSheets( selectedTabIndex - 1, "amount" )')
+								| {{ "FINANCE.PROJECT.ATTRIBUTES.AMOUNT" | translate }}
+								| &nbsp;
+								i.fa.fa-sort(*ngIf='sortArrays.amount === 0')
+								i.fa.fa-arrow-up(*ngIf='sortArrays.amount === 1')
+								i.fa.fa-arrow-down(*ngIf='sortArrays.amount === -1')
+							mat-cell.layout-align-end(*matCellDef='let element')
+							mat-footer-cell.layout-align-end(*matFooterCellDef)
+
+						// Price Column
+						ng-container(matColumnDef='price')
+							mat-header-cell.layout-align-end.sort-col(*matHeaderCellDef, (click)='sortSheets( selectedTabIndex - 1, "price" )')
+								| {{ "GENERAL.ATTRIBUTES.PRICE" | translate }}
+								| &nbsp;
+								i.fa.fa-sort(*ngIf='sortArrays.price === 0')
+								i.fa.fa-arrow-up(*ngIf='sortArrays.price === 1')
+								i.fa.fa-arrow-down(*ngIf='sortArrays.price === -1')
+							mat-cell.layout-align-end(*matCellDef='let element')
+							mat-footer-cell.layout-align-end(*matFooterCellDef)
+
+						// Total Column
+						ng-container(matColumnDef='total')
+							mat-header-cell.layout-align-end.sort-col(*matHeaderCellDef, (click)='sortSheets( selectedTabIndex - 1, "total" )')
+								| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+								| &nbsp;
+								i.fa.fa-sort(*ngIf='sortArrays.total === 0')
+								i.fa.fa-arrow-up(*ngIf='sortArrays.total === 1')
+								i.fa.fa-arrow-down(*ngIf='sortArrays.total === -1')
+							mat-cell.layout-align-end(*matCellDef='let element')
+								.text-warn
+									| {{ ( element?.total || 0 )?.toFixed( 0 ) | commas }}
+							mat-footer-cell.layout-align-end(*matFooterCellDef)
+								.text-warning
+									| {{ ( lineItemDataSource[ selectedTabIndex - 1 ]?.footerTotal || 0 )?.toFixed( 0 ) | commas }}
+
+						// Note Column
+						ng-container(matColumnDef='note')
+							mat-header-cell.w-300.sort-col(*matHeaderCellDef, (click)='sortSheets( selectedTabIndex - 1, "note" )')
+								| {{ "FINANCE.PROJECT.ATTRIBUTES.NOTE" | translate }}
+								| &nbsp;
+								i.fa.fa-sort(*ngIf='sortArrays.note === 0')
+								i.fa.fa-arrow-up(*ngIf='sortArrays.note === 1')
+								i.fa.fa-arrow-down(*ngIf='sortArrays.note === -1')
+							mat-cell.w-300(*matCellDef='let element')
+							mat-footer-cell.w-300(*matFooterCellDef)
+
+						// Actions Column
+						ng-container(matColumnDef='actions', stickyEnd)
+							mat-header-cell.w-115(*matHeaderCellDef)
+								.layout-row.layout-align-space-between-center.flex-noshrink
+									| {{ "GENERAL.ATTRIBUTES.ACTION" | translate }}
+									.ml-10(*ngIf='!isLiabilitiesAccountant && !isCFO && canAddSheet && lineItemDataSource[ selectedTabIndex - 1 ]?.filteredData?.length')
+										button(
+											plugin-button-only-icon,
+											mat-stroked-button,
+											color='accent',
+											(click)='toggleSortPriority()',
+											[matTooltip]='sortable ? ( "GENERAL.LABELS.APPLY_SORTED" | translate ) : ( "GENERAL.LABELS.SORTING" | translate )')
+											ng-template([ngIf]='!sortable')
+												i.icon.icon-sort
+											ng-template([ngIf]='sortable')
+												i.fa.fa-check
+							mat-cell.w-115(*matCellDef='let element; let index = index;')
+								action-box([disabled]='isLiabilitiesAccountant || isCFO || !canAddSheet')
+									action-button(
+										color='accent',
+										icon='fa fa-plus',
+										[disabled]='project?.project_status === projectStatus.DONE',
+										[title]='"GENERAL.LABELS.ADD" | translate',
+										(onClick)='openDialogProjectLineItem( { group: element?.group } )')
+								.ph-10(*ngIf='sortable')
+									button(
+										plugin-button-only-icon,
+										mat-stroked-button,
+										type='button',
+										(click)='changeGroupPriority( index )')
+										i.icon.icon-sort.text-accent(style='transform: rotate(90deg)')
+							mat-footer-cell.w-115(*matFooterCellDef)
+
+						ng-container(matColumnDef='expandedDetail')
+							mat-cell(
+								*matCellDef='let detail',
+								style='padding: 0; overflow: unset;')
+								include block-project-line-item.partial.pug
+
+						mat-header-row(*matHeaderRowDef='lineItemDisplayedColumns')
+						mat-row(
+							[class.hide]='!row?.group?.length',
+							*matRowDef='let row; columns: lineItemDisplayedColumns;')
+						mat-row.detail-row(
+							*matRowDef='let row; columns: [ "expandedDetail" ]; when: isExpansionDetailRow;',
+							[@detailExpand]='row?.group_info?.show_detail_row ? "expanded" : "collapsed"',
+							[class.unscrollable]='row?.group && detailRowScrollable[ row?.group ]')
+						mat-footer-row(
+							footerRowInTop,
+							*matFooterRowDef='lineItemDisplayedColumns; sticky: true;',
+							[class.hide]='!lineItemDataSource[ selectedTabIndex - 1 ]?.filteredData?.length')
+						mat-footer-row(
+							*matFooterRowDef='lineItemDisplayedColumns; sticky: true;',
+							[class.hide]='!lineItemDataSource[ selectedTabIndex - 1 ]?.filteredData?.length')

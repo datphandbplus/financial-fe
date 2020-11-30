@@ -1,0 +1,139 @@
+form.form-project-bill-status(
+	*ngIf='isCFO || isLiabilitiesAccountant || bill?.status === BILL_STATUS?.MONEY_COLLECTED',
+	[formGroup]='billStatusForm')
+	.layout-row.layout-align-start-center.mt-10.mb-20
+		.font-size-18.font-weight-500
+			| {{ "GENERAL.LABELS.STATUS" | translate | uppercase }}
+			| ({{ "FINANCE.PROJECT.LABELS.LIABILITIES_ACCOUNTANT_ONLY" | translate | uppercase }})
+		.ph-20.flex-auto
+			mat-divider
+		button(
+			*ngIf='isLiabilitiesAccountant && !viewOnly',
+			mat-raised-button,
+			color='primary',
+			(click)='updateStatus()',
+			[disabled]='billStatusForm?.invalid || isSubmitting || isUploading')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting && !isUploading')
+						| {{ ( bill?.id ? "GENERAL.LABELS.SAVE" : "GENERAL.LABELS.ADD" ) | translate }}
+					ng-template([ngIf]='isSubmitting || isUploading')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')
+	.layout-row.flex-100.mb-30.layout-align-start-center
+		mat-form-field.flex-auto(
+			plugin-input-radio,
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "GENERAL.LABELS.STATUS" | translate }}
+			input.hide(matInput)
+			mat-radio-group(
+				[(ngModel)]='bill.status',
+				(change)='billStatusChange( $event )',
+				[formControl]='billStatusForm?.controls[ "status" ]',
+				[disableControl]='isSubmitting || isUploading || !isLiabilitiesAccountant || viewOnly',
+				ngDefaultControl)
+				mat-radio-button.mr-15([value]='BILL_STATUS?.WAITING')
+					| {{ "FINANCE.PROJECT.LABELS.WAITING" | translate }}
+				mat-radio-button.mr-15([value]='BILL_STATUS?.PROCESSING')
+					| {{ "FINANCE.PROJECT.LABELS.PROCESSING" | translate }}
+				mat-radio-button.mr-15(
+					[value]='BILL_STATUS?.INVOICE_SENT',
+					[disabled]='!bill?.invoices?.length')
+					| {{ "FINANCE.PROJECT.LABELS.INVOICE_SENT" | translate }}
+				mat-radio-button.mr-15(
+					[value]='BILL_STATUS?.MONEY_COLLECTED')
+					| {{ "FINANCE.PROJECT.LABELS.MONEY_COLLECTED" | translate }}
+	.layout-row.layout-wrap.layout-fixer-15(*ngIf='bill?.status === BILL_STATUS?.MONEY_COLLECTED')
+		mat-form-field.mb-10.ph-15.flex-50(
+			plugin-input-parse-commas,
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.TOTAL" | translate }}
+			input(
+				matInput,
+				type='number',
+				step='1000',
+				min='0',
+				[(ngModel)]='bill.total_real',
+				[formControl]='billStatusForm?.controls[ "total_real" ]',
+				[disableControl]='isSubmitting || isUploading',
+				[readonly]='!isLiabilitiesAccountant || viewOnly',
+				required,
+				ngDefaultControl)
+			span(matPrefix)
+				| {{ ( bill?.total_real?.toString() || "" ) | commas }}
+			mat-hint
+				| {{ ( bill?.total_real?.toString() || "" ) | commas }}
+			mat-error
+				error-message(
+					[label]='"FINANCE.PROJECT.LABELS.TOTAL" | translate',
+					[control]='billStatusForm?.controls[ "total_real" ]')
+		mat-form-field.mb-10.ph-15.flex-50(
+			plugin-input-parse-commas,
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "GENERAL.LABELS.VAT" | translate }}
+			input(
+				matInput,
+				type='number',
+				step='1000',
+				min='0',
+				[(ngModel)]='bill.total_vat_real',
+				[formControl]='billStatusForm?.controls[ "total_vat_real" ]',
+				[disableControl]='isSubmitting || isUploading',
+				[readonly]='!isLiabilitiesAccountant || viewOnly',
+				required,
+				ngDefaultControl)
+			span(matPrefix)
+				| {{ ( bill?.total_vat_real?.toString() || "" ) | commas }}
+			mat-hint
+				| {{ ( bill?.total_vat_real?.toString() || "" ) | commas }}
+			mat-error
+				error-message(
+					[label]='"GENERAL.LABELS.VAT" | translate',
+					[control]='billStatusForm?.controls[ "total_vat_real" ]')
+		mat-form-field.ph-15.flex-50(
+			floatLabel='always',
+			appearance='outline',
+			(click)='receivedPicker?.open()')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.RECEIVED_DATE" | translate }}
+			span
+				| {{ bill?.received_date ? ( bill?.received_date | momentDateFormat ) : "FINANCE.PROJECT.PLACEHOLDERS.RECEIVED_DATE" | translate }}
+			input.hide(
+				matInput,
+				[max]="maxDate",
+				[matDatepicker]='receivedPicker',
+				[(ngModel)]='bill.received_date',
+				[formControl]='billStatusForm?.controls[ "received_date" ]',
+				ngDefaultControl,
+				required,
+				readonly)
+			mat-datepicker-toggle(
+				matSuffix,
+				[for]='receivedPicker')
+			mat-datepicker(
+				#receivedPicker,
+				[disabled]='!isLiabilitiesAccountant || viewOnly')
+		mat-form-field.ph-15.flex-50(
+			plugin-input-parse-commas,
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.SUBTOTAL" | translate }}
+			input(
+				matInput,
+				type='number',
+				min='0',
+				[formControl]='billForm?.controls[ "subtotal" ]',
+				[disableControl]='isSubmitting || isUploading',
+				readonly,
+				ngDefaultControl)
+			span(matPrefix)
+				| {{ ( ( bill?.total_real + bill?.total_vat_real )?.toString() || "" ) | commas }}

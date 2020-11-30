@@ -1,0 +1,43 @@
+@import '~angular-core/lib/scss/partials/variable';
+@import 'src/scss/partials/variable';
+
+.project-detail {
+	&__input-status {
+		.mat-form-field.mat-focused .mat-form-field-outline {
+			color: unset;
+		}
+
+		.mat-form-field-outline {
+			color: currentColor;
+
+			&:before {
+				content: '';
+				background-color: currentColor;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				position: absolute;
+				border-radius: 5px;
+				opacity: .2;
+			}
+		}
+
+		input {
+			color: $black;
+		}
+	}
+
+	.sidebar-item {
+		position: relative;
+
+		.dots {
+			width: 6px;
+			height: 6px;
+			background-color: $warning;
+			position: absolute;
+			border-radius: 50%;
+			right: -10px;
+		}
+	}
+}

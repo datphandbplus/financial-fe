@@ -1,0 +1,113 @@
+form.dialog-project-bill-plan.layout-column(
+	[formGroup]='projectBillPlanForm',
+	(submit)='projectBillPlan?.id ? update() : create()')
+	h1(matDialogTitle)
+		ng-container(*ngIf='projectBillPlan?.id')
+			| {{ "FINANCE.PROJECT.TITLES.EDIT_PROJECT_BILL_PLAN" | translate }}
+		ng-container(*ngIf='!projectBillPlan?.id')
+			| {{ "FINANCE.PROJECT.TITLES.NEW_PROJECT_BILL_PLAN" | translate }}
+
+	div(matDialogContent)
+		.layout-row.layout-wrap.layout-fixer-15
+			mat-form-field.mb-10.ph-15.flex-100(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.NAME" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='projectBillPlan.name',
+					[placeholder]='"GENERAL.PLACEHOLDERS.NAME" | translate',
+					[formControl]='projectBillPlanForm?.controls[ "name" ]',
+					[disableControl]='isSubmitting',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.NAME" | translate',
+						[control]='projectBillPlanForm?.controls[ "name" ]')
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.TARGET_PERCENT" | translate }}
+				input(
+					matInput,
+					type='number',
+					[(ngModel)]='projectBillPlan.target_percent',
+					[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.TARGET_PERCENT" | translate',
+					[formControl]='projectBillPlanForm?.controls[ "target_percent" ]',
+					[disableControl]='isSubmitting',
+					ngDefaultControl)
+				span(matSuffix)
+					| {{ "FINANCE.PROJECT.LABELS.PERCENT" | translate | lowercase }}
+				span(matPrefix)
+					| {{ ( projectBillPlan?.target_percent?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( projectBillPlan?.target_percent?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"FINANCE.PROJECT.LABELS.TARGET_PERCENT" | translate',
+						[control]='projectBillPlanForm?.controls[ "target_percent" ]')
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline',
+				(click)='targetDatePicker?.open()')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.TARGET_DATE" | translate }}
+				span
+					| {{ projectBillPlan?.target_date ? ( projectBillPlan?.target_date | momentDateFormat ) : ( "FINANCE.PROJECT.PLACEHOLDERS.TARGET_DATE" | translate ) }}
+				input.hide(
+					matInput,
+					[matDatepicker]='targetDatePicker',
+					[(ngModel)]='projectBillPlan.target_date',
+					[formControl]='projectBillPlanForm?.controls[ "target_date" ]',
+					ngDefaultControl,
+					readonly)
+				mat-datepicker-toggle(
+					matSuffix,
+					[for]='targetDatePicker')
+				mat-datepicker(
+					#targetDatePicker,
+					[disabled]='isSubmitting')
+
+			mat-form-field.ph-15.flex-100(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.NOTE" | translate }}
+				textarea(
+					matInput,
+					rows='7',
+					[(ngModel)]='projectBillPlan.note',
+					[placeholder]='"FINANCE.PROJECT.LABELS.NOTE" | translate',
+					[formControl]='projectBillPlanForm?.controls[ "note" ]',
+					[disableControl]='isSubmitting',
+					ngDefaultControl)
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='projectBillPlanForm?.invalid || isSubmitting')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ "GENERAL.LABELS.SAVE" | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

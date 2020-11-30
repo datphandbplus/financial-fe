@@ -1,0 +1,302 @@
+form.dialog-client.layout-column(
+	[formGroup]='clientForm',
+	(submit)='data ? update() : create()')
+	h1(matDialogTitle)
+		ng-template([ngIf]='!data')
+			| {{ "FINANCE.CLIENT.TITLES.ADD_CLIENT" | translate }}
+		ng-template([ngIf]='data')
+			| {{ "FINANCE.CLIENT.TITLES.EDIT_CLIENT" | translate }}
+
+	div(matDialogContent)
+		.layout-row.layout-wrap.layout-fixer-15
+			select-box.mb-10.ph-15.flex-100(
+				matInput,
+				*ngIf='hasLezoApp && !data',
+				[disableControl]='isSubmitting',
+				[(ngModel)]='client.lezo_client_id',
+				[label]='"FINANCE.CLIENT.LABELS.LINK_WITH_LEZO_CLIENT" | translate',
+				[placeholder]='"FINANCE.CLIENT.PLACEHOLDERS.CLIENT" | translate',
+				[formControl]='clientForm?.controls[ "lezo_client_id" ]',
+				[data]='lezoClientService?.getAll()',
+				(selectionOptionChange)='onLezoClientChange( $event )',
+				ngDefaultControl)
+
+			mat-form-field.mb-10.flex-50.ph-15(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.SHORT_NAME" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='client.short_name',
+					[readonly]='hasLezoApp && client?.lezo_client_id',
+					[placeholder]='"GENERAL.PLACEHOLDERS.SHORT_NAME" | translate',
+					[formControl]='clientForm?.controls[ "short_name" ]',
+					[disableControl]='isSubmitting',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.SHORT_NAME" | translate',
+						[control]='clientForm?.controls[ "short_name" ]')
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.TAX" | translate }}
+				input(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting',
+					[(ngModel)]='client.tax',
+					[placeholder]='"GENERAL.PLACEHOLDERS.TAX" | translate',
+					[formControl]='clientForm?.controls[ "tax" ]',
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.TAX" | translate',
+						[control]='clientForm?.controls[ "tax" ]')
+
+			mat-form-field.mb-10.flex-50.ph-15(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.OFFICIAL_NAME" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='client.name',
+					[placeholder]='"GENERAL.PLACEHOLDERS.OFFICIAL_NAME" | translate',
+					[formControl]='clientForm?.controls[ "name" ]',
+					[disableControl]='isSubmitting',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.OFFICIAL_NAME" | translate',
+						[control]='clientForm?.controls[ "name" ]')
+
+			mat-form-field.mb-10.flex-50.ph-15(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.PHONE" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='client.phone',
+					[placeholder]='"GENERAL.PLACEHOLDERS.PHONE" | translate',
+					[formControl]='clientForm?.controls[ "phone" ]',
+					[disableControl]='isSubmitting',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.PHONE" | translate',
+						[control]='clientForm?.controls[ "phone" ]')
+
+			mat-form-field.mb-10.flex-100.ph-15(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.ADDRESS" | translate }}
+				input(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting',
+					[(ngModel)]='client.address',
+					[placeholder]='"GENERAL.PLACEHOLDERS.ADDRESS" | translate',
+					[formControl]='clientForm?.controls[ "address" ]',
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.ADDRESS" | translate',
+						[control]='clientForm?.controls[ "address" ]')
+
+			mat-form-field.mb-10.flex-100.ph-15(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.BANK_NAME" | translate }}
+				input(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting',
+					[(ngModel)]='client.bank_name',
+					[placeholder]='"GENERAL.PLACEHOLDERS.BANK_NAME" | translate',
+					[formControl]='clientForm?.controls[ "bank_name" ]',
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.BANK_NAME" | translate',
+						[control]='clientForm?.controls[ "bank_name" ]')
+
+			select-box.mb-10.ph-15.flex-50(
+				matInput,
+				fieldKey='name',
+				[disableControl]='isSubmitting',
+				[(ngModel)]='client.bank_province',
+				[label]='"GENERAL.LABELS.BANK_PROVINCE" | translate',
+				[placeholder]='"GENERAL.PLACEHOLDERS.BANK_PROVINCE" | translate',
+				[formControl]='clientForm?.controls[ "bank_province" ]',
+				[data]='PROVINCE_MAP',
+				ngDefaultControl)
+
+			mat-form-field.mb-10.flex-50.ph-15(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.BANK_BRANCH" | translate }}
+				input(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting',
+					[(ngModel)]='client.bank_branch',
+					[placeholder]='"GENERAL.PLACEHOLDERS.BANK_BRANCH" | translate',
+					[formControl]='clientForm?.controls[ "bank_branch" ]',
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.BANK_BRANCH" | translate',
+						[control]='clientForm?.controls[ "bank_branch" ]')
+
+			mat-form-field.mb-10.flex-100.ph-15(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.BANK_ACCOUNT_NUMBER" | translate }}
+				input(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting',
+					[(ngModel)]='client.bank_account_number',
+					[placeholder]='"GENERAL.PLACEHOLDERS.BANK_ACCOUNT_NUMBER" | translate',
+					[formControl]='clientForm?.controls[ "bank_account_number" ]',
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.BANK_ACCOUNT_NUMBER" | translate',
+						[control]='clientForm?.controls[ "bank_account_number" ]')
+
+			mat-form-field.mb-10.flex-100.ph-15(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.PAYMENT_TERM" | translate }}
+				input(
+					matInput,
+					type='number',
+					step='1',
+					min='0',
+					[(ngModel)]='client.payment_term',
+					[placeholder]='"GENERAL.PLACEHOLDERS.PAYMENT_TERM" | translate',
+					[formControl]='clientForm?.controls[ "payment_term" ]',
+					[disableControl]='isSubmitting',
+					required,
+					ngDefaultControl)
+				span(matSuffix)
+					| {{ "GENERAL.LABELS.DAYS" | translate | lowercase }}
+				span(matPrefix)
+					| {{ ( client?.payment_term?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( client?.payment_term?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.PAYMENT_TERM" | translate',
+						[control]='clientForm?.controls[ "payment_term" ]')
+
+			mat-form-field.flex-100.ph-15(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.DESCRIPTION" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting',
+					[(ngModel)]='client.description',
+					[placeholder]='"GENERAL.PLACEHOLDERS.DESCRIPTION" | translate',
+					[formControl]='clientForm?.controls[ "description" ]',
+					ngDefaultControl)
+
+		.layout-row.layout-align-start-center.mt-10.mb-20
+				.mr-20.font-size-18.font-weight-500
+					| {{ "FINANCE.CLIENT.LABELS.CONTACT_POINT" | translate | uppercase }}
+				mat-divider.flex-auto
+
+		ng-template(
+			ngFor,
+			let-contact,
+			let-last='last',
+			let-i='index',
+			[ngForOf]='clientForm?.controls[ "contact_list" ][ "controls" ]')
+			.layout-row.layout-wrap.flex-100
+				mat-form-field.mb-10.pr-10.flex-auto(
+					floatLabel='always',
+					appearance='outline')
+					mat-label
+						| {{ "GENERAL.LABELS.PERSON" | translate }}
+						| {{ i + 1 }}
+					textarea(
+						matInput,
+						rows='4',
+						[(ngModel)]='client.contact_list[ i ]',
+						[formControl]='contact?.controls[ "info" ]',
+						[disableControl]='isSubmitting',
+						required,
+						[readonly]='contactListControl[ i ]',
+						ngDefaultControl)
+					mat-error
+						error-message(
+							[label]='"GENERAL.LABELS.PERSON" | translate',
+							[control]='contact?.controls[ "info" ]')
+
+				.layout-column.layout-wrap
+					.mt-5.flex-nogrow.ph-15(*ngIf='clientForm?.controls[ "contact_list" ][ "controls" ]?.length')
+					.pv-5
+						button(
+							plugin-button-only-icon,
+							mat-stroked-button,
+							type='button',
+							(click)='editContactList( i )')
+							i.fa.text-success([ngClass]='{ "fa-edit": contactListControl[ i ], "fa-check": !contactListControl[ i ] }')
+					.pv-5
+						button(
+							plugin-button-only-icon,
+							mat-stroked-button,
+							type='button',
+							(click)='removeClientContactFB( i )')
+							i.fa.fa-trash-alt.text-warn
+
+		button(
+			*ngIf='( clientForm?.controls[ "contact_list" ][ "controls" ]?.length < maxContacts )',
+			mat-raised-button,
+			type='button',
+			color='primary',
+			(click)='addClientContactFB()')
+			i.fa.fa-plus.mr-15
+			| {{ "FINANCE.CLIENT.LABELS.NEW_CONTACT_POINT" | translate }}
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='clientForm?.invalid || isSubmitting || isEditing()')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ ( data ? "GENERAL.LABELS.SAVE" : "GENERAL.LABELS.ADD" ) | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

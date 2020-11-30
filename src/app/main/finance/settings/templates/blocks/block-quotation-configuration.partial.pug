@@ -1,0 +1,131 @@
+.block-quotation-configuration
+	.layout-row.layout-align-start-center.mb-20
+		.font-size-18.font-weight-500
+			| {{ "FINANCE.SETTINGS.LABELS.QUOTATION_CONFIGURATION" | translate | uppercase }}
+		.ph-20.flex-auto
+			mat-divider([inset]='true')
+
+	.layout-column.layout-fixer-15
+		mat-form-field.ph-15(
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "GENERAL.LABELS.QUOTATION_NOTE" | translate }}
+			textarea(
+				matInput,
+				rows='7',
+				[(ngModel)]='setting.quotation_note',
+				[placeholder]='"GENERAL.PLACEHOLDERS.QUOTATION_NOTE" | translate',
+				[formControl]='settingForm?.controls[ "quotation_note" ]',
+				[disableControl]='isUpdating || isUploading',
+				ngDefaultControl)
+
+	.layout-row.layout-fixer-15
+		mat-form-field.flex-25.ph-15(
+			plugin-input-parse-commas,
+			appearance='outline',
+			floatLabel='always')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.MANAGEMENT_FEE" | translate }}
+			input(
+				matInput,
+				type='number',
+				step='1',
+				min='0',
+				[(ngModel)]='setting.management_fee',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.MANAGEMENT_FEE" | translate',
+				[formControl]='settingForm?.controls[ "management_fee" ]',
+				[disableControl]='isUpdating || isUploading',
+				required,
+				ngDefaultControl)
+			span(matSuffix)
+				| %
+			span(matPrefix)
+				| {{ ( setting?.management_fee?.toString() || "" ) | commas }}
+			mat-hint
+				| {{ ( setting?.management_fee?.toString() || "" ) | commas }}
+			mat-error
+				error-message(
+					[label]='"FINANCE.PROJECT.LABELS.MANAGEMENT_FEE" | translate',
+					[control]='settingForm?.controls[ "management_fee" ]')
+
+		mat-form-field.flex-25.ph-15(
+			plugin-input-parse-commas,
+			appearance='outline',
+			floatLabel='always')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.TOTAL_EXTRA_FEE" | translate }}
+			input(
+				matInput,
+				type='number',
+				step='1',
+				min='0',
+				[(ngModel)]='setting.total_extra_fee',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.TOTAL_EXTRA_FEE" | translate',
+				[formControl]='settingForm?.controls[ "total_extra_fee" ]',
+				[disableControl]='isUpdating || isUploading',
+				required,
+				ngDefaultControl)
+			span(matSuffix)
+				| %
+			span(matPrefix)
+				| {{ ( setting?.total_extra_fee?.toString() || "" ) | commas }}
+			mat-hint
+				| {{ ( setting?.total_extra_fee?.toString() || "" ) | commas }}
+			mat-error
+				error-message(
+					[label]='"FINANCE.PROJECT.LABELS.TOTAL_EXTRA_FEE" | translate',
+					[control]='settingForm?.controls[ "total_extra_fee" ]')
+
+		mat-form-field.flex-25.ph-15(
+			plugin-input-parse-commas,
+			appearance='outline',
+			floatLabel='always')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.EXTRA_COST_FEE" | translate }}
+			input(
+				matInput,
+				type='number',
+				step='1',
+				min='0',
+				[(ngModel)]='setting.extra_cost_fee',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.EXTRA_COST_FEE" | translate',
+				[formControl]='settingForm?.controls[ "extra_cost_fee" ]',
+				[disableControl]='isUpdating || isUploading',
+				required,
+				ngDefaultControl)
+			span(matSuffix)
+				| %
+			span(matPrefix)
+				| {{ ( setting?.extra_cost_fee?.toString() || "" ) | commas }}
+			mat-hint
+				| {{ ( setting?.extra_cost_fee?.toString() || "" ) | commas }}
+			mat-error
+				error-message(
+					[label]='"FINANCE.PROJECT.LABELS.EXTRA_COST_FEE" | translate',
+					[control]='settingForm?.controls[ "extra_cost_fee" ]')
+
+		mat-form-field.flex-25.ph-15(
+			plugin-input-parse-commas,
+			appearance='outline',
+			floatLabel='always')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.MAX_PO_PRICE" | translate }}
+			input(
+				matInput,
+				type='number',
+				step='1000',
+				[(ngModel)]='setting.max_po_price',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.MAX_PO_PRICE" | translate',
+				[formControl]='settingForm?.controls[ "max_po_price" ]',
+				[disableControl]='isUpdating || isUploading',
+				required,
+				ngDefaultControl)
+			span(matPrefix)
+				| {{ ( setting?.max_po_price?.toString() || "" ) | commas }}
+			mat-hint
+				| {{ ( setting?.max_po_price?.toString() || "" ) | commas }}
+			mat-error
+				error-message(
+					[label]='"FINANCE.PROJECT.LABELS.MAX_PO_PRICE" | translate',
+					[control]='settingForm?.controls[ "max_po_price" ]')

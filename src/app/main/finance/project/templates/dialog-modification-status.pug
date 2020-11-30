@@ -1,0 +1,59 @@
+form.dialog-modification-status.layout-column(
+	[formGroup]='modificationStatusForm',
+	(submit)='update()')
+	h1(matDialogTitle)
+		| {{ "FINANCE.PROJECT.TITLES.MODIFICATION_STATUS" | translate }}
+
+	div(matDialogContent)
+		.layout-column
+			mat-form-field.mb-10(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.NAME" | translate }}
+				input(
+					matInput,
+					[value]='costModification?.name',
+					disabled='true')
+
+			mat-form-field.flex-auto(
+				plugin-input-radio,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.PROJECT_STATUS" | translate }}
+				input.hide(matInput)
+				mat-radio-group(
+					[(ngModel)]='costModification.status',
+					[formControl]='modificationStatusForm?.controls[ "status" ]',
+					[disableControl]='isUpdating',
+					ngDefaultControl,
+					required)
+					mat-radio-button.mr-10([value]='COST_MODIFICATION_STATUS?.APPROVED')
+						| {{ "FINANCE.PROJECT.LABELS.APPROVED" | translate }}
+					mat-radio-button([value]='COST_MODIFICATION_STATUS?.REJECTED')
+						| {{ "FINANCE.PROJECT.LABELS.REJECTED" | translate }}
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isUpdating',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='modificationStatusForm?.invalid || isUpdating')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isUpdating')
+						| {{ "GENERAL.LABELS.SAVE" | translate }}
+					ng-template([ngIf]='isUpdating')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isUpdating',
+					diameter='20')

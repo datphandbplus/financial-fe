@@ -1,0 +1,16 @@
+mat-tab-group.dialog-project-bill(
+	mat-stretch-tabs,
+	[(selectedIndex)]='selectedTabIndex')
+	mat-tab
+		ng-template(mat-tab-label)
+			| {{ "FINANCE.PROJECT.LABELS.BILL" | translate }}
+		ng-template([ngIf]='selectedTabIndex === 0')
+			include blocks/form-project-bill.partial.pug
+	mat-tab([disabled]='!bill?.id')
+		ng-template(mat-tab-label)
+			| {{ "FINANCE.PROJECT.LABELS.PROCEDURE" | translate }}
+			ng-template([ngIf]='procedureIndex > -1 && bill?.id')
+				| &nbsp;&#35;{{ procedureIndex + 1 }}
+		ng-template([ngIf]='selectedTabIndex === 1')
+			include blocks/table-bill-procedure.partial.pug
+			include blocks/form-project-bill-procedure.partial.pug

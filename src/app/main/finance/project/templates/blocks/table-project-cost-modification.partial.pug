@@ -1,0 +1,244 @@
+.table-cost-modification.mat-elevation-z8
+	.layout-row.layout-align-start-center.p-10
+		.layout-row.layout-fixer-5.mr-15
+			.ph-5
+				button(
+					plugin-button-only-icon,
+					mat-raised-button,
+					[disabled]='!loaded ',
+					(click)='getProjectConfig()')
+					i.fa.fa-sync-alt
+				button.export-btn(
+					style = 'margin-left: 10px',
+					mat-raised-button,
+					color='success',
+					(click)='exportExcel()')
+					i.fa.fa-download.mr-10
+					| {{ "FINANCE.PROJECT.LABELS.EXPORT" | translate }}
+
+	div([fullscreen]='".mat-column-actions"')
+		loading-overlay([visible]='!loaded')
+			mat-table(
+				#table,
+				plugin-data-table,
+				matSort,
+				[dataSource]='dataSource',
+				[attr.data-label]='!dataSource?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+				// No. Column
+				ng-container(matColumnDef='no')
+					mat-header-cell.w-50(*matHeaderCellDef)
+						| {{ "GENERAL.ATTRIBUTES.NUMBER_ORDER" | translate }}
+					mat-cell.w-50(*matCellDef='let index = index;')
+						| {{ index + 1 }}
+					mat-footer-cell.w-50(*matFooterCellDef)
+				// PO Column
+				ng-container(matColumnDef='po')
+					mat-header-cell.w-120(*matHeaderCellDef, mat-sort-header='po_name')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.PO_CODE" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.w-120(*matCellDef='let element')
+						.font-weight-500
+							| {{ element?.po_name || "" }}
+					mat-footer-cell.w-120(*matFooterCellDef)
+				// Items Column
+				ng-container(matColumnDef='name')
+					mat-header-cell.w-120(*matHeaderCellDef, mat-sort-header)
+						| {{ "GENERAL.ATTRIBUTES.ITEMS" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.w-120(*matCellDef='let element')
+						| {{ element?.name || "N/A" }}
+					mat-footer-cell.w-120(*matFooterCellDef)
+				// Vendor Column
+				ng-container(matColumnDef='vendor')
+					mat-header-cell.w-200(*matHeaderCellDef, mat-sort-header='vendor_name_vi')
+						| {{ "FINANCE.VENDOR.ATTRIBUTES.VENDOR" | translate }}
+						| &nbsp;
+					mat-cell.w-200(*matCellDef='let element')
+						span([class.text-strike]='element?.vendor_name?.is_disabled')
+							| {{ element?.vendor_name || "N/A" }}
+					mat-footer-cell.w-200(*matFooterCellDef)
+						.text-success
+							| {{ "FINANCE.PROJECT.LABELS.TOTAL" | translate }}
+
+				// Old Total Column
+				ng-container(matColumnDef='old_total')
+					mat-header-cell.w-120.layout-align-end(*matHeaderCellDef, mat-sort-header)
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.OLD_TOTAL" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.w-120.layout-align-end(*matCellDef='let element')
+						.text-truncate([matTooltip]='element?.old_total | commas')
+							| {{ ( element?.old_total || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.w-120.layout-align-end(*matFooterCellDef)
+						.text-warning.text-truncate([matTooltip]='footerRow?.total | commas')
+							| {{ ( footerRow?.old_total || 0 )?.toFixed( 0 ) | commas }}
+				// New Total Column
+				ng-container(matColumnDef='new_total')
+					mat-header-cell.w-120.layout-align-end(*matHeaderCellDef, mat-sort-header)
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.NEW_TOTAL" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.w-120.layout-align-end(*matCellDef='let element')
+						.text-truncate([matTooltip]='element?.new_total | commas')
+							| {{ ( element?.new_total || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.w-120.layout-align-end(*matFooterCellDef)
+						.text-warning.text-truncate([matTooltip]='footerRow?.total | commas')
+							| {{ ( footerRow?.new_total || 0 )?.toFixed( 0 ) | commas }}
+				// Difference Column
+				ng-container(matColumnDef='difference')
+					mat-header-cell.w-120.layout-align-end(*matHeaderCellDef, mat-sort-header='difference')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.DIFFERENCE" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.w-120.layout-align-end(*matCellDef='let element')
+						.text-truncate(
+							[matTooltip]='element?.difference | commas',
+							[ngClass]='{"text-success": element?.difference <= 0, "text-warn": element?.difference > 0 }')
+							| {{ ( element?.difference || 0 )?.toFixed( 0 ) | commas }}
+							| (
+							| {{ ( element?.difference_percent || 0 )?.toFixed( 2 ) | commas }}%
+							| )
+					mat-footer-cell.w-120.layout-align-end(*matFooterCellDef)
+						.text-warning.text-truncate([matTooltip]='footerRow?.total | commas')
+							| {{ ( footerRow?.difference || 0 )?.toFixed( 0 ) | commas }}
+				// Compare Column
+				ng-container(matColumnDef='compare')
+					mat-header-cell.w-120.layout-align-end(*matHeaderCellDef, mat-sort-header='compare')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.COMPARE_WITH_TOTAL" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.w-120.layout-align-end(*matCellDef='let element')
+						span(
+							[matTooltip]='( element?.difference / ( totalBaseCostItem || 1 ) * 100 ) | commas',
+							[ngClass]='{"text-success": element?.difference <= 0, "text-warn": element?.difference > 0 }')
+							| {{ ( element?.difference / ( totalBaseCostItem || 1 ) * 100 )?.toFixed( 2 ) | commas }}%
+					mat-footer-cell.w-120(*matFooterCellDef)
+				// Approve by Column
+				ng-container(matColumnDef='approve_by')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='approve_by')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.APPROVE_BY" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell(*matCellDef='let element')
+						| {{ element?.user?.full_name || "N/A" }}
+					mat-footer-cell(*matFooterCellDef)
+				// Status Column
+				ng-container(matColumnDef='status')
+					mat-header-cell.w-150(*matHeaderCellDef, mat-sort-header='status')
+						.text-center.flex-auto
+							| {{ "GENERAL.ATTRIBUTES.STATUS" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+					mat-cell.w-150(*matCellDef='let element')
+						status-box(
+							[color]='element?.status_name?.color',
+							[status]='element?.status_name?.name | translate')
+					mat-footer-cell.w-150(*matFooterCellDef)
+				// Actions Column
+				ng-container(matColumnDef='actions')
+					mat-header-cell.w-65(*matHeaderCellDef)
+						| {{ "GENERAL.ATTRIBUTES.ACTION" | translate }}
+					mat-cell.w-65(*matCellDef='let element')
+						action-box([disabled]='element?.status !== COST_MODIFICATION_STATUS?.WAITING || !( isCEO || ( isProcurementManager && !isOverTotalExtraFee ) )')
+							action-button(
+								color='accent',
+								icon='icon icon-approval',
+								[title]='"FINANCE.PROJECT.LABELS.APPROVE" | translate',
+								[disabled]='!loaded',
+								(onClick)='openDialog( element )')
+					mat-footer-cell.w-65(*matFooterCellDef)
+
+				// Filters
+				ng-container(matColumnDef='filters')
+					mat-header-cell(*matHeaderCellDef)
+						// No. Column
+						mat-cell.w-50
+						// PO. Column
+						mat-cell.w-120
+							filter-box(
+								type='filter',
+								[disabled]='!loaded',
+								[data]='filteredPO',
+								multiple='true',
+								[(filter)]='poFilters.po_code',
+								(applyFilter)='applyFilterPO()')
+						// Items Column
+						mat-cell.w-120
+							filter-box(
+								[(filter)]='searchQueries.name',
+								(applyFilter)='customFilter()',
+								[disabled]='!loaded')
+						// Vendor Column
+						mat-cell.w-200
+							filter-box(
+								type='filter',
+								fieldName='vendor_name',
+								[disabled]='!loaded',
+								[data]='filteredVendor',
+								multiple='true',
+								[(filter)]='filters[ "vendor_id" ]',
+								(applyFilter)='customFilter()')
+						// Old Total Column
+						mat-cell.w-120
+							filter-box(
+								type='range',
+								[(filter)]='filters.old_total',
+								[min]='0',
+								[max]='( dataSource?.data | max: "old_total" ) || 1000',
+								(applyFilter)='customFilter()',
+								[disabled]='!loaded')
+						// New Total Column
+						mat-cell.w-120
+							filter-box(
+								type='range',
+								[(filter)]='filters.new_total',
+								[min]='0',
+								[max]='( dataSource?.data | max: "new_total" ) || 1000',
+								(applyFilter)='customFilter()',
+								[disabled]='!loaded')
+						// Difference Column
+						mat-cell.w-120
+							filter-box(
+								type='range',
+								[(filter)]='filters.difference',
+								[min]='0',
+								[max]='( dataSource?.data | max: "difference" ) || 1000',
+								(applyFilter)='customFilter()',
+								[disabled]='!loaded')
+						// Compare Column
+						mat-cell.w-120
+						// Approve by Column
+						mat-cell
+						// Status Column
+						mat-cell.w-150
+							filter-box(
+								type='filter',
+								translated='true',
+								multiple='true',
+								[(filter)]='filters[ "status_name.id" ]',
+								(applyFilter)='customFilter()',
+								[disabled]='!loaded',
+								[data]='projectCostModificationStatus',
+								ngDefaultControl)
+						// Actions Column
+						mat-cell.w-65
+					mat-footer-cell(*matFooterCellDef)
+
+				mat-header-row(*matHeaderRowDef='displayedColumns')
+				mat-header-row(*matHeaderRowDef='[ "filters" ]')
+				mat-row(*matRowDef='let row; columns: displayedColumns;')
+				mat-footer-row(
+					footerRowInTop,
+					*matFooterRowDef='displayedColumns',
+					[class.hide]='!dataSource?.filteredData?.length')
+				mat-footer-row(
+					*matFooterRowDef='displayedColumns',
+					[class.hide]='!dataSource?.filteredData?.length')
+
+			mat-paginator(
+				#paginator,
+				pageSize='30',
+				[pageSizeOptions]='[ 30, 50, 100 ]',
+				showFirstLastButtons='true')

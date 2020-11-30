@@ -1,0 +1,213 @@
+mat-card.form-project-management.mat-elevation-z8.mb-30(*ngIf='isCEO')
+	form([formGroup]='managementForm')
+		div
+			.layout-row.layout-align-start-center.mb-20
+				.font-size-18.font-weight-500
+					| {{ "FINANCE.PROJECT.LABELS.PROJECT_CONFIG" | translate | uppercase }}
+				.ph-20.flex-auto
+					mat-divider([inset]='true')
+
+			.layout-row.layout-fixer-15
+				mat-form-field.flex-25.ph-15(
+					plugin-input-parse-commas,
+					floatLabel='always',
+					appearance='outline')
+					mat-label
+						| {{ "FINANCE.PROJECT.LABELS.EXCHANGE_RATE" | translate }}
+					input(
+						matInput,
+						type='number',
+						step='1000',
+						min='0',
+						[(ngModel)]='projectConfig.exchange_rate',
+						[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.EXCHANGE_RATE" | translate',
+						[disableControl]='isSubmitting',
+						[formControl]='managementForm?.controls[ "exchange_rate" ]',
+						[readonly]='!isCEO',
+						required,
+						ngDefaultControl)
+					span(matPrefix)
+						| {{ ( projectConfig?.exchange_rate?.toString() || "" ) | commas }}
+					mat-hint
+						| {{ ( projectConfig?.exchange_rate?.toString() || "" ) | commas }}
+					mat-error
+						error-message(
+							[label]='"FINANCE.PROJECT.LABELS.EXCHANGE_RATE" | translate',
+							[control]='managementForm?.controls[ "exchange_rate" ]')
+				select-box.flex-25.ph-15.project-detail__input-status(
+					translated='true',
+					[style.color]='projectConfig?.project_status_name?.color',
+					[(ngModel)]='projectConfig.project_status',
+					(ngModelChange)='onChangeProjectStatus()',
+					[label]='"FINANCE.PROJECT.LABELS.PROJECT_STATUS" | translate',
+					[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.PROJECT_STATUS" | translate',
+					[disableControl]='isSubmitting || !isCEO',
+					[formControl]='managementForm?.controls[ "project_status" ]',
+					[data]='projectStatus',
+					required,
+					ngDefaultControl)
+				mat-form-field.flex-25.ph-15(
+					plugin-input-parse-commas,
+					floatLabel='always',
+					appearance='outline')
+					mat-label
+						| {{ "FINANCE.PROJECT.LABELS.MINIMUM_PAYMENT_PERIOD" | translate }}
+					input(
+						matInput,
+						type='number',
+						step='1000',
+						min='0',
+						[(ngModel)]='projectConfig.valid_duration',
+						[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.MINIMUM_PAYMENT_PERIOD" | translate',
+						[disableControl]='isSubmitting',
+						[formControl]='managementForm?.controls[ "valid_duration" ]',
+						[readonly]='!isCEO',
+						required,
+						ngDefaultControl)
+					span(matPrefix)
+						| {{ ( projectConfig?.valid_duration?.toString() || "" ) | commas }}
+					mat-hint
+						| {{ ( projectConfig?.valid_duration?.toString() || "" ) | commas }}
+					mat-error
+						error-message(
+							[label]='"FINANCE.PROJECT.LABELS.MINIMUM_PAYMENT_PERIOD" | translate',
+							[control]='managementForm?.controls[ "valid_duration" ]')
+		div
+			.layout-row.layout-align-start-center.mb-20
+				.font-size-18.font-weight-500
+					| {{ "FINANCE.PROJECT.LABELS.MANAGEMENT_COSTS_INCURRED" | translate | uppercase }}
+				.ph-20.flex-auto
+					mat-divider([inset]='true')
+
+			.layout-row.layout-fixer-15
+				mat-form-field.flex-25.ph-15(
+					plugin-input-parse-commas,
+					appearance='outline',
+					floatLabel='always')
+					mat-label
+						| {{ "FINANCE.PROJECT.LABELS.MANAGEMENT_FEE" | translate }}
+					input(
+						matInput,
+						type='number',
+						step='1',
+						min='0',
+						[(ngModel)]='projectConfig.management_fee',
+						[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.MANAGEMENT_FEE" | translate',
+						[formControl]='managementForm?.controls[ "management_fee" ]',
+						[disableControl]='isSubmitting',
+						[readonly]='!isCEO',
+						required,
+						ngDefaultControl)
+					span(matSuffix)
+						| %
+					span(matPrefix)
+						| {{ ( projectConfig?.management_fee?.toString() || "" ) | commas }}
+					mat-hint
+						| {{ ( projectConfig?.management_fee?.toString() || "" ) | commas }}
+					mat-error
+						error-message(
+							[label]='"FINANCE.PROJECT.LABELS.MANAGEMENT_FEE" | translate',
+							[control]='managementForm?.controls[ "management_fee" ]')
+
+				mat-form-field.flex-25.ph-15(
+					plugin-input-parse-commas,
+					appearance='outline',
+					floatLabel='always')
+					mat-label
+						| {{ "FINANCE.PROJECT.LABELS.TOTAL_EXTRA_FEE" | translate }}
+					input(
+						matInput,
+						type='number',
+						step='1',
+						min='0',
+						[(ngModel)]='projectConfig.total_extra_fee',
+						[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.TOTAL_EXTRA_FEE" | translate',
+						[formControl]='managementForm?.controls[ "total_extra_fee" ]',
+						[disableControl]='isSubmitting',
+						[readonly]='!isCEO',
+						required,
+						ngDefaultControl)
+					span(matSuffix)
+						| %
+					span(matPrefix)
+						| {{ ( projectConfig?.total_extra_fee?.toString() || "" ) | commas }}
+					mat-hint
+						| {{ ( projectConfig?.total_extra_fee?.toString() || "" ) | commas }}
+					mat-error
+						error-message(
+							[label]='"FINANCE.PROJECT.LABELS.TOTAL_EXTRA_FEE" | translate',
+							[control]='managementForm?.controls[ "total_extra_fee" ]')
+
+				mat-form-field.flex-25.ph-15(
+					plugin-input-parse-commas,
+					appearance='outline',
+					floatLabel='always')
+					mat-label
+						| {{ "FINANCE.PROJECT.LABELS.EXTRA_COST_FEE" | translate }}
+					input(
+						matInput,
+						type='number',
+						step='1',
+						min='0',
+						[(ngModel)]='projectConfig.extra_cost_fee',
+						[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.EXTRA_COST_FEE" | translate',
+						[formControl]='managementForm?.controls[ "extra_cost_fee" ]',
+						[disableControl]='isSubmitting',
+						[readonly]='!isCEO',
+						required,
+						ngDefaultControl)
+					span(matSuffix)
+						| %
+					span(matPrefix)
+						| {{ ( projectConfig?.extra_cost_fee?.toString() || "" ) | commas }}
+					mat-hint
+						| {{ ( projectConfig?.extra_cost_fee?.toString() || "" ) | commas }}
+					mat-error
+						error-message(
+							[label]='"FINANCE.PROJECT.LABELS.EXTRA_COST_FEE" | translate',
+							[control]='managementForm?.controls[ "extra_cost_fee" ]')
+
+				mat-form-field.flex-25.ph-15(
+					plugin-input-parse-commas,
+					appearance='outline',
+					floatLabel='always')
+					mat-label
+						| {{ "FINANCE.PROJECT.LABELS.MAX_PO_PRICE" | translate }}
+					input(
+						matInput,
+						type='number',
+						step='1000',
+						min='0',
+						[(ngModel)]='projectConfig.max_po_price',
+						[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.MAX_PO_PRICE" | translate',
+						[formControl]='managementForm?.controls[ "max_po_price" ]',
+						[disableControl]='isSubmitting',
+						[readonly]='!isCEO',
+						required,
+						ngDefaultControl)
+					span(matPrefix)
+						| {{ ( projectConfig?.max_po_price?.toString() || "" ) | commas }}
+					mat-hint
+						| {{ ( projectConfig?.max_po_price?.toString() || "" ) | commas }}
+					mat-error
+						error-message(
+							[label]='"FINANCE.PROJECT.LABELS.MAX_PO_PRICE" | translate',
+							[control]='managementForm?.controls[ "max_po_price" ]')
+
+		.layout-row.layout-align-end
+			button(
+				*ngIf='isCEO',
+				mat-raised-button,
+				color='primary',
+				(click)='updateProjectConfig()',
+				[disabled]='managementForm?.invalid || isSubmitting')
+				.layout-row.layout-align-center-center
+					.flex-auto
+						ng-template([ngIf]='!isSubmitting')
+							i.fa.fa-save.mr-15
+							| {{ "GENERAL.LABELS.SAVE" | translate }}
+						ng-template([ngIf]='isSubmitting')
+							| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+					mat-spinner.ml-5(
+						*ngIf='isSubmitting',
+						diameter='20')

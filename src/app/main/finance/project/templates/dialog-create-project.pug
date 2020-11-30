@@ -1,0 +1,259 @@
+form.dialog-create-project.layout-column(
+	[formGroup]='projectForm',
+	(submit)='create()')
+	h1(matDialogTitle)
+		| {{ "FINANCE.PROJECT.TITLES.ADD_PROJECT" | translate }}
+
+	div(matDialogContent)
+		.layout-row.layout-wrap.layout-fixer-15
+			select-box.mb-10.ph-15.flex-100(
+				matInput,
+				*ngIf='hasLezoApp',
+				[disableControl]='isSubmitting',
+				[(ngModel)]='project.lezo_project_id',
+				[label]='"FINANCE.PROJECT.LABELS.LINK_WITH_LEZO_PROJECT" | translate',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.PROJECT" | translate',
+				[formControl]='projectForm?.controls[ "lezo_project_id" ]',
+				[data]='lezoProjectService?.getAll()',
+				(selectionOptionChange)='onLezoProjectChange( $event )',
+				ngDefaultControl)
+
+			mat-form-field.mb-10.ph-15.flex-100(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.NAME" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='project.name',
+					[readonly]='hasLezoApp && project?.lezo_project_id',
+					[placeholder]='"GENERAL.PLACEHOLDERS.NAME" | translate',
+					[formControl]='projectForm?.controls[ "name" ]',
+					[disableControl]='isSubmitting',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.NAME" | translate',
+						[control]='projectForm?.controls[ "name" ]')
+
+			select-box.mb-10.ph-15.flex-33(
+				[(ngModel)]='project.client_id',
+				[readonly]='hasLezoApp && project?.lezo_client_id',
+				[label]='"FINANCE.CLIENT.LABELS.CLIENT" | translate',
+				[placeholder]='"FINANCE.CLIENT.PLACEHOLDERS.CLIENT" | translate',
+				[disableControl]='isSubmitting',
+				[formControl]='projectForm?.controls[ "client_id" ]',
+				[data]='clients',
+				fieldName='short_name',
+				required,
+				ngDefaultControl)
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.CONTACT_PERSON" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='project.contact',
+					[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.CONTACT_PERSON" | translate',
+					[formControl]='projectForm?.controls[ "contact" ]',
+					[disableControl]='isSubmitting',
+					ngDefaultControl,
+					required)
+				mat-error
+					error-message(
+						[label]='"FINANCE.PROJECT.LABELS.CONTACT_PERSON" | translate',
+						[control]='projectForm?.controls[ "contact" ]')
+
+			select-box.mb-10.ph-15.flex-33(
+				fieldName='full_name',
+				fieldImage='avatar',
+				fieldSubName='email',
+				[init]='isPM',
+				[(ngModel)]='project.manage_by',
+				[label]='"FINANCE.USER.LABELS.PM" | translate',
+				[placeholder]='"FINANCE.USER.PLACEHOLDERS.PM" | translate',
+				[disableControl]='isSubmitting',
+				[formControl]='projectForm?.controls[ "manage_by" ]',
+				[data]='userService?.getAll( "pm-only" )',
+				[readonly]='isPM',
+				required,
+				ngDefaultControl)
+
+			select-box.mb-10.ph-15.flex-33(
+				fieldName='full_name',
+				fieldImage='avatar',
+				fieldSubName='email',
+				[init]='isSale',
+				[(ngModel)]='project.sale_by',
+				[label]='"FINANCE.USER.LABELS.SALE" | translate',
+				[placeholder]='"FINANCE.USER.PLACEHOLDERS.SALE" | translate',
+				[disableControl]='isSubmitting',
+				[formControl]='projectForm?.controls[ "sale_by" ]',
+				[data]='userService?.getAll( "sale-only" )',
+				[readonly]='isSale',
+				required,
+				ngDefaultControl)
+
+			select-box.mb-10.ph-15.flex-33(
+				fieldName='full_name',
+				fieldImage='avatar',
+				fieldSubName='email',
+				[(ngModel)]='project.qs_by',
+				[label]='"FINANCE.USER.LABELS.QS" | translate',
+				[placeholder]='"FINANCE.USER.PLACEHOLDERS.QS" | translate',
+				[disableControl]='isSubmitting',
+				[formControl]='projectForm?.controls[ "qs_by" ]',
+				[data]='userService?.getAll( "qs-only" )',
+				required,
+				ngDefaultControl)
+
+			select-box.mb-10.ph-15.flex-33(
+				fieldName='full_name',
+				fieldImage='avatar',
+				fieldSubName='email',
+				[(ngModel)]='project.purchase_by',
+				[label]='"FINANCE.USER.LABELS.PURCHASING" | translate',
+				[placeholder]='"FINANCE.USER.PLACEHOLDERS.PURCHASING" | translate',
+				[disableControl]='isSubmitting',
+				[formControl]='projectForm?.controls[ "purchase_by" ]',
+				[data]='userService?.getAll( "purchase-only" )',
+				required,
+				ngDefaultControl)
+
+			select-box.mb-10.ph-15.flex-33(
+				fieldName='full_name',
+				fieldImage='avatar',
+				fieldSubName='email',
+				[(ngModel)]='project.construct_by',
+				[label]='"FINANCE.USER.LABELS.CONSTRUCTION" | translate',
+				[placeholder]='"FINANCE.USER.PLACEHOLDERS.CONSTRUCTION" | translate',
+				[disableControl]='isSubmitting',
+				[formControl]='projectForm?.controls[ "construct_by" ]',
+				[data]='userService?.getAll( "construct-only" )',
+				ngDefaultControl)
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				floatLabel='always',
+				appearance='outline',
+				(click)='projectTimePicker?.open()')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.PROJECT_TIME" | translate }}
+				span
+					| {{ project?.project_time ? ( ( project?.project_time?.begin | momentDateFormat ) + " - " + ( project?.project_time?.end | momentDateFormat ) ) : ( "FINANCE.PROJECT.PLACEHOLDERS.PROJECT_TIME" | translate ) }}
+				input.hide(
+					matInput,
+					[satDatepicker]='projectTimePicker',
+					[(ngModel)]='project.project_time',
+					[formControl]='projectForm?.controls[ "project_time" ]',
+					ngDefaultControl,
+					readonly)
+				mat-datepicker-toggle(
+					matSuffix,
+					[for]='projectTimePicker')
+				sat-datepicker(
+					#projectTimePicker,
+					rangeMode='true',
+					[disabled]='isSubmitting')
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				floatLabel='always',
+				appearance='outline',
+				(click)='quotationDatePicker?.open()')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.QUOTATION_DATE" | translate }}
+				span
+					| {{ project?.quotation_date ? ( project?.quotation_date | momentDateFormat ) : ( "FINANCE.PROJECT.PLACEHOLDERS.QUOTATION_DATE" | translate ) }}
+				input.hide(
+					matInput,
+					[matDatepicker]='quotationDatePicker',
+					[(ngModel)]='project.quotation_date',
+					[formControl]='projectForm?.controls[ "quotation_date" ]',
+					ngDefaultControl,
+					readonly)
+				mat-datepicker-toggle(
+					matSuffix,
+					[for]='quotationDatePicker')
+				mat-datepicker(
+					#quotationDatePicker,
+					[disabled]='isSubmitting')
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.MINIMUM_PAYMENT_PERIOD" | translate }}
+				input(
+					matInput,
+					type='number',
+					step='1',
+					min='0',
+					[(ngModel)]='project.valid_duration',
+					[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.MINIMUM_PAYMENT_PERIOD" | translate',
+					[formControl]='projectForm?.controls[ "valid_duration" ]',
+					[disableControl]='isSubmitting',
+					ngDefaultControl)
+				span(matSuffix)
+					| {{ "GENERAL.LABELS.DAYS" | translate | lowercase }}
+				span(matPrefix)
+					| {{ ( project?.valid_duration?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( project?.valid_duration?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"FINANCE.PROJECT.LABELS.MINIMUM_PAYMENT_PERIOD" | translate',
+						[control]='projectForm?.controls[ "valid_duration" ]')
+
+			mat-form-field.mb-10.ph-15.flex-66(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.ADDRESS" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='project.address',
+					[placeholder]='"GENERAL.PLACEHOLDERS.ADDRESS" | translate',
+					[formControl]='projectForm?.controls[ "address" ]',
+					[disableControl]='isSubmitting',
+					ngDefaultControl)
+
+			mat-form-field.ph-15.flex-100(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.QUOTATION_NOTE" | translate }}
+				textarea(
+					matInput,
+					rows='7',
+					[(ngModel)]='project.quotation_note',
+					[placeholder]='"GENERAL.PLACEHOLDERS.QUOTATION_NOTE" | translate',
+					[formControl]='projectForm?.controls[ "quotation_note" ]',
+					[disableControl]='isSubmitting',
+					ngDefaultControl)
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='projectForm?.invalid || isSubmitting')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ "GENERAL.LABELS.ADD" | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

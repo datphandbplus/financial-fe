@@ -1,0 +1,33 @@
+.block-exchange-rate
+	.layout-row.layout-align-start-center.mb-20
+		.font-size-18.font-weight-500
+			| {{ "FINANCE.PROJECT.LABELS.EXCHANGE_RATE" | translate | uppercase }}
+		.ph-20.flex-auto
+			mat-divider([inset]='true')
+
+	.layout-row.layout-fixer-15
+		mat-form-field.flex-25.ph-15(
+			plugin-input-parse-commas,
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "FINANCE.PROJECT.LABELS.EXCHANGE_RATE" | translate }}
+			input(
+				matInput,
+				type='number',
+				step='1000',
+				min='0',
+				[(ngModel)]='setting.exchange_rate',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.EXCHANGE_RATE" | translate',
+				[formControl]='settingForm?.controls[ "exchange_rate" ]',
+				[disableControl]='isUpdating || isUploading',
+				required,
+				ngDefaultControl)
+			span(matPrefix)
+				| {{ ( setting?.exchange_rate?.toString() || "" ) | commas }}
+			mat-hint
+				| {{ ( setting?.exchange_rate?.toString() || "" ) | commas }}
+			mat-error
+				error-message(
+					[label]='"FINANCE.PROJECT.LABELS.EXCHANGE_RATE" | translate',
+					[control]='settingForm?.controls[ "exchange_rate" ]')

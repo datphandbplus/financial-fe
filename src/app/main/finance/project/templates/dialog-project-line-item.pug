@@ -1,0 +1,217 @@
+form.dialog-project-line-item.layout-column(
+	[formGroup]='lineItemForm',
+	(submit)='lineItem?.id ? update() : create()')
+	h1(matDialogTitle)
+		ng-template([ngIf]='!lineItem?.id')
+			| {{ "FINANCE.PROJECT.TITLES.ADD_LINE_ITEM" | translate }}
+		ng-template([ngIf]='lineItem?.id')
+			| {{ "FINANCE.PROJECT.TITLES.EDIT_LINE_ITEM" | translate }}
+		| &nbsp;-
+		| {{ lineItem?.project_sheet_name || "N/A" }}
+
+	div(matDialogContent)
+		.layout-row.layout-wrap.layout-fixer-15
+			auto-complete.mb-10.ph-15.flex-50(
+				[(ngModel)]='lineItem.group',
+				[label]='"FINANCE.PROJECT.LABELS.GROUP" | translate',
+				[emptyLabel]='"FINANCE.PROJECT.LABELS.NO_GROUP" | translate',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.GROUP" | translate',
+				[disableControl]='isSubmitting || isUploading',
+				[data]='groupList',
+				(ngModelChange)='updateChildGroupList( lineItem?.group )',
+				[formControl]='lineItemForm?.controls[ "group" ]',
+				ngDefaultControl)
+
+			auto-complete.mb-10.ph-15.flex-50(
+				[(ngModel)]='lineItem.child_group',
+				[label]='"FINANCE.PROJECT.LABELS.CHILD_GROUP" | translate',
+				[emptyLabel]='"FINANCE.PROJECT.LABELS.NO_CHILD_GROUP" | translate',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.CHILD_GROUP" | translate',
+				[disableControl]='isSubmitting || isUploading',
+				[data]='childGroupList',
+				[formControl]='lineItemForm?.controls[ "child_group" ]',
+				ngDefaultControl)
+
+			select-box.mb-10.ph-15.flex-33(
+				[init]='true',
+				[(ngModel)]='lineItem.line_item_category_id',
+				[label]='"FINANCE.LINE_ITEM_CATEGORY.LABELS.LINE_ITEM_CATEGORY" | translate',
+				[emptyLabel]='"GENERAL.LABELS.NO_CATEGORY" | translate',
+				[placeholder]='"GENERAL.PLACEHOLDERS.CATEGORY" | translate',
+				[disableControl]='isSubmitting || isUploading',
+				[data]='lineItemCategoryService?.getAll( "reference" )',
+				[formControl]='lineItemForm?.controls[ "line_item_category_id" ]',
+				ngDefaultControl)
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.NAME" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='lineItem.name',
+					[placeholder]='"GENERAL.PLACEHOLDERS.NAME" | translate',
+					[formControl]='lineItemForm?.controls[ "name" ]',
+					[disableControl]='isSubmitting || isUploading',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.NAME" | translate',
+						[control]='lineItemForm?.controls[ "name" ]')
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.UNIT" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='lineItem.unit',
+					[placeholder]='"GENERAL.PLACEHOLDERS.UNIT" | translate',
+					[formControl]='lineItemForm?.controls[ "unit" ]',
+					[disableControl]='isSubmitting || isUploading',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.UNIT" | translate',
+						[control]='lineItemForm?.controls[ "unit" ]')
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.AMOUNT" | translate }}
+				input(
+					matInput,
+					step='1',
+					min='0',
+					type='number',
+					[(ngModel)]='lineItem.amount',
+					(ngModelChange)='updateTotal()',
+					[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.AMOUNT" | translate',
+					[formControl]='lineItemForm?.controls[ "amount" ]',
+					[disableControl]='isSubmitting || isUploading',
+					required,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( lineItem?.amount?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( lineItem?.amount?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"FINANCE.PROJECT.LABELS.AMOUNT" | translate',
+						[control]='lineItemForm?.controls[ "amount" ]')
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.PRICE" | translate }}
+				input(
+					matInput,
+					step='1000',
+					min='0',
+					type='number',
+					[(ngModel)]='lineItem.price',
+					(ngModelChange)='updateTotal()',
+					[formControl]='lineItemForm?.controls[ "price" ]',
+					[disableControl]='isSubmitting || isUploading',
+					required,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( lineItem?.price?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( lineItem?.price?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.PRICE" | translate',
+						[control]='lineItemForm?.controls[ "price" ]')
+
+			mat-form-field.mb-10.ph-15.flex-33(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.TOTAL" | translate }}
+				input(
+					matInput,
+					type='number',
+					[(ngModel)]='lineItem.total',
+					[formControl]='lineItemForm?.controls[ "total" ]',
+					readonly,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( lineItem?.total?.toString() || "" ) | commas }}
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.DESCRIPTION" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting || isUploading',
+					[(ngModel)]='lineItem.description',
+					[placeholder]='"GENERAL.PLACEHOLDERS.DESCRIPTION" | translate',
+					[formControl]='lineItemForm?.controls[ "description" ]',
+					ngDefaultControl)
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.NOTE" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting || isUploading',
+					[(ngModel)]='lineItem.note',
+					[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.NOTE" | translate',
+					[formControl]='lineItemForm?.controls[ "note" ]',
+					ngDefaultControl)
+
+			mat-form-field.mb-10.ph-15.flex-100(
+				*ngIf='hasImage',
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.IMAGE" | translate }}:
+				input(
+					matInput,
+					readonly,
+					[value]='lineItem?.image_name || "N/A"')
+
+		upload-box(
+			[label]='"FINANCE.PROJECT.LABELS.IMAGE" | translate',
+			[disabled]='isSubmitting || isUploading',
+			(onFileSelected)='onFileSelected( $event )')
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting || isUploading',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='lineItemForm?.invalid || isSubmitting || isUploading')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ ( lineItem.id ? "GENERAL.LABELS.SAVE" : "GENERAL.LABELS.ADD" ) | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

@@ -1,0 +1,73 @@
+.form-login(*ngIf='channel?.exists && isLoginState')
+	.mb-30
+		.font-size-32.line-height-32.mb-5.font-weight-500
+			| {{ "AUTH.LOGIN.LABELS.LOGIN" | translate }}
+		div(*ngIf='ENVIRONMENT?.MULTI_CHANNELS')
+			| {{ "AUTH.LOGIN.LABELS.WORKSPACE" | translate }}:&nbsp;
+			span.text-uppercase
+				| {{ channel?.id || "N/A" }}.{{ ENVIRONMENT?.APP_DOMAIN || "N/A" }}
+
+	form.layout-column(
+		[formGroup]='loginForm',
+		(submit)='login()')
+		mat-form-field.mb-10(
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "GENERAL.LABELS.EMAIL" | translate }}
+			input(
+				matInput,
+				[placeholder]='"AUTH.LOGIN.PLACEHOLDERS.EMAIL" | translate',
+				[(ngModel)]='employee.email',
+				[formControl]='loginForm?.controls[ "email" ]',
+				[disableControl]='isSubmitting',
+				ngDefaultControl,
+				required)
+			mat-error
+				error-message(
+					[label]='"GENERAL.LABELS.EMAIL" | translate',
+					[control]='loginForm?.controls[ "email" ]')
+
+		mat-form-field.mb-10(
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "AUTH.LOGIN.LABELS.PASSWORD" | translate }}
+			input(
+				matInput,
+				[type]='!unhide ? "password" : "text"',
+				[placeholder]='"AUTH.LOGIN.PLACEHOLDERS.PASSWORD" | translate',
+				[(ngModel)]='employee.password',
+				[formControl]='loginForm?.controls[ "password" ]',
+				[disableControl]='isSubmitting',
+				ngDefaultControl,
+				required)
+			i.fa.font-size-24(
+				matSuffix,
+				[class.fa-eye]='!unhide',
+				[class.fa-eye-slash]='unhide',
+				(click)='unhide = !unhide')
+			mat-error
+				error-message(
+					[label]='"AUTH.LOGIN.LABELS.PASSWORD" | translate',
+					[control]='loginForm?.controls[ "password" ]')
+
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='loginForm?.invalid || isSubmitting')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ "AUTH.LOGIN.LABELS.LOGIN" | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')
+
+		.mt-15
+			| {{ "AUTH.LOGIN.LABELS.FORGOT_PASSWORD" | translate }}&nbsp;
+			span.clickable.text-primary((click)='isLoginState = false')
+				| {{ "AUTH.LOGIN.LABELS.RESET_NOW" | translate }}

@@ -1,0 +1,74 @@
+.table-vendor-category.mat-elevation-z8
+	loading-overlay([visible]='!loaded')
+		mat-table(
+			#table,
+			plugin-data-table,
+			matSort,
+			[dataSource]='dataSource',
+			[attr.data-label]='!dataSource?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+			// Name Column
+			ng-container(matColumnDef='name')
+				mat-header-cell(*matHeaderCellDef, mat-sort-header='name')
+					| {{ "FINANCE.VENDOR_CATEGORY.ATTRIBUTES.VENDOR_CATEGORY" | translate }}
+					| &nbsp;
+					i.fa.fa-sort
+				mat-cell(*matCellDef='let element')
+					.font-weight-500
+						| {{ element?.name || "N/A" }}
+			// Description Column
+			ng-container(matColumnDef='description')
+				mat-header-cell(*matHeaderCellDef, mat-sort-header='description')
+					| {{ "GENERAL.ATTRIBUTES.DESCRIPTION" | translate }}
+					| &nbsp;
+					i.fa.fa-sort
+				mat-cell(
+					*matCellDef='let element',
+					[matTooltip]='element?.description')
+					.text-truncate
+						| {{ element?.description || "N/A" }}
+			// Actions Column
+			ng-container(matColumnDef='actions')
+				mat-header-cell.w-65(*matHeaderCellDef)
+					| {{ "GENERAL.ATTRIBUTES.ACTION" | translate }}
+				mat-cell.w-65(*matCellDef='let element')
+					action-box([disabled]='isConstructionManager')
+						action-button(
+							color='success',
+							icon='fa fa-edit',
+							[title]='"GENERAL.LABELS.EDIT" | translate',
+							[disabled]='!loaded || isDeleting',
+							(onClick)='openDialog( element )')
+						action-button(
+							color='warn',
+							icon='fa fa-trash',
+							[title]='"GENERAL.LABELS.DELETE" | translate',
+							[disabled]='!loaded || isDeleting',
+							(onClick)='delete( element )')
+
+			// Filters
+			ng-container(matColumnDef='filters')
+				mat-header-cell(*matHeaderCellDef)
+					// Name Column
+					mat-cell
+						filter-box(
+							[disabled]='!loaded || isSubmitting',
+							[(filter)]='searchQueries.name',
+							(applyFilter)='applyFilter()')
+					// Description Column
+					mat-cell
+						filter-box(
+							[disabled]='!loaded || isSubmitting',
+							[(filter)]='searchQueries.description',
+							(applyFilter)='applyFilter()')
+					// Actions Column
+					mat-cell.w-65
+
+			mat-header-row(*matHeaderRowDef='displayedColumns')
+			mat-header-row(*matHeaderRowDef='[ "filters" ]')
+			mat-row(*matRowDef='let row; columns: displayedColumns;')
+
+		mat-paginator(
+			#paginator,
+			pageSize='30',
+			[pageSizeOptions]='[ 30, 50, 100 ]',
+			showFirstLastButtons='true')

@@ -1,0 +1,10 @@
+.line-item-setting.page
+	sidebar
+		sidebar-item(
+			[routerLinkActive]='[ "active" ]',
+			[routerLink]='"/finance/line-item/category"')
+			| {{ "FINANCE.LINE_ITEM_CATEGORY.LABELS.LINE_ITEM_CATEGORY" | translate }}
+
+	.page__content
+		.container
+			router-outlet

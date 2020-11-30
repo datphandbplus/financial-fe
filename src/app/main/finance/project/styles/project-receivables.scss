@@ -1,0 +1,28 @@
+@import '~angular-core/lib/scss/partials/variable';
+@import 'src/scss/partials/variable';
+
+.project-receivables {
+	.table-project-receivables {
+		.mat-row {
+			&:nth-child(even) {
+				background-color: '#fafafa';
+			}
+		}
+
+		.active-row {
+			background-color: $gray !important;
+			border: 1px solid $warning;
+		}
+	}
+}
+
+div.detail-receivable-area{
+	position: relative;
+}
+.export-btn{
+	position: absolute;
+	top: 6px;
+	right: 14px;
+	cursor: pointer;
+	z-index: 99;
+}

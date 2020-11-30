@@ -1,0 +1,118 @@
+.table-user.mat-elevation-z8
+	loading-overlay([visible]='!loaded')
+		mat-table(
+			#table,
+			plugin-data-table,
+			matSort,
+			[dataSource]='dataSource',
+			[attr.data-label]='!dataSource?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+			// Name Column
+			ng-container(matColumnDef='name')
+				mat-header-cell(*matHeaderCellDef, mat-sort-header='full_name')
+					| {{ "GENERAL.ATTRIBUTES.FULL_NAME" | translate }}
+					| &nbsp;
+					i.fa.fa-sort
+				mat-cell(*matCellDef='let element')
+					.layout-row.layout-align-start-center
+						avatar-box.mr-15(
+							[source]='element?.avatar || element?.lezo_employee?.avatar',
+							[title]='element?.full_name || element?.lezo_employee?.full_name',
+							size='36')
+						div
+							.layout-row
+								.font-weight-500
+									| {{ element?.full_name || element?.lezo_employee?.full_name || "N/A" }}
+								i.fa.fa-info-circle.note-icon(
+									*ngIf='hasLezoApp && element?.lezo_employee_id',
+									[matTooltip]='"FINANCE.USER.LABELS.LINKED_WITH_LEZO_EMPLOYEE" | translate')
+							.font-size-12
+								| {{ element?.user_role?.name || "N/A" }}&nbsp;
+								ng-template([ngIf]='element?.is_owner')
+									| ({{ "FINANCE.USER.LABELS.SUPER_ADMIN" | translate }})
+			// Email Column
+			ng-container(matColumnDef='email')
+				mat-header-cell(*matHeaderCellDef, mat-sort-header='email')
+					| {{ "GENERAL.ATTRIBUTES.EMAIL" | translate }}
+					| &nbsp;
+					i.fa.fa-sort
+				mat-cell(
+					*matCellDef='let element',
+					[matTooltip]='element?.email')
+					.text-truncate
+						| {{ element?.email || element?.lezo_employee?.email || "N/A" }}
+			// Status Column
+			ng-container(matColumnDef='status')
+				mat-header-cell(*matHeaderCellDef, mat-sort-header='status')
+					.ph-10
+						| {{ "GENERAL.ATTRIBUTES.STATUS" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+				mat-cell(*matCellDef='let element')
+					mat-slide-toggle.ph-10(
+						[checked]='!element?.is_disabled',
+						[disabled]='!loaded || isSubmitting || !canEdit( element )',
+						(change)='element.is_disabled = !element.is_disabled; toggleStatus( element );')
+					span
+						| {{ ( element?.is_disabled ? "GENERAL.LABELS.DISABLED" : "GENERAL.LABELS.ACTIVATED" ) | translate }}
+			// Actions Column
+			ng-container(matColumnDef='actions')
+				mat-header-cell.w-65(*matHeaderCellDef)
+					| {{ "GENERAL.ATTRIBUTES.ACTION" | translate }}
+				mat-cell.w-65(*matCellDef='let element')
+					action-box([disabled]='!canEdit( element )')
+						action-button(
+							color='accent',
+							icon='fa fa-envelope',
+							[title]='"FINANCE.USER.LABELS.SEND_ACTIVATION_EMAIL" | translate',
+							[disabled]='!loaded || isSubmitting',
+							(onClick)='sendActivationEmail( element )')
+						action-button(
+							color='success',
+							icon='fa fa-edit',
+							[title]='"GENERAL.LABELS.EDIT" | translate',
+							[disabled]='!loaded || isSubmitting',
+							(onClick)='openDialog( element )')
+						action-button(
+							color='warn',
+							icon='fa fa-trash',
+							[title]='"GENERAL.LABELS.DELETE" | translate',
+							[disabled]='!loaded || isSubmitting',
+							(onClick)='delete( element )')
+
+			// Filters
+			ng-container(matColumnDef='filters')
+				mat-header-cell(*matHeaderCellDef)
+					// Name Column
+					mat-cell
+						filter-box(
+							[disabled]='!loaded || isSubmitting',
+							[(filter)]='searchQueries.full_name',
+							(applyFilter)='applyFilter()')
+					// Email Column
+					mat-cell
+						filter-box(
+							[disabled]='!loaded || isSubmitting',
+							[(filter)]='searchQueries.email',
+							(applyFilter)='applyFilter()')
+					// Status Column
+					mat-cell
+						filter-box(
+							type='filter',
+							translated='true',
+							[disabled]='!loaded || isSubmitting',
+							[(filter)]='filters.is_disabled',
+							[emptyLabel]='"GENERAL.LABELS.ALL_STATUS" | translate',
+							[data]='[ { id: false, name: "GENERAL.LABELS.ACTIVATED" }, { id: true, name: "GENERAL.LABELS.DISABLED" } ]',
+							(applyFilter)='applyFilter()')
+					// Actions Column
+					mat-cell.w-65
+
+			mat-header-row(*matHeaderRowDef='displayedColumns')
+			mat-header-row(*matHeaderRowDef='[ "filters" ]')
+			mat-row(*matRowDef='let row; columns: displayedColumns;')
+
+		mat-paginator(
+			#paginator,
+			pageSize='30',
+			[pageSizeOptions]='[ 30, 50, 100 ]',
+			showFirstLastButtons='true')

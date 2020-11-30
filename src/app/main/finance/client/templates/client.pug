@@ -1,0 +1,38 @@
+.client.page
+	.page__content
+		.container
+			.layout-row.layout-align-start-center.mb-15
+				.layout-row.layout-fixer-5.mr-15
+					.ph-5
+						button(
+							plugin-button-only-icon,
+							mat-raised-button,
+							[disabled]='!loaded || isSubmitting',
+							(click)='resetFilter(); getList();')
+							i.fa.fa-sync-alt
+					.ph-5
+						button(
+							plugin-button-only-icon,
+							mat-raised-button,
+							[disabled]='!loaded || isSubmitting',
+							(click)='applySorter( true )')
+							i.fa.fa-sort-alpha-down(*ngIf='!isReverse')
+							i.fa.fa-sort-alpha-up(*ngIf='isReverse')
+				.flex-auto
+				.layout-row
+					button(
+						mat-raised-button,
+						color='primary',
+						[disabled]='!loaded || isSubmitting',
+						(click)='openDialog()')
+						i.fa.fa-plus.mr-15
+						| {{ "FINANCE.CLIENT.LABELS.NEW_CLIENT" | translate }}
+					span &nbsp;&nbsp;&nbsp;
+					button(
+						mat-raised-button,
+						color='success',
+						(click)='exportExcel()')
+						i.fa.fa-download.mr-10
+						| {{ "FINANCE.PROJECT.LABELS.EXPORT" | translate }}
+
+			include blocks/table-client.partial.pug

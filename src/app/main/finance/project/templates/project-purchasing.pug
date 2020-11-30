@@ -1,0 +1,12 @@
+mat-tab-group.mat-elevation-z8.project-purchasing(
+	[(selectedIndex)]='selectedTabIndex',
+	(selectedIndexChange)='tabChanged( $event )')
+	mat-tab([label]='"FINANCE.PROJECT.LABELS.PURCHASING_LIST" | translate')
+		ng-template([ngIf]='selectedTabIndex === 0')
+			include blocks/table-purchasing-list.partial.pug
+	mat-tab([label]='"FINANCE.PROJECT.LABELS.PURCHASING_PENDING_LIST" | translate')
+		ng-template([ngIf]='selectedTabIndex === 1')
+			include blocks/table-pending-list.partial.pug
+	mat-tab([label]='"FINANCE.PROJECT.LABELS.PO_LIST" | translate')
+		ng-template([ngIf]='selectedTabIndex === 2')
+			include blocks/table-po-list.partial.pug

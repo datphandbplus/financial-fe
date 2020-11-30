@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<head>
+	<base href="/"/>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0"/>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+	<style type="text/css">
+		html, body {
+			height: 100%;
+			overflow: hidden;
+			font-family: Roboto, Helvetica, sans-serif;
+			font-size: 14px;
+			-webkit-font-smoothing: auto;
+			-moz-osx-font-smoothing: auto;
+			margin: 0;
+			letter-spacing: -.1px;
+		}
+		app[ng-version] + .splash-screen { display: none !important; }
+	</style>
+</head>
+<body class="layout-column" style="position: relative;">
+	<app class="layout-column flex-noshrink"></app>
+	<div class="splash-screen" style="width: 100%; height: 100%; display: table; background-color: #00245a; position: fixed; z-index: 2;">
+		<div style="display: table-cell; vertical-align: middle; text-align: center;">
+			<img src="./assets/images/logo.png" width="150">
+			<h3 class="text-center" style="color: #fff">Loading...</h3>
+		</div>
+	</div>
+</body>

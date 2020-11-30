@@ -1,0 +1,30 @@
+@import '~angular-core/lib/scss/partials/variable';
+@import 'src/scss/partials/variable';
+
+.dialog-project-bill {
+	.mat-dialog-container {
+		padding: 0;
+		max-height: 700px !important;
+	}
+
+	.procedure-pagination {
+		overflow-x: scroll;
+
+		&__item {
+			background: $dark-gray;
+			color: $white;
+
+			&-done {
+				background: $success;
+			}
+
+			&-active {
+				background: $accent;
+			}
+		}
+	}
+
+	.mat-header-row {
+		min-height: 40px;
+	}
+}

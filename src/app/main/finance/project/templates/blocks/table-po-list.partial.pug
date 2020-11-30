@@ -1,0 +1,311 @@
+mat-card.table-po-list(style='overflow: hidden')
+	.layout-row.mb-15.layout-fixer-10.flex-auto
+		.layout-row
+			.ph-10
+				button(
+					plugin-button-only-icon,
+					mat-raised-button,
+					[disabled]='!loaded',
+					(click)='getPOList()')
+					i.fa.fa-sync-alt
+			.ph-10(*ngIf='isCEO')
+				button(
+					plugin-button-only-icon,
+					mat-raised-button,
+					[disabled]='!loaded',
+					(click)='sortPOVat()')
+					i.fas.fa-sort-numeric-down(*ngIf='sortDown')
+					i.fas.fa-sort-numeric-up(*ngIf='!sortDown')
+			.ph-10
+				button(
+					mat-raised-button,
+					color='success',
+					(click)='exportExcelPO()')
+					i.fa.fa-download
+					| {{ "FINANCE.PROJECT.LABELS.EXPORT" | translate }}
+
+	div([fullscreen]='".mat-column-actions"')
+		loading-overlay([visible]='!loaded')
+			mat-table(
+				#tableSourcePOSort="matSort",
+				plugin-data-table,
+				matSort,
+				[dataSource]='dataSourcePO',
+				[attr.data-label]='!dataSourcePO?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+				// PO code Column
+				ng-container(matColumnDef='pocode')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='po_code')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.PO_CODE" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.cursor(
+						*matCellDef='let element',
+						(click)='showGroupModalDetail( element )')
+							.font-weight-500
+								| {{ element?.po_code || "N/A" }}
+					mat-footer-cell(*matFooterCellDef)
+				// PO. Column
+				ng-container(matColumnDef='po')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='name')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.PO" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.cursor(
+						*matCellDef='let element',
+						(click)='showGroupModalDetail( element )')
+						| {{ element?.name || "N/A" }}
+					mat-footer-cell(*matFooterCellDef)
+				// Vendor Column
+				ng-container(matColumnDef='vendor')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='vendor')
+						| {{ "FINANCE.VENDOR.ATTRIBUTES.VENDOR" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell(*matCellDef='let element')
+						| {{ element?.vendor?.short_name || "N/A" }}
+					mat-footer-cell(*matFooterCellDef)
+				// Name Column
+				ng-container(matColumnDef='name')
+					mat-header-cell.w-300(*matHeaderCellDef)
+						| {{ "FINANCE.COST_ITEM.ATTRIBUTES.COST_ITEM" | translate }}
+					mat-cell.w-300.layout-align-end(*matCellDef='let element')
+						div
+							| {{ ( element?.old_count_cost || 0 )?.toFixed( 0 ) | commas }}
+							| &nbsp;{{ "FINANCE.PROJECT.LABELS.ITEMS" | translate }}
+							.text-success(*ngIf='element?.status === PURCHASE_ORDER_STATUS?.MODIFIED')
+								| {{ ( element?.new_count_cost || 0 )?.toFixed( 0 ) | commas }}
+								| &nbsp;{{ "FINANCE.PROJECT.LABELS.ITEMS" | translate }}
+					mat-footer-cell.w-300.layout-align-end(*matFooterCellDef)
+						.text-success
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+				// Total Column
+				ng-container(matColumnDef='total')
+					mat-header-cell.layout-align-end(*matHeaderCellDef)
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+					mat-cell.layout-align-end(*matCellDef='let element')
+						.text-right
+							| {{ ( element?.total || 0 )?.toFixed( 0 ) | commas }}
+							.text-accent(*ngIf='element?.status !== PURCHASE_ORDER_STATUS?.MODIFIED')
+								| {{ ( element?.planed || 0 )?.toFixed( 0 ) | commas }}
+							.text-success(*ngIf='element?.status === PURCHASE_ORDER_STATUS?.MODIFIED')
+								| {{ ( element?.new_total || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+						.text-warning.text-truncate([matTooltip]='footerRow?.total_po | commas')
+							| {{ ( footerRow?.total_po || 0 )?.toFixed( 0 ) | commas }}
+				// VAT Column
+				ng-container(matColumnDef='vat')
+					mat-header-cell.layout-align-end(*matHeaderCellDef)
+						| {{ "GENERAL.ATTRIBUTES.VAT_RATE" | translate }}
+					mat-cell.layout-align-end(*matCellDef='let element')
+						.text-right
+							| {{ ( element?.vat_percent || 0 )?.toFixed( 0 ) | commas }}%
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+				// Total VAT Column
+				ng-container(matColumnDef='total_vat')
+					mat-header-cell.layout-align-end(*matHeaderCellDef)
+						| {{ "GENERAL.ATTRIBUTES.VAT" | translate }}
+					mat-cell.layout-align-end(*matCellDef='let element')
+						.text-right
+							| {{ ( element?.total_vat || 0 )?.toFixed( 0 ) | commas }}
+							.text-accent(*ngIf='element?.status !== PURCHASE_ORDER_STATUS?.MODIFIED')
+								| {{ ( element?.planed * (element?.vat_percent / 100) || 0 )?.toFixed( 0 ) | commas }}
+							.text-success(*ngIf='element?.status === PURCHASE_ORDER_STATUS?.MODIFIED')
+								| {{ ( ( element?.new_total * element?.vat_percent / 100 ) || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+						.text-warning.text-truncate([matTooltip]='footerRow?.total_po_vat | commas')
+							| {{ ( footerRow?.total_po_vat || 0 )?.toFixed( 0 ) | commas }}
+				// Total with VAT Column
+				ng-container(matColumnDef='total_w_vat')
+					mat-header-cell.layout-align-end(*matHeaderCellDef)
+						| {{ "FINANCE.PROJECT.LABELS.SUBTOTAL" | translate }}
+					mat-cell.layout-align-end(*matCellDef='let element')
+						.text-right
+							| {{ ( ( element?.total_vat + element?.total ) || 0 )?.toFixed( 0 ) | commas }}
+							.text-success(*ngIf='element?.status === PURCHASE_ORDER_STATUS?.MODIFIED')
+								| {{ ( ( element?.new_total * ( 1 + element?.vat_percent / 100 ) ) || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+						.text-warning.text-truncate([matTooltip]='( footerRow?.total_po_vat + footerRow?.total_po ) | commas')
+							| {{ ( ( footerRow?.total_po_vat + footerRow?.total_po ) || 0 )?.toFixed( 0 ) | commas }}
+				// Status Column
+				ng-container(matColumnDef='status')
+					mat-header-cell.w-150(*matHeaderCellDef)
+						.text-center.flex-auto
+							| {{ "FINANCE.COST_ITEM.ATTRIBUTES.STATUS" | translate }}
+					mat-cell.w-150(*matCellDef='let element')
+						.layout-column.flex-auto
+							status-box(
+								[color]='element?.status_name?.color',
+								[status]='element?.status_name?.name | translate')
+							.text-center.font-size-12.mt-3(*ngIf='!element?.approvers_process?.is_done')
+								span.text-warning
+									| {{ ( element?.approvers_process?.waiting?.count || 0 )?.toFixed( 0 ) | commas }}
+								| &nbsp;/&nbsp;
+								span.text-success
+									| {{ ( element?.approvers_process?.approved?.count || 0 )?.toFixed( 0 ) | commas }}
+								| &nbsp;/&nbsp;
+								span.text-warn
+									| {{ ( element?.approvers_process?.rejected?.count || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.w-150.layout-align-end(*matFooterCellDef)
+						.text-warning.text-truncate(
+							*ngIf='isConstructionManager',
+							[matTooltip]='( footerRow?.total_po_vat + footerRow?.total_po ) | commas')
+							| {{ ( ( footerRow?.total_po_vat + footerRow?.total_po ) || 0 )?.toFixed( 0 ) | commas }}
+				// Actions Column
+				ng-container(matColumnDef='actions')
+					mat-header-cell.w-65(*matHeaderCellDef)
+						| {{ "GENERAL.ATTRIBUTES.ACTION" | translate }}
+					mat-cell.w-65(*matCellDef='let element')
+						action-box([disabled]='!( isPM || isProcurementManager || isPurchasing || isCEO ) || ( element?.status === PURCHASE_ORDER_STATUS?.FREEZED && !isCEO )')
+							action-button(
+								*ngIf='isPM || isProcurementManager || ( element?.approvers_process.need_ceo && isCEO )',
+								color='accent',
+								icon='icon icon-checklist',
+								[title]='"FINANCE.PROJECT.LABELS.APPROVE" | translate',
+								[disabled]='!loaded || ( element?.status !== PURCHASE_ORDER_STATUS?.WAITING_APPROVAL && element?.status !== PURCHASE_ORDER_STATUS?.REJECTED && element?.status !== PURCHASE_ORDER_STATUS?.MODIFIED )',
+								(onClick)='openApproverDialog( element )')
+							action-button(
+								*ngIf='isCEO && element?.status !== PURCHASE_ORDER_STATUS?.FREEZED',
+								color='warning',
+								icon='fas fa-bolt',
+								[title]='"FINANCE.PROJECT.LABELS.FREEZE" | translate',
+								[disabled]='!loaded',
+								(onClick)='freezePO( element, PURCHASE_ORDER_STATUS?.FREEZED )')
+							action-button(
+								*ngIf='isCEO && element?.status === PURCHASE_ORDER_STATUS?.FREEZED',
+								color='success',
+								icon='fas fa-bolt',
+								[title]='"FINANCE.PROJECT.LABELS.DEFROST" | translate',
+								[disabled]='!loaded',
+								(onClick)='freezePO( element, PURCHASE_ORDER_STATUS?.DEFROST )')
+							ng-template([ngIf]='isPurchasing')
+								action-button(
+									color='accent',
+									icon='icon icon-approval',
+									[title]='"FINANCE.PROJECT.LABELS.GET_APPROVAL" | translate',
+									[disabled]='!loaded || element?.status === PURCHASE_ORDER_STATUS?.WAITING_APPROVAL || element?.status === PURCHASE_ORDER_STATUS?.APPROVED || element?.status === PURCHASE_ORDER_STATUS?.MODIFIED',
+									(onClick)='changeStatusPO( element, PURCHASE_ORDER_STATUS?.WAITING_APPROVAL )')
+								action-button(
+									color='warn',
+									icon='fa fa-ban',
+									[title]='"GENERAL.LABELS.CANCEL" | translate',
+									[disabled]='!loaded || !( element?.status === PURCHASE_ORDER_STATUS?.WAITING_APPROVAL || element?.status === PURCHASE_ORDER_STATUS?.MODIFIED )',
+									(onClick)='changeStatusPO( element, PURCHASE_ORDER_STATUS?.CANCELLED )')
+								action-button(
+									color='success',
+									icon='fa fa-edit',
+									[title]='"GENERAL.LABELS.EDIT" | translate',
+									[disabled]='!loaded || element?.status === PURCHASE_ORDER_STATUS?.WAITING_APPROVAL || element?.status === PURCHASE_ORDER_STATUS?.REJECTED || element?.status === PURCHASE_ORDER_STATUS?.APPROVED || element?.status === PURCHASE_ORDER_STATUS?.MODIFIED',
+									(onClick)='openDialogProjectPurchaseOrder( element )')
+								action-button(
+									color='success',
+									icon='fa fa-edit',
+									[title]='"GENERAL.LABELS.MODIFY" | translate',
+									[disabled]='!loaded || element?.status !== PURCHASE_ORDER_STATUS?.APPROVED',
+									(onClick)='openDialogProjectPurchaseOrderModify( element )')
+								action-button(
+									color='warn',
+									icon='fa fa-trash',
+									[title]='"GENERAL.LABELS.DELETE" | translate',
+									[disabled]='!loaded || element?.status === PURCHASE_ORDER_STATUS?.WAITING_APPROVAL || ( element?.status === PURCHASE_ORDER_STATUS?.APPROVED && element?.project_payments?.length ) || element?.status === PURCHASE_ORDER_STATUS?.REJECTED || element?.status === PURCHASE_ORDER_STATUS?.MODIFIED',
+									(onClick)='deletePO( element )')
+								action-button(
+									color='warning',
+									icon='icon icon-pay',
+									[title]='"FINANCE.PROJECT.LABELS.REQUEST_PAYMENT" | translate',
+									[disabled]='!loaded || element?.planed >= element?.total || element?.status !== PURCHASE_ORDER_STATUS?.APPROVED',
+									(onClick)='openDialogRequestPayment( element )')
+								// View only
+								action-button(
+									*ngIf='element?.status === PURCHASE_ORDER_STATUS?.WAITING_APPROVAL'
+									color='accent',
+									icon='fa fa-eye',
+									[title]='"GENERAL.LABELS.VIEW" | translate',
+									[disabled]='!loaded',
+									(onClick)='openApproverDialog( element )')
+					mat-footer-cell.w-65(*matFooterCellDef)
+
+				ng-container(matColumnDef='detailExpand')
+					mat-cell(
+						*matCellDef='let element',
+						style='padding: 0')
+						include block-po-cost-item.partial.pug
+
+				// Filters
+				ng-container(matColumnDef='filters')
+					mat-header-cell(*matHeaderCellDef)
+						// PO code Column
+						mat-cell
+							filter-box(
+								type='filter',
+								[disabled]='!loaded',
+								[data]='filteredPO',
+								multiple='true',
+								[(filter)]='poFilters.po_code',
+								(applyFilter)='applyFilterPO()')
+						// PO. Column
+						mat-cell
+							filter-box(
+								[disabled]='!loaded',
+								[(filter)]='poSearchQueries.name',
+								(applyFilter)='applyFilterPO()')
+						// Vendor Column
+						mat-cell
+							filter-box(
+								type='filter',
+								[disabled]='!loaded',
+								[data]='filteredVendor',
+								multiple='true',
+								[(filter)]='poFilters.vendor_id',
+								(applyFilter)='applyFilterPO()')
+						// Name Column
+						mat-cell.w-300
+						// Total Column
+						mat-cell(*ngIf='!isConstruction && !isConstructionManager')
+							filter-box(
+								[(filter)]='poSearchQueries.total',
+								(applyFilter)='applyFilterPO()',
+								[disabled]='!loaded')
+						// VAT Column
+						mat-cell(*ngIf='!isConstruction && !isConstructionManager')
+						// Total VAT Column
+						mat-cell(*ngIf='!isConstruction && !isConstructionManager')
+						// Total with VAT Column
+						mat-cell(*ngIf='!isConstruction && !isConstructionManager')
+							filter-box(
+								[(filter)]='poSearchQueries.subtotal',
+								(applyFilter)='applyFilterPO()',
+								[disabled]='!loaded')
+						// Status Column
+						mat-cell.w-150
+							filter-box(
+								type='filter',
+								translated='true',
+								multiple='true',
+								[(filter)]='poFilters[ "status_name.id" ]',
+								(applyFilter)='applyFilterPO()',
+								[disabled]='!loaded',
+								[data]='purchaseOrderStatus')
+						// Actions Column
+						mat-cell.w-65
+					mat-footer-cell(*matFooterCellDef)
+
+				mat-header-row(*matHeaderRowDef='poListsColumns')
+				mat-header-row(*matHeaderRowDef='[ "filters" ]')
+				mat-row(*matRowDef='let row; columns: poListsColumns;')
+				mat-row.detail-row(
+					*matRowDef='let row; columns: [ "detailExpand" ]; when: isExpansionDetailRow;',
+					[@detailExpand]='row?.po_info?.show_detail_row ? "expanded" : "collapsed"',
+					[class.unscrollable]='row?.id && detailRowScrollable[ "PO_" + row?.id ]')
+				mat-footer-row(
+					footerRowInTop,
+					*matFooterRowDef='poListsColumns',
+					[class.hide]='!dataSourcePO?.filteredData?.length || isConstruction')
+				mat-footer-row(
+					*matFooterRowDef='poListsColumns',
+					[class.hide]='!dataSourcePO?.filteredData?.length || isConstruction')
+
+			collapse-paginator(
+				(paginatorRef)='paginatorPO = $event',
+				pageSize='30',
+				[pageSizeOptions]='[ 30, 50, 100 ]',
+				showFirstLastButtons='true')

@@ -1,0 +1,8 @@
+.activate.layout-column.flex-noshrink
+	.mv-100.layout-column.layout-align-center-center.flex-noshrink
+		mat-card.mat-elevation-z6.w-400
+			img.mb-20(
+				[lazyLoad]='ENVIRONMENT?.APP_LOGO',
+				width='120')
+			include blocks/form-set-password.partial.pug
+	copyright

@@ -1,0 +1,38 @@
+.upload-box
+	.layout-row.layout-align-start-center.layout-wrap
+		mat-label.mr-15
+			| {{ label }}
+		input.hide(
+			type='file',
+			(change)='checkFileSelected( $event )',
+			[accept]='allowExtensions',
+			[disabled]='disabled || uploading',
+			#fileInput)
+		button.mat-elevation-z(
+			mat-stroked-button,
+			type='button',
+			color='primary',
+			[disabled]='disabled || uploading',
+			(click)='fileInput?.click()')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!uploading')
+						i.fa.fa-upload.mr-15
+						| {{ "GENERAL.LABELS.UPLOAD" | translate }}
+					ng-template([ngIf]='uploading')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='uploading',
+					diameter='20')
+		.mr-15
+		i.font-size-12.text-wrap-no-spaces.mv-10(*ngIf='selectedFile')
+			| {{ selectedFile?.name || "N/A" }}
+			| ({{ ( selectedFile?.size / 1024 / 1024 )?.toFixed( 2 ) | commas }}MB)
+			i.fa.fa-check.text-success.ml-5
+	ul.upload-hint.ph-15
+		li
+			| {{ "UPLOAD_HINTS.MAX_FILE_SIZE" | translate }}:
+			| {{ allowFileSize?.toFixed( 2 ) | commas }}MB
+		li
+			| {{ "UPLOAD_HINTS.FILE_FORMAT" | translate }}:
+			| {{ allowExtensions || "N/A" }}

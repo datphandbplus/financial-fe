@@ -1,0 +1,301 @@
+form.dialog-vendor.layout-column(
+	[formGroup]='vendorForm',
+	(submit)='data ? update() : create()')
+	h1(matDialogTitle)
+		ng-template([ngIf]='!data')
+			| {{ "FINANCE.VENDOR.TITLES.ADD_VENDOR" | translate }}
+		ng-template([ngIf]='data')
+			| {{ "FINANCE.VENDOR.TITLES.EDIT_VENDOR" | translate }}
+
+	div(matDialogContent)
+		.layout-row.layout-wrap.layout-fixer-15
+			select-box.mb-10.ph-15.flex-50(
+				[init]='!!data',
+				[(ngModel)]='vendor.vendor_category_id',
+				[label]='"FINANCE.VENDOR_CATEGORY.LABELS.VENDOR_CATEGORY" | translate',
+				[emptyLabel]='"GENERAL.LABELS.NO_CATEGORY" | translate',
+				[placeholder]='"GENERAL.PLACEHOLDERS.CATEGORY" | translate',
+				[disableControl]='isSubmitting',
+				[formControl]='vendorForm?.controls[ "vendor_category_id" ]',
+				[data]='vendorCategoryService?.getAll( "reference" )',
+				ngDefaultControl)
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.TAX" | translate }}
+				input(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting',
+					[(ngModel)]='vendor.tax',
+					[placeholder]='"GENERAL.PLACEHOLDERS.TAX" | translate',
+					[formControl]='vendorForm?.controls[ "tax" ]',
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.TAX" | translate',
+						[control]='vendorForm?.controls[ "tax" ]')
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.SHORT_NAME" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='vendor.short_name',
+					[placeholder]='"GENERAL.PLACEHOLDERS.SHORT_NAME" | translate',
+					[formControl]='vendorForm?.controls[ "short_name" ]',
+					[disableControl]='isSubmitting',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.SHORT_NAME" | translate',
+						[control]='vendorForm?.controls[ "short_name" ]')
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.PHONE" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='vendor.phone',
+					[placeholder]='"GENERAL.PLACEHOLDERS.PHONE" | translate',
+					[formControl]='vendorForm?.controls[ "phone" ]',
+					[disableControl]='isSubmitting',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.PHONE" | translate',
+						[control]='vendorForm?.controls[ "phone" ]')
+
+			mat-form-field.mb-10.ph-15.flex-100(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.OFFICIAL_NAME" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='vendor.name',
+					[placeholder]='"GENERAL.PLACEHOLDERS.OFFICIAL_NAME" | translate',
+					[formControl]='vendorForm?.controls[ "name" ]',
+					[disableControl]='isSubmitting',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.OFFICIAL_NAME" | translate',
+						[control]='vendorForm?.controls[ "name" ]')
+
+			mat-form-field.mb-10.ph-15.flex-100(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.ADDRESS" | translate }}
+				input(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting',
+					[(ngModel)]='vendor.address',
+					[placeholder]='"GENERAL.PLACEHOLDERS.ADDRESS" | translate',
+					[formControl]='vendorForm?.controls[ "address" ]',
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.ADDRESS" | translate',
+						[control]='vendorForm?.controls[ "address" ]')
+
+			mat-form-field.mb-10.ph-15.flex-100(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.BANK_NAME" | translate }}
+				input(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting',
+					[(ngModel)]='vendor.bank_name',
+					[placeholder]='"GENERAL.PLACEHOLDERS.BANK_NAME" | translate',
+					[formControl]='vendorForm?.controls[ "bank_name" ]',
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.BANK_NAME" | translate',
+						[control]='vendorForm?.controls[ "bank_name" ]')
+
+			select-box.mb-10.ph-15.flex-50(
+				matInput,
+				fieldKey='name',
+				[disableControl]='isSubmitting',
+				[(ngModel)]='vendor.bank_province',
+				[label]='"GENERAL.LABELS.BANK_PROVINCE" | translate',
+				[placeholder]='"GENERAL.PLACEHOLDERS.BANK_PROVINCE" | translate',
+				[formControl]='vendorForm?.controls[ "bank_province" ]',
+				[data]='PROVINCE_MAP',
+				ngDefaultControl)
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.BANK_BRANCH" | translate }}
+				input(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting',
+					[(ngModel)]='vendor.bank_branch',
+					[placeholder]='"GENERAL.PLACEHOLDERS.BANK_BRANCH" | translate',
+					[formControl]='vendorForm?.controls[ "bank_branch" ]',
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.BANK_BRANCH" | translate',
+						[control]='vendorForm?.controls[ "bank_branch" ]')
+
+			mat-form-field.mb-10.ph-15.flex-100(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.BANK_ACCOUNT_NUMBER" | translate }}
+				input(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting',
+					[(ngModel)]='vendor.bank_account_number',
+					[placeholder]='"GENERAL.PLACEHOLDERS.BANK_ACCOUNT_NUMBER" | translate',
+					[formControl]='vendorForm?.controls[ "bank_account_number" ]',
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.BANK_ACCOUNT_NUMBER" | translate',
+						[control]='vendorForm?.controls[ "bank_account_number" ]')
+
+			mat-form-field.mb-10.ph-15.flex-100(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.PAYMENT_TERM" | translate }}
+				input(
+					matInput,
+					type='number',
+					step='1',
+					min='0',
+					[(ngModel)]='vendor.payment_term',
+					[placeholder]='"GENERAL.PLACEHOLDERS.PAYMENT_TERM" | translate',
+					[formControl]='vendorForm?.controls[ "payment_term" ]',
+					[disableControl]='isSubmitting',
+					required,
+					ngDefaultControl)
+				span(matSuffix)
+					| {{ "GENERAL.LABELS.DAYS" | translate | lowercase }}
+				span(matPrefix)
+					| {{ ( vendor?.payment_term?.toString() || "" ) | commas }}
+				mat-hint
+					| {{ ( vendor?.payment_term?.toString() || "" ) | commas }}
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.PAYMENT_TERM" | translate',
+						[control]='vendorForm?.controls[ "payment_term" ]')
+
+			mat-form-field.ph-15.flex-100(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.DESCRIPTION" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting',
+					[(ngModel)]='vendor.description',
+					[placeholder]='"GENERAL.PLACEHOLDERS.DESCRIPTION" | translate',
+					[formControl]='vendorForm?.controls[ "description" ]',
+					ngDefaultControl)
+
+		.layout-row.layout-align-start-center.mt-10.mb-20
+				.mr-20.font-size-18.font-weight-500
+					| {{ "FINANCE.VENDOR.LABELS.CONTACT_POINT" | translate | uppercase }}
+				mat-divider.flex-auto
+
+		ng-template(
+			ngFor,
+			let-contact,
+			let-last='last',
+			let-i='index',
+			[ngForOf]='vendorForm?.controls[ "contact_list" ][ "controls" ]')
+			.layout-row.layout-wrap.flex-100
+				mat-form-field.mb-10.pr-10.flex-auto(
+					floatLabel='always',
+					appearance='outline')
+					mat-label
+						| {{ "GENERAL.LABELS.PERSON" | translate }}
+						| {{ i + 1 }}
+					textarea(
+						matInput,
+						rows='4',
+						[(ngModel)]='vendor.contact_list[ i ]',
+						[formControl]='contact?.controls[ "info" ]',
+						[disableControl]='isSubmitting',
+						required,
+						[readonly]='contactListControl[ i ]',
+						ngDefaultControl)
+					mat-error
+						error-message(
+							[label]='"GENERAL.LABELS.PERSON" | translate',
+							[control]='contact?.controls[ "info" ]')
+
+				.layout-column.layout-wrap
+					.mt-5.flex-nogrow.ph-15(*ngIf='vendorForm?.controls[ "contact_list" ][ "controls" ]?.length')
+					.pv-5
+						button(
+							plugin-button-only-icon,
+							mat-stroked-button,
+							type='button',
+							(click)='editContactList( i )')
+							i.fa.text-success([ngClass]='{ "fa-edit": contactListControl[ i ], "fa-check": !contactListControl[ i ] }')
+					.pv-5
+						button(
+							plugin-button-only-icon,
+							mat-stroked-button,
+							type='button',
+							(click)='removeVendorContactFB( i )')
+							i.fa.fa-trash-alt.text-warn
+
+
+		button(
+			*ngIf='( vendorForm?.controls[ "contact_list" ][ "controls" ]?.length < maxContacts )',
+			mat-raised-button,
+			type='button',
+			color='primary',
+			(click)='addVendorContactFB()')
+			i.fa.fa-plus.mr-15
+			| {{ "FINANCE.VENDOR.LABELS.NEW_CONTACT_POINT" | translate }}
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='vendorForm?.invalid || isSubmitting || isEditing()')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ ( data ? "GENERAL.LABELS.SAVE" : "GENERAL.LABELS.ADD" ) | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

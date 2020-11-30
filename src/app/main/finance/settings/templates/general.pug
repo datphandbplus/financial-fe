@@ -1,0 +1,34 @@
+.general
+	mat-card.mat-elevation-z8
+		form(
+			[formGroup]='settingForm',
+			(submit)='update()')
+			include blocks/block-branch-information.partial.pug
+			include blocks/block-quotation-configuration.partial.pug
+			include blocks/block-contract-signer.partial.pug
+			include blocks/block-exchange-rate.partial.pug
+
+			.layout-row.layout-align-end.mt-30.layout-fixer-5
+				.ph-5
+					button(
+						mat-raised-button,
+						[disabled]='isUploading || isUpdating || selectedFile',
+						(click)='reset()')
+						i.fa.fa-sync-alt.mr-15
+						| {{ "GENERAL.LABELS.REFRESH" | translate }}
+				.ph-5
+					button(
+						mat-raised-button,
+						type='submit',
+						color='primary',
+						[disabled]='isUploading || isUpdating || selectedFile')
+						.layout-row.layout-align-center-center
+							.flex-auto
+								ng-template([ngIf]='!isUploading')
+									i.fa.fa-save.mr-15
+									| {{ "GENERAL.LABELS.SAVE" | translate }}
+								ng-template([ngIf]='isUploading')
+									| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+							mat-spinner.ml-5(
+								*ngIf='isUploading',
+								diameter='20')

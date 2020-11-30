@@ -1,0 +1,165 @@
+.project-detail.page
+	sidebar
+		sidebar-item(
+			*ngIf='!isConstruction && !isConstructionManager',
+			[class.active]='rootTab === "overview"',
+			(click)='rootTabChanged( "overview" )')
+			| {{ "FINANCE.PROJECT.LABELS.OVERVIEW" | translate }}
+		sidebar-item(
+			*ngIf='!isConstruction && !isLiabilitiesAccountant && !isPurchasing && !isGeneralAccountant && !isConstructionManager',
+			[class.active]='rootTab === "quotation"',
+			(click)='rootTabChanged( "quotation" )')
+			| {{ "FINANCE.PROJECT.LABELS.QUOTATION" | translate }}
+			span.dots(*ngIf='waitingAction?.quotation')
+		sidebar-item(
+			*ngIf='!isConstruction && !isSale && !isGeneralAccountant && !isLiabilitiesAccountant && !isPurchasing',
+			[class.active]='rootTab === "cost"',
+			(click)='rootTabChanged( "cost" )')
+			| {{ "FINANCE.PROJECT.LABELS.COST" | translate }}
+		sidebar-item(
+			*ngIf='( !isSale && !isQS && !isGeneralAccountant && !isLiabilitiesAccountant ) && project?.quotation_status === QUOTATION_STATUS?.APPROVED',
+			[class.active]='rootTab === "purchasing"',
+			(click)='rootTabChanged( "purchasing" )')
+			| {{ "FINANCE.PROJECT.LABELS.PURCHASING" | translate }}
+			span.dots(*ngIf='waitingAction?.purchasing')
+		sidebar-item(
+			*ngIf='!isSale && !isQS && !isPurchasing && !isConstruction && !isConstructionManager',
+			[class.active]='rootTab === "receivables"',
+			(click)='rootTabChanged( "receivables" )')
+			| {{ "FINANCE.PROJECT.LABELS.RECEIVABLES" | translate }}
+			span.dots(*ngIf='waitingAction?.receivables || waitingAction?.receivable_plan')
+		sidebar-item(
+			*ngIf='!isSale && !isQS',
+			[class.active]='rootTab === "payables"',
+			(click)='rootTabChanged( "payables" )')
+			| {{ "FINANCE.PROJECT.LABELS.PAYABLES" | translate }}
+			span.dots(*ngIf='waitingAction?.payables_waiting_approve || waitingAction?.payables || waitingAction?.payable_plan')
+		sidebar-item(
+			*ngIf='( isQS || isCEO || isProcurementManager || isPM || isSale || isConstruction || isConstructionManager ) && project?.quotation_status === QUOTATION_STATUS?.APPROVED',
+			[class.active]='rootTab === "vo"',
+			(click)='rootTabChanged( "vo" )')
+			| {{ "FINANCE.PROJECT.LABELS.VARIATION_ORDERS" | translate }}
+			span.dots(*ngIf='waitingAction?.vo')
+		sidebar-item(
+			*ngIf='isCEO || isProcurementManager || isCFO',
+			[class.active]='rootTab === "config"',
+			(click)='rootTabChanged( "config" )')
+			| {{ "FINANCE.PROJECT.LABELS.CONFIG_AND_STATISTIC" | translate }}
+			span.dots(*ngIf='waitingAction?.config_statistic')
+
+	.page__content
+		.container
+			mat-card.mat-elevation-z8.mb-30(*ngIf='loaded && ( rootTab === "overview" || rootTab === "quotation" )')
+				.layout-row.layout-align-space-between
+					include blocks/block-project-info.partial.pug
+					.layout-column
+						ng-template([ngIf]='loaded && rootTab === "quotation"')
+							ng-template([ngIf]='canApproveProject && ( isPM || isSale || isProcurementManager )')
+								.mb-10.layout-column
+									button.custom-mat-button-large(
+										mat-raised-button,
+										color='accent',
+										[disabled]='project?.user?.is_disabled || approverDecision?.status === QUOTATION_STATUS?.APPROVED',
+										(click)='confirmUpdateProject( "approve" )')
+										| {{ "FINANCE.PROJECT.LABELS.APPROVE" | translate }}
+										i.icon.icon-stamp
+								.mb-10.layout-column
+									button.custom-mat-button-large(
+										mat-raised-button,
+										color='warn',
+										[disabled]='project?.user?.is_disabled || approverDecision?.status === QUOTATION_STATUS?.REJECTED',
+										(click)='confirmUpdateProject( "reject" )')
+										| {{ "FINANCE.PROJECT.LABELS.REJECT" | translate }}
+										i.icon.icon-stamp-times
+							ng-template([ngIf]='isQS')
+								.mb-10.layout-column(*ngIf='project?.quotation_status === QUOTATION_STATUS?.PROCESSING || project?.quotation_status === QUOTATION_STATUS?.CANCELLED')
+									button.custom-mat-button-large(
+										mat-raised-button,
+										color='accent',
+										[disabled]='!canSubmitProject || project?.user?.is_disabled',
+										(click)='confirmUpdateProject( "waiting_approval" )')
+										| {{ "FINANCE.PROJECT.LABELS.GET_APPROVAL" | translate }}
+										i.icon.icon-approval
+								.mb-10.layout-column(*ngIf='project?.quotation_status === QUOTATION_STATUS?.WAITING_APPROVAL')
+									button.custom-mat-button-large(
+										mat-raised-button,
+										color='warn',
+										[disabled]='project?.user?.is_disabled',
+										(click)='confirmUpdateProject( "cancel" )')
+										| {{ "GENERAL.LABELS.CANCEL" | translate }}
+										i.fa.fa-ban
+
+						.flex-noshrink.layout-align-end-end.layout-column
+							button(
+								plugin-button-only-icon,
+								mat-raised-button,
+								[disabled]='!loaded',
+								(click)='getProjectDetail()')
+								i.fa.fa-sync-alt
+
+			router-outlet
+
+			project-overview(
+				*ngIf='loaded && rootTab === "overview"',
+				[projectId]='projectId',
+				[project]='project',
+				[loaded]='loaded',
+				[queryFor]='"overview"',
+				[showRealIncomeCost]='true',
+				[canManageProject]='canManage( project )')
+
+			project-quotation(
+				*ngIf='loaded && rootTab === "quotation"',
+				[projectId]='projectId',
+				[project]='project',
+				[loaded]='loaded',
+				[canManageProject]='canManage( project )',
+				[canAddSheet]='canAddSheet',
+				(checkSheetApproval)='checkSheetApproval( $event )')
+
+			project-cost(
+				*ngIf='loaded && rootTab === "cost"',
+				[projectId]='projectId',
+				[project]='project',
+				[canAddCost]='canAddCost',
+				[loaded]='loaded')
+
+			project-purchasing(
+				*ngIf='loaded && rootTab === "purchasing"',
+				[projectId]='projectId',
+				[project]='project',
+				[loaded]='loaded',
+				[canRequest]='project?.quotation_status === QUOTATION_STATUS?.APPROVED && project?.project_status !== PROJECT_STATUS?.PITCHING && project?.project_status !== PROJECT_STATUS?.DELAYED && project?.project_status !== PROJECT_STATUS?.DROPPED && project?.project_status !== PROJECT_STATUS?.FAIL',
+				(refreshProjectDetail)='refreshProjectDetail()')
+
+			project-receivables(
+				*ngIf='loaded && rootTab === "receivables"',
+				[projectId]='projectId',
+				[project]='project',
+				[canManageBill]='project?.quotation_status === QUOTATION_STATUS?.APPROVED',
+				[activeBillId]='queryParams?.bill_id',
+				[loaded]='loaded',
+				(refreshProjectDetail)='refreshProjectDetail()')
+
+			project-payables(
+				*ngIf='loaded && rootTab === "payables"',
+				[projectId]='projectId',
+				[project]='project',
+				[canManageBill]='project?.quotation_status === QUOTATION_STATUS?.APPROVED',
+				[activePaymentId]='queryParams?.payment_id',
+				[loaded]='loaded',
+				(refreshProjectDetail)='refreshProjectDetail()')
+
+			project-config(
+				*ngIf='loaded && rootTab === "config" && ( isCEO || isProcurementManager || isCFO )',
+				[projectId]='projectId',
+				[project]='project',
+				[loaded]='loaded',
+				[canManageProject]='canManage( project )',
+				(refreshProjectDetail)='refreshProjectDetail()')
+
+			project-vo(
+				*ngIf='loaded && rootTab === "vo" && ( isQS || isCEO || isProcurementManager || isPM || isSale || isConstruction || isConstructionManager )',
+				[projectId]='projectId',
+				[project]='project',
+				[loaded]='loaded')

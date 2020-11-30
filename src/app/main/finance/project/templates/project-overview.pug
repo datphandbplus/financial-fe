@@ -1,0 +1,37 @@
+mat-card.project-overview.mat-elevation-z8(*ngIf='isQS || isPM || isProcurementManager || isCEO || isCFO')
+	.layout-row.layout-fixer-15(*ngIf='showRealIncomeCost')
+		.flex-50.ph-15
+			.layout-column
+				.layout-row.layout-align-start-end.mb-10.font-weight-500
+					span.text-primary.mb-5
+						| {{ "FINANCE.PROJECT.LABELS.RECEIVABLES" | translate }}:&nbsp;
+					span.text-success.font-size-18
+						| {{ ( customDatasets[ 0 ]?.income || 0 )?.toFixed( 0 ) | commas }}&nbsp;
+					span.text-primary.font-size-18
+						| /
+						| {{ ( customDatasets[ 0 ]?.total_income || 0 )?.toFixed( 0 ) | commas }}
+						| ({{ ((customDatasets[ 0 ]?.income / customDatasets[ 0 ]?.total_income)*100).toFixed(2) || 0 }}%)
+				mat-progress-bar.custom-mat-progress-bar.h-15(
+					[mode]='determinate',
+					[value]='customDatasets[ 0 ]?.percent_income || 0',
+					[style.color]='customDatasets[ 0 ]?.income_color')
+		.flex-50.ph-15
+			.layout-column
+				.layout-row.layout-align-start-end.mb-10.font-weight-500.config-block
+					span.text-primary.mb-5
+						| {{ "FINANCE.PROJECT.LABELS.PAYABLES" | translate }}:&nbsp;
+					span.text-warning.font-size-18
+						| {{ ( customDatasets[ 0 ]?.cost || 0 )?.toFixed( 0 ) | commas }}&nbsp;
+					span.text-primary.font-size-18
+						| /
+						| {{ ( (totalSum.subtotal + totalsPurchasing * 1.1 ) || 0 )?.toFixed( 0 ) | commas }}
+						| ({{ ((customDatasets[ 0 ]?.cost/(totalSum.subtotal + totalsPurchasing* 1.1))*100).toFixed(2) || 0 }}%)
+					span.font-size-18.updown(
+						[ngClass]='{"text-success": (totalSum.total  + totalsPurchasing - subTotalItemCostVo) < 0, "text-warn": (totalSum.total  + totalsPurchasing - subTotalItemCostVo) >= 0 }')
+						| <i class="fas" [ngClass]='{"fa-arrow-down": (totalSum.total  + totalsPurchasing - subTotalItemCostVo) < 0, "fa-arrow-up": (totalSum.total  + totalsPurchasing - subTotalItemCostVo) >= 0 }'></i> ({{ (totalSum.total  + totalsPurchasing - subTotalItemCostVo)/subTotalItemCostVo * 100 | commas }}%)
+				mat-progress-bar.custom-mat-progress-bar.h-15(
+					[mode]='determinate',
+					[value]='customDatasets[ 0 ]?.percent_cost || 0',
+					[style.color]='customDatasets[ 0 ]?.cost_color')
+
+	include blocks/block-overview-chart.partial.pug

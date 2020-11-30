@@ -1,0 +1,9 @@
+@import '~angular-core/lib/scss/partials/variable';
+
+.copyright {
+	font-size: 12px;
+	text-align: right;
+	position: relative;
+	color: rgba($black, .5);
+	padding: 15px 35px;
+}

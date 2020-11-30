@@ -1,0 +1,13 @@
+mat-tab-group.dialog-purchase-order-approver(
+	mat-stretch-tabs,
+	[(selectedIndex)]='selectedTabIndex')
+	mat-tab
+		ng-template(mat-tab-label)
+			| {{ "FINANCE.PROJECT.TITLES.GET_APPROVE" | translate }}
+		ng-template([ngIf]='selectedTabIndex === 0')
+			include blocks/form-purchase-order-approver.partial.pug
+	mat-tab
+		ng-template(mat-tab-label)
+			| {{ purchaseOrder?.name || "N/A" }}
+		ng-template([ngIf]='selectedTabIndex === 1')
+			include blocks/form-project-purchase-order-modified.partial.pug

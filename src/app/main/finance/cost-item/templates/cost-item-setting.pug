@@ -1,0 +1,10 @@
+.cost-item-setting.page
+	sidebar
+		sidebar-item(
+			[routerLinkActive]='[ "active" ]',
+			[routerLink]='"/finance/cost-item/category"')
+			| {{ "FINANCE.COST_ITEM_CATEGORY.LABELS.COST_ITEM_CATEGORY" | translate }}
+
+	.page__content
+		.container
+			router-outlet

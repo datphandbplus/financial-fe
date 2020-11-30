@@ -1,0 +1,147 @@
+.project-vo-detail
+	mat-card.mat-elevation-z8.mb-30
+		.layout-row.layout-align-space-between
+			.layout-row.layout-align-start-center.layout-fixer-15.layout-wrap.flex-85
+				mat-form-field.flex-40.ph-15(appearance='outline')
+					mat-label
+						| {{ "GENERAL.LABELS.NAME" | translate }}
+					input(
+						matInput,
+						readonly,
+						[value]='currentVO?.name || "N/A"')
+
+				mat-form-field.flex-35.ph-15(appearance='outline')
+					mat-label
+						| {{ "FINANCE.PROJECT.LABELS.NOTE" | translate }}
+					input(
+						matInput,
+						readonly,
+						[value]='currentVO?.note || "N/A"')
+
+				mat-form-field.flex-25.ph-15.project-vo-detail__input-status(
+					appearance='outline',
+					[style.color]='currentVO?.status_name?.color')
+					mat-label
+						| {{ "GENERAL.LABELS.STATUS" | translate }}
+					input(
+						matInput,
+						readonly,
+						[value]='currentVO?.status_name?.name ? ( currentVO?.status_name?.name | translate ) : "N/A"')
+
+				mat-form-field.flex-25.ph-15(appearance='outline')
+					mat-label
+						| {{ "FINANCE.USER.LABELS.PM" | translate }}
+					input(
+						matInput,
+						readonly,
+						[value]='currentVO?.pm?.user?.full_name || "N/A"')
+					span(matSuffix)
+						i.icon.icon-waiting.text-warning.font-size-18(
+							*ngIf='currentVO?.pm?.status === VO_APPROVE_STATUS?.WAITING_APPROVAL',
+							[matTooltip]='currentVO?.pm?.comment')
+						i.icon.icon-stamp.text-success.font-size-18(
+							*ngIf='currentVO?.pm?.status === VO_APPROVE_STATUS?.APPROVED',
+							[matTooltip]='currentVO?.pm?.comment')
+						i.icon.icon-stamp-times.text-warn.font-size-18(
+							*ngIf='currentVO?.pm?.status === VO_APPROVE_STATUS?.REJECTED',
+							[matTooltip]='currentVO?.pm?.comment')
+
+				mat-form-field.flex-25.ph-15(appearance='outline')
+					mat-label
+						| {{ "FINANCE.USER.LABELS.SALE" | translate }}
+					input(
+						matInput,
+						readonly,
+						[value]='currentVO?.sale?.user?.full_name || "N/A"')
+					span(matSuffix)
+						i.icon.icon-waiting.text-warning.font-size-18(
+							*ngIf='currentVO?.sale?.status === VO_APPROVE_STATUS?.WAITING_APPROVAL',
+							[matTooltip]='currentVO?.sale?.comment')
+						i.icon.icon-stamp.text-success.font-size-18(
+							*ngIf='currentVO?.sale?.status === VO_APPROVE_STATUS?.APPROVED',
+							[matTooltip]='currentVO?.sale?.comment')
+						i.icon.icon-stamp-times.text-warn.font-size-18(
+							*ngIf='currentVO?.sale?.status === VO_APPROVE_STATUS?.REJECTED',
+							[matTooltip]='currentVO?.sale?.comment')
+
+				mat-form-field.flex-25.ph-15(appearance='outline')
+					mat-label
+						| {{ "FINANCE.USER.LABELS.PROCUREMENT_MANAGER" | translate }}
+					input(
+						matInput,
+						readonly,
+						[value]='currentVO?.procurement_manager?.user?.full_name || "N/A"')
+					span(matSuffix)
+						i.icon.icon-waiting.text-warning.font-size-18(
+							*ngIf='currentVO?.procurement_manager?.status === VO_APPROVE_STATUS?.WAITING_APPROVAL',
+							[matTooltip]='currentVO?.procurement_manager?.comment')
+						i.icon.icon-stamp.text-success.font-size-18(
+							*ngIf='currentVO?.procurement_manager?.status === VO_APPROVE_STATUS?.APPROVED',
+							[matTooltip]='currentVO?.procurement_manager?.comment')
+						i.icon.icon-stamp-times.text-warn.font-size-18(
+							*ngIf='currentVO?.procurement_manager?.status === VO_APPROVE_STATUS?.REJECTED',
+							[matTooltip]='currentVO?.procurement_manager?.comment')
+
+				mat-form-field.flex-25.ph-15(appearance='outline')
+					mat-label
+						| {{ "FINANCE.USER.LABELS.CEO" | translate }}
+					input(
+						matInput,
+						readonly,
+						[value]='currentVO?.ceo?.user?.full_name || "N/A"')
+					span(matSuffix)
+						i.icon.icon-waiting.text-warning.font-size-18(
+							*ngIf='currentVO?.ceo?.status === VO_APPROVE_STATUS?.WAITING_APPROVAL',
+							[matTooltip]='currentVO?.ceo?.comment')
+						i.icon.icon-stamp.text-success.font-size-18(
+							*ngIf='currentVO?.ceo?.status === VO_APPROVE_STATUS?.APPROVED',
+							[matTooltip]='currentVO?.ceo?.comment')
+						i.icon.icon-stamp-times.text-warn.font-size-18(
+							*ngIf='currentVO?.ceo?.status === VO_APPROVE_STATUS?.REJECTED',
+							[matTooltip]='currentVO?.ceo?.comment')
+
+				.flex-100.ph-15
+					button(
+						mat-raised-button,
+						color='primary',
+						(click)='onBack?.emit()')
+						| {{ "GENERAL.LABELS.BACK" | translate }}
+
+			.layout-column
+				.mb-10(*ngIf='!isQS && currentVO?.status === PROJECT_VO_STATUS?.WAITING_APPROVAL')
+					button.custom-mat-button-large(
+						mat-raised-button,
+						color='accent',
+						[disabled]='!loaded',
+						(click)='approveVO()')
+						| {{ "FINANCE.PROJECT.LABELS.APPROVE" | translate }}
+						i.icon.icon-stamp
+				ng-container(*ngIf='isQS')
+					.mb-10(*ngIf='currentVO?.status === PROJECT_VO_STATUS?.PROCESSING || currentVO?.status === PROJECT_VO_STATUS?.CANCELLED || currentVO?.status === PROJECT_VO_STATUS?.REJECTED ')
+						button.custom-mat-button-large(
+							mat-raised-button,
+							color='accent',
+							[disabled]='!loaded || project?.project_status === projectStatus?.DONE',
+							(click)='getApproval( PROJECT_VO_STATUS?.WAITING_APPROVAL )')
+							| {{ "FINANCE.PROJECT.LABELS.GET_APPROVAL" | translate }}
+							i.icon.icon-stamp
+					.mb-10(*ngIf='currentVO?.status === PROJECT_VO_STATUS?.WAITING_APPROVAL')
+						button.custom-mat-button-large(
+							mat-raised-button,
+							color='warn',
+							[disabled]='!loaded',
+							(click)='getApproval( PROJECT_VO_STATUS?.CANCELLED )')
+							| {{ "GENERAL.LABELS.CANCEL" | translate }}
+							i.fa.fa-ban
+
+	mat-tab-group.mat-elevation-z8(
+		[(selectedIndex)]='selectedTabIndex',
+		(selectedIndexChange)='tabChanged( $event )')
+		mat-tab([label]='"FINANCE.PROJECT.LABELS.QUOTATION" | translate')
+			ng-template([ngIf]='selectedTabIndex === 0')
+				include blocks/tab-vo-line.partial.pug
+		mat-tab(
+			*ngIf='!isSale',
+			[label]='"FINANCE.PROJECT.LABELS.COST" | translate')
+			ng-template([ngIf]='selectedTabIndex === 1')
+				include blocks/tab-vo-cost.partial.pug

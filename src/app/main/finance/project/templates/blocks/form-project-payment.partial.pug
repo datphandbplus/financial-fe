@@ -1,0 +1,95 @@
+form.layout-column.p-25([formGroup]='paymentForm')
+	div(matDialogContent)
+		.layout-row.layout-wrap.layout-fixer-15
+			mat-form-field.mb-10.ph-15.flex-100(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.NAME" | translate }}
+				input(
+					matInput,
+					[ngModel]='payment?.name',
+					[placeholder]='"GENERAL.PLACEHOLDERS.NAME" | translate',
+					[formControl]='paymentForm?.controls[ "name" ]',
+					readonly,
+					ngDefaultControl)
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.TOTAL" | translate }}
+				input(
+					matInput,
+					type='number',
+					[ngModel]='payment?.total',
+					[formControl]='paymentForm?.controls[ "total" ]',
+					readonly,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( payment?.total?.toString() || "" ) | commas }}
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.VAT" | translate }}
+				input(
+					matInput,
+					type='number',
+					[ngModel]='payment?.total_vat',
+					[formControl]='paymentForm?.controls[ "vat" ]',
+					readonly,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( payment?.total_vat?.toString() || "" ) | commas }}
+
+			mat-form-field.mb-10.ph-15.flex-50(
+				plugin-input-parse-commas,
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.SUBTOTAL" | translate }}
+				input(
+					matInput,
+					type='number',
+					[formControl]='paymentForm?.controls[ "subtotal" ]',
+					readonly,
+					ngDefaultControl)
+				span(matPrefix)
+					| {{ ( ( payment?.total + payment?.total_vat )?.toString() || 0 ) | commas }}
+
+			select-box.mb-10.ph-15.flex-50(
+				[sort]='false',
+				[translated]='true',
+				[(ngModel)]='payment.transfer_type',
+				[label]='"FINANCE.PROJECT.LABELS.TRANSFER_TYPE" | translate',
+				[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.TRANSFER_TYPE" | translate',
+				[formControl]='paymentForm?.controls[ "transfer_type" ]',
+				[disableControl]='isSubmitting || isUploading',
+				[data]='transferType',
+				[readonly]='true',
+				ngDefaultControl)
+
+		include form-project-payment-invoice.partial.pug
+		include form-project-payment-status.partial.pug
+		include form-project-payment-finance-note.partial.pug
+		include form-project-payment-order.partial.pug
+
+	div(
+		matDialogActions,
+		align='end')
+		button.export-btn(
+			mat-raised-button,
+			color='success',
+			(click)='exportExcel()')
+			i.fa.fa-download.mr-10
+			| {{ "FINANCE.PROJECT.LABELS.EXPORT" | translate }}
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting || isUploading',
+			(click)='hasChange ? closeDiaglog() : onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}

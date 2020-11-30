@@ -1,0 +1,82 @@
+form.dialog-create-sheet.layout-column(
+	[formGroup]='sheetForm',
+	(submit)='sheet?.id ? update() : create()')
+	h1(matDialogTitle)
+		ng-template([ngIf]='!sheet?.id')
+			| {{ "FINANCE.PROJECT.TITLES.ADD_SHEET" | translate }}
+		ng-template([ngIf]='sheet?.id')
+			| {{ "FINANCE.PROJECT.TITLES.EDIT_SHEET" | translate }}
+		| &nbsp;-
+		| {{ sheet?.project_name || "N/A" }}
+
+	div(matDialogContent)
+		.layout-column
+			mat-form-field.mb-10(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.SHEET" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='sheet.name',
+					[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.SHEET" | translate',
+					[formControl]='sheetForm?.controls[ "name" ]',
+					[disableControl]='isSubmitting',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"FINANCE.PROJECT.LABELS.SHEET" | translate',
+						[control]='sheetForm?.controls[ "name" ]')
+
+			mat-form-field.mb-10(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.DESCRIPTION" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting',
+					[(ngModel)]='sheet.description',
+					[placeholder]='"GENERAL.PLACEHOLDERS.DESCRIPTION" | translate',
+					[formControl]='sheetForm?.controls[ "description" ]',
+					ngDefaultControl)
+
+			mat-form-field(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.NOTE" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[disableControl]='isSubmitting',
+					[(ngModel)]='sheet.note',
+					[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.NOTE" | translate',
+					[formControl]='sheetForm?.controls[ "note" ]',
+					ngDefaultControl)
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			type='submit',
+			color='primary',
+			[disabled]='sheetForm?.invalid || isSubmitting')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ ( sheet.id ? "GENERAL.LABELS.SAVE" : "GENERAL.LABELS.ADD" ) | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

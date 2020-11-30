@@ -1,0 +1,32 @@
+ng-template([ngIf]='!account || !viewLoaded')
+	include blocks/block-splash-screen.partial.pug
+
+ng-template([ngIf]='account && viewLoaded')
+	mat-drawer-container.drawer.flex-noshrink.layout-column(autosize)
+		mat-drawer(
+			#drawer,
+			mode='side',
+			opened='true',
+			fixedInViewport='true')
+			perfect-scrollbar(
+				[config]='{ suppressScrollX: true }')
+				.direction
+					.layout-column.layout-align-center-center.mb-80
+						img(
+							[src]='ENVIRONMENT?.APP_LOGO',
+							width='50',
+							height='50')
+					finance-direction
+		mat-drawer-content.flex-noshrink.layout-column
+			header.header.layout-row.layout-align-start-center.pv-15.ph-30.mat-elevation-z6
+				.font-size-28.line-height-28.font-weight-500.flex-auto
+					| {{ getPageTitle() | async }}
+				include ./blocks/block-account.partial.pug
+				mat-progress-bar.header__process(
+					color='accent',
+					mode='indeterminate',
+					value='50',
+					[class.hide]='!( pageService?.processing | async )')
+			.flex-noshrink.layout-column
+				router-outlet
+			copyright

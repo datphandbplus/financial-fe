@@ -1,0 +1,74 @@
+.layout-row
+    .row
+        .col-2
+            .layout-row.layout-space-between
+                .mv-15
+                    br
+                    br
+                    br
+
+            div.kkk
+                canvas(
+                    baseChart,
+                    [labels]='columnChartSettings.labels',
+                    [datasets]='columnChartSettings.datasets',
+                    [colors]='columnChartSettings.colors',
+                    [options]='columnChartSettings.options',
+                    legend='true',
+                    chartType='bar')
+            div.text-center.my-note
+                div.divme
+                    div.vo-color
+                    span.margin-span VO
+                    div.plan-receivable-color
+                    span.margin-span Receivable Plan
+                    div.real-receivable-color
+                    span.margin-span Receivable
+                    div.plan-payable-color
+                    span.margin-span Payable Plan
+                    div.real-payable-color
+                    span.margin-span Payable
+        .col-4
+            span
+        .col-1
+            .layout-row.layout-align-end
+                .mv-15
+                    mat-button-toggle-group(
+                        [(ngModel)]='rrpFilters.type',
+                        (change)='getProjectStatisticRRP()')
+                        mat-button-toggle(value='week')
+                            | {{ "GENERAL.LABELS.WEEK" | translate }}
+                        mat-button-toggle(value='month')
+                            | {{ "GENERAL.LABELS.MONTH" | translate }}
+
+            div
+                canvas(
+                    baseChart,
+                    [labels]='rrpChartLabels',
+                    [datasets]='rrpChartDatasets',
+                    [colors]='rrpChartColors',
+                    [options]='rrpChartOptions',
+                    legend='true',
+                    chartType='line')
+.layout-row
+    .row
+        .col-3
+            .layout-row.layout-align-end
+                .mv-15
+                    mat-button-toggle-group(
+                        [(ngModel)]='filters.type',
+                        (change)='getProjectStatistic()')
+                        mat-button-toggle(value='week')
+                            | {{ "GENERAL.LABELS.WEEK" | translate }}
+                        mat-button-toggle(value='month')
+                            | {{ "GENERAL.LABELS.MONTH" | translate }}
+
+            div
+                canvas(
+                    baseChart,
+                    [labels]='chartLabels',
+                    [datasets]='chartDatasets',
+                    [colors]='chartColors',
+                    [options]='chartOptions',
+                    legend='true',
+                    chartType='line')

@@ -1,0 +1,118 @@
+.block-project-line-item.flex-noshrink
+	ng-template(
+		ngFor,
+		let-childGroup,
+		let-childIndex='index',
+		[ngForOf]='detail?.child_groups')
+		.project-line-item
+			.project-line-item__child-group([class.hide]='!childGroup?.child_group')
+				.layout-row.border-bottom(style='min-height: 48px')
+					// Name Column
+					mat-cell.w-300.pos-sticky.pos-sticky-left.mat-table-sticky
+						| {{ childGroup?.child_group }}
+
+					// Desc Column
+					mat-cell.w-300
+
+					// Image Column
+					mat-cell
+
+					// Unit Column
+					mat-cell
+
+					// Amount Column
+					mat-cell
+
+					// Price Column
+					mat-cell
+
+					// Total Column
+					mat-cell.layout-align-end
+						.text-accent
+							| {{ ( childGroup?.total || 0 )?.toFixed( 0 ) | commas }}
+
+					// Note Column
+					mat-cell.w-300
+
+					// Actions Column
+					mat-cell.mat-column-actions.pos-sticky.pos-sticky-right.mat-table-sticky.w-115
+						.ph-10(*ngIf='sortable')
+							button(
+								plugin-button-only-icon,
+								mat-stroked-button,
+								type='button',
+								(click)='changeChildGroupPriority( detail, childIndex )')
+								i.icon.icon-sort.text-accent
+
+			.project-line-item__list
+				.layout-row.border-bottom(
+					style='min-height: 48px',
+					*ngFor='let item of childGroup?.items; let index = index')
+					// Name Column
+					mat-cell.w-300.pos-sticky.pos-sticky-left.mat-table-sticky
+						.w-30
+							| {{ index + 1 }}
+						.ph-5
+							| {{ item?.name || "N/A" }}
+
+					// Desc Column
+					mat-cell.w-300
+						| {{ item?.description || "N/A" }}
+
+					// Image Column
+					mat-cell
+						span.clickable(
+							*ngIf='item?.image',
+							(click)='openLightbox( item )')
+							img(
+								width='30px',
+								[src]='"./assets/images/image-holder.png"')
+						span.clickable(
+							*ngIf='!isLiabilitiesAccountant && !isCFO && canAddSheet && !item?.image',
+							(click)='openDialogProjectLineItem( item )')
+							img(
+								width='30px',
+								[src]='"./assets/images/add-image.png"')
+
+					// Unit Column
+					mat-cell
+						| {{ item?.unit || "N/A" }}
+
+					// Amount Column
+					mat-cell.layout-align-end
+						| {{ ( item?.amount || 0 )?.toFixed( 0 ) | commas }}
+
+					// Price Column
+					mat-cell.layout-align-end
+						| {{ ( item?.price || 0 )?.toFixed( 0 ) | commas }}
+
+					// Total Column
+					mat-cell.layout-align-end
+						| {{ ( item?.total || 0 )?.toFixed( 0 ) | commas }}
+
+					// Note Column
+					mat-cell.w-300
+						| {{ item?.note || "N/A" }}
+
+					// Actions Column
+					mat-cell.mat-column-actions.pos-sticky.pos-sticky-right.mat-table-sticky.w-115
+						action-box([disabled]='isLiabilitiesAccountant || isCFO || !canAddSheet')
+							action-button(
+								color='success',
+								icon='fa fa-edit',
+								[disabled]='project?.project_status === projectStatus.DONE',
+								[title]='"GENERAL.LABELS.EDIT" | translate',
+								(onClick)='openDialogProjectLineItem( item )')
+							action-button(
+								color='warn',
+								icon='fa fa-trash',
+								[disabled]='project?.project_status === projectStatus.DONE',
+								[title]='"GENERAL.LABELS.DELETE" | translate',
+								(onClick)='deleteProjectLineItem( item )')
+						.ph-10(*ngIf='sortable')
+							button(
+								plugin-button-only-icon,
+								mat-stroked-button,
+								type='button',
+								(click)='changePriority( childGroup, index )')
+								i.icon.icon-sort.text-accent

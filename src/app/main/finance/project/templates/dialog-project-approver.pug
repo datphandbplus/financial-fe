@@ -1,0 +1,61 @@
+form.dialog-project-approver.layout-column(
+	[formGroup]='projectApproverForm',
+	(submit)='update()')
+	h1(matDialogTitle)
+		| {{ "FINANCE.PROJECT.TITLES.EDIT_PROJECT" | translate }}
+
+	div(matDialogContent)
+		.mb-20([innerHtml]='projectApprover?.confirmation')
+
+		.layout-column.layout-fixer-15(*ngIf='!isQS')
+			mat-form-field.ph-15(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.COMMENT" | translate }}
+				textarea(
+					matInput,
+					rows='5',
+					[(ngModel)]='projectApprover.comment',
+					[placeholder]='"GENERAL.PLACEHOLDERS.COMMENT" | translate',
+					[formControl]='projectApproverForm?.controls[ "comment" ]',
+					[disableControl]='isSubmitting',
+					ngDefaultControl)
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			*ngIf='!isQS',
+			mat-raised-button,
+			type='submit',
+			color='primary')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ "GENERAL.LABELS.SAVE" | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')
+		button(
+			*ngIf='isQS',
+			mat-raised-button,
+			type='submit',
+			color='accent')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ "GENERAL.LABELS.OK" | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')

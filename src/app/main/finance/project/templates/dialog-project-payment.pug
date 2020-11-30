@@ -1,0 +1,26 @@
+mat-tab-group.dialog-project-payment(
+	mat-stretch-tabs,
+	[(selectedIndex)]='selectedTabIndex')
+	mat-tab
+		ng-template(mat-tab-label)
+			| {{ "FINANCE.PROJECT.LABELS.PAYMENT" | translate }}
+		ng-template([ngIf]='selectedTabIndex === 0')
+			include blocks/form-project-payment.partial.pug
+	mat-tab([disabled]='!payment?.id')
+		ng-template(mat-tab-label)
+			| {{ "FINANCE.PROJECT.LABELS.PROCEDURE" | translate }}
+			ng-template([ngIf]='procedureIndex > -1 && payment?.id')
+				| &nbsp;&#35;{{ procedureIndex + 1 }}
+		ng-template([ngIf]='selectedTabIndex === 1')
+			include blocks/table-payment-procedure.partial.pug
+			include blocks/form-project-payment-procedure.partial.pug
+	mat-tab
+		ng-template(mat-tab-label)
+			| {{ "FINANCE.PROJECT.LABELS.APPROVE_PAYMENT_STATUS" | translate }}
+		ng-template([ngIf]='selectedTabIndex === 2')
+			include blocks/form-project-payment-approver.partial.pug
+	mat-tab
+		ng-template(mat-tab-label)
+			| {{ "FINANCE.PROJECT.LABELS.PO_DETAIL" | translate }}
+		ng-template([ngIf]='selectedTabIndex === 3')
+			include blocks/block-project-payment-po.partial.pug

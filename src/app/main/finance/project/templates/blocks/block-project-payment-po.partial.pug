@@ -1,0 +1,287 @@
+.block-project-payment-po.p-25
+	.layout-row.layout-wrap.layout-fixer-15
+		mat-form-field.mb-10.ph-15.flex-50(
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "FINANCE.COST_ITEM.LABELS.PURCHASE_ORDER" | translate }}
+			input(
+				matInput,
+				[value]='projectPurchaseOrder.name',
+				[placeholder]='"FINANCE.COST_ITEM.PLACEHOLDERS.PURCHASE_ORDER" | translate',
+				readonly,
+				ngDefaultControl)
+
+		//- mat-form-field.mb-10.ph-15.flex-50(
+		//- 	*ngIf='!isConstruction && !isConstructionManager',
+		//- 	plugin-input-parse-commas,
+		//- 	floatLabel='always',
+		//- 	appearance='outline')
+		//- 	mat-label
+		//- 		| {{ "GENERAL.LABELS.VAT_PERCENT" | translate }}
+		//- 	input(
+		//- 		matInput,
+		//- 		step='1',
+		//- 		min='0',
+		//- 		type='number',
+		//- 		[value]='projectPurchaseOrder.vat_percent',
+		//- 		readonly,
+		//- 		ngDefaultControl)
+		//- 	span(matSuffix)
+		//- 		| %
+		//- 	span(matPrefix)
+		//- 		| {{ ( projectPurchaseOrder?.vat_percent?.toString() || "" ) | commas }}
+		//- 	mat-hint
+		//- 		| {{ ( projectPurchaseOrder?.vat_percent?.toString() || "" ) | commas }}
+
+		mat-form-field.mb-10.ph-15.flex-50(
+			floatLabel='always',
+			appearance='outline')
+			mat-label
+				| {{ "FINANCE.VENDOR.ATTRIBUTES.VENDOR" | translate }}
+			input(
+				matInput,
+				[value]='( projectPurchaseOrder.vendor && projectPurchaseOrder.vendor.short_name ) || "N/A"',
+				[placeholder]='"FINANCE.VENDOR.ATTRIBUTES.VENDOR" | translate',
+				readonly,
+				ngDefaultControl)
+
+	//- .layout-row.layout-align-start-center.mt-10.mb-20
+	//- 	.mr-20.font-size-18.font-weight-500
+	//- 		| {{ "FINANCE.PROJECT.LABELS.DISCOUNT" | translate | uppercase }}
+	//- 	mat-divider.flex-auto
+
+	//- .layout-row.layout-wrap.layout-fixer-15.mb-10
+		//- mat-form-field.mb-10.ph-15.flex-50(
+		//- 	*ngIf='!isConstruction && !isConstructionManager',
+		//- 	floatLabel='always',
+		//- 	appearance='outline')
+		//- 	mat-label
+		//- 		| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_TYPE" | translate }}
+		//- 	input(
+		//- 		matInput,
+		//- 		[value]='projectPurchaseOrder.discount_type',
+		//- 		readonly,
+		//- 		ngDefaultControl)
+
+		//- mat-form-field.ph-15.flex-20(
+		//- 	*ngIf='!isConstruction && !isConstructionManager',
+		//- 	plugin-input-parse-commas,
+		//- 	floatLabel='always',
+		//- 	appearance='outline')
+		//- 	mat-label
+		//- 		| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_AMOUNT" | translate }}
+		//- 	input(
+		//- 		matInput,
+		//- 		type='number',
+		//- 		step='1',
+		//- 		min='0',
+		//- 		[value]='projectPurchaseOrder.discount_amount',
+		//- 		readonly,
+		//- 		ngDefaultControl)
+		//- 	span(matPrefix)
+		//- 		| {{ ( projectPurchaseOrder?.discount_amount?.toString() || "" ) | commas }}
+		//- 	mat-hint
+		//- 		| {{ ( projectPurchaseOrder?.discount_value?.toString() || "" ) | commas }}
+
+		//- mat-form-field.ph-15.flex-30(
+		//- 	*ngIf='!isConstruction && !isConstructionManager',
+		//- 	plugin-input-parse-commas,
+		//- 	floatLabel='always',
+		//- 	appearance='outline')
+		//- 	mat-label
+		//- 		| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_VALUE" | translate }}
+		//- 	input(
+		//- 		matInput,
+		//- 		type='number',
+		//- 		[value]='projectPurchaseOrder.discount_value',
+		//- 		readonly,
+		//- 		ngDefaultControl)
+		//- 	span(matPrefix)
+		//- 		| {{ ( projectPurchaseOrder?.discount_value?.toString() || "" ) | commas }}
+
+		//- mat-form-field.ph-15.flex-100(
+		//- 	*ngIf='!isConstruction && !isConstructionManager',
+		//- 	plugin-input-parse-commas,
+		//- 	floatLabel='always',
+		//- 	appearance='outline')
+		//- 	mat-label
+		//- 		| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_REMAIN" | translate }}
+		//- 	input(
+		//- 		matInput,
+		//- 		type='number',
+		//- 		[value]='projectPurchaseOrder.total_remain',
+		//- 		readonly,
+		//- 		ngDefaultControl)
+		//- 	span(matPrefix)
+		//- 		| {{ ( projectPurchaseOrder?.total_remain?.toString() || "" ) | commas }}
+
+		//- mat-form-field.mb-10.ph-15.flex-50(
+		//- 	*ngIf='!isConstruction && !isConstructionManager',
+		//- 	floatLabel='always',
+		//- 	appearance='outline')
+		//- 	mat-label
+		//- 		| {{ "GENERAL.LABELS.DESCRIPTION" | translate }}
+		//- 	textarea(
+		//- 		matInput,
+		//- 		rows='5',
+		//- 		[value]='projectPurchaseOrder.description',
+		//- 		[placeholder]='"GENERAL.PLACEHOLDERS.DESCRIPTION" | translate',
+		//- 		readonly,
+		//- 		ngDefaultControl)
+
+		//- mat-form-field.mb-10.ph-15.flex-50(
+		//- 	*ngIf='!isConstruction && !isConstructionManager',
+		//- 	floatLabel='always',
+		//- 	appearance='outline')
+		//- 	mat-label
+		//- 		| {{ "FINANCE.PROJECT.LABELS.NOTE" | translate }}
+		//- 	textarea(
+		//- 		matInput,
+		//- 		rows='5',
+		//- 		[value]='projectPurchaseOrder.note',
+		//- 		[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.NOTE" | translate',
+		//- 		readonly,
+		//- 		ngDefaultControl)
+
+	div
+		mat-table(
+			#table,
+			plugin-data-table,
+			[dataSource]='dataSourcePOItem',
+			[attr.data-label]='!dataSourcePOItem?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+			// No. Column
+			ng-container(matColumnDef='no')
+				mat-header-cell.w-50(*matHeaderCellDef)
+					| {{ "GENERAL.ATTRIBUTES.NUMBER_ORDER" | translate }}
+				mat-cell.w-50(*matCellDef='let element; index as i;')
+					| {{ i + 1 }}
+				mat-footer-cell.w-50(*matFooterCellDef)
+			// Name Column
+			ng-container(matColumnDef='name')
+				mat-header-cell(*matHeaderCellDef)
+					| {{ "GENERAL.ATTRIBUTES.NAME" | translate }}
+				mat-cell(*matCellDef='let element')
+					| {{ element?.name || "N/A" }}
+				mat-footer-cell(*matFooterCellDef)
+			// Vendor Column
+			//- ng-container(matColumnDef='vendor')
+			//- 	mat-header-cell.w-100(*matHeaderCellDef)
+			//- 		| {{ "FINANCE.VENDOR.ATTRIBUTES.VENDOR" | translate }}
+			//- 	mat-cell.w-100(*matCellDef)
+			//- 		| {{ projectPurchaseOrder?.vendor?.short_name || "N/A" }}
+			//- 	mat-footer-cell.w-100(*matFooterCellDef)
+			// Unit Column
+			ng-container(matColumnDef='unit')
+				mat-header-cell.w-70(
+					*matHeaderCellDef,
+					[ngClass]='{ "w-130": isConstruction || isConstructionManager }')
+					| {{ "GENERAL.ATTRIBUTES.UNIT" | translate }}
+				mat-cell.w-70(
+					*matCellDef='let element',
+					[ngClass]='{ "w-130": isConstruction || isConstructionManager }')
+					| {{ element?.unit || "N/A" }}
+				mat-footer-cell.w-70.layout-align-end(
+					*matFooterCellDef,
+					[ngClass]='{ "w-130": isConstruction || isConstructionManager }')
+					.layout-column.text-right(*ngIf='isConstruction || isConstructionManager')
+						.text-success.text-nowrap.mv-10
+							| {{ "FINANCE.PROJECT.LABELS.SUM" | translate }}
+						.text-success.text-nowrap.mv-10
+							| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_VALUE" | translate }}
+						.text-success.text-nowrap.mv-10
+							| {{ "FINANCE.PROJECT.LABELS.SUM_DISCOUNT" | translate }}
+						.text-success.text-nowrap.mv-10
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.VAT" | translate }}
+							| ({{ projectPurchaseOrder?.vat_percent | commas }}%)
+						.text-success.text-nowrap.mv-10
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL_INCLUDED_VAT" | translate }}
+			// Amount Column
+			ng-container(matColumnDef='amount')
+				mat-header-cell.layout-align-end.w-70(
+					*matHeaderCellDef,
+					[ngClass]='{ "w-130": isConstruction || isConstructionManager }')
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.AMOUNT" | translate }}
+				mat-cell.layout-align-end.w-70(
+					*matCellDef='let element',
+					[ngClass]='{ "w-130": isConstruction || isConstructionManager }')
+					| {{ element?.amount | commas }}
+				mat-footer-cell.layout-align-end.w-70(
+					*matFooterCellDef,
+					[ngClass]='{ "w-130": isConstruction || isConstructionManager }')
+					.layout-column.text-right(*ngIf='isConstruction || isConstructionManager')
+						.text-warning.text-truncate.mv-10([matTooltip]='projectPurchaseOrder?.total | commas')
+							| {{ ( projectPurchaseOrder?.total || 0 )?.toFixed( 0 ) | commas }}
+						.text-warning.text-truncate.mv-10([matTooltip]='projectPurchaseOrder?.discount_value | commas')
+							| {{ ( projectPurchaseOrder?.discount_value || 0 )?.toFixed( 0 ) | commas }}
+						.text-warning.text-truncate.mv-10([matTooltip]='projectPurchaseOrder?.total_remain | commas')
+							| {{ ( projectPurchaseOrder?.total_remain || 0 )?.toFixed( 0 ) | commas }}
+						.text-warning.text-truncate.mv-10([matTooltip]='( projectPurchaseOrder?.total_remain * projectPurchaseOrder?.vat_percent / 100 ) | commas')
+							| {{ ( ( projectPurchaseOrder?.total_remain * projectPurchaseOrder?.vat_percent / 100 ) || 0 )?.toFixed( 0 ) | commas }}
+						.text-warning.text-truncate.mv-10([matTooltip]='( projectPurchaseOrder?.total_remain * ( 1 + projectPurchaseOrder?.vat_percent / 100 ) ) | commas')
+							| {{ ( ( projectPurchaseOrder?.total_remain * ( 1 + projectPurchaseOrder?.vat_percent / 100 ) ) || 0 )?.toFixed( 0 ) | commas }}
+			// Price Column
+			ng-container(matColumnDef='price')
+				mat-header-cell.layout-align-end.w-130(*matHeaderCellDef)
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.PRICE" | translate }}
+				mat-cell.layout-align-end.w-130(*matCellDef='let element')
+					| {{ element?.price | commas }}
+				mat-footer-cell.layout-align-end.w-130(*matFooterCellDef)
+					.layout-column.text-right
+						.text-success.text-nowrap.mv-10
+							| {{ "FINANCE.PROJECT.LABELS.SUM" | translate }}
+						.text-success.text-nowrap.mv-10
+							| {{ "FINANCE.PROJECT.LABELS.DISCOUNT_VALUE" | translate }}
+						.text-success.text-nowrap.mv-10
+							| {{ "FINANCE.PROJECT.LABELS.SUM_DISCOUNT" | translate }}
+						.text-success.text-nowrap.mv-10
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.VAT" | translate }}
+							| ({{ projectPurchaseOrder?.vat_percent | commas }}%)
+						.text-success.text-nowrap.mv-10
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL_INCLUDED_VAT" | translate }}
+			// Total Column
+			ng-container(matColumnDef='total')
+				mat-header-cell.layout-align-end.w-130(*matHeaderCellDef)
+					| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+				mat-cell.layout-align-end.w-130(*matCellDef='let element')
+					| {{ ( element?.total )?.toFixed( 0 ) | commas }}
+				mat-footer-cell.layout-align-end.w-130(*matFooterCellDef)
+					.layout-column.text-right
+						.text-warning.text-truncate.mv-10([matTooltip]='projectPurchaseOrder?.total | commas')
+							| {{ ( projectPurchaseOrder?.total || 0 )?.toFixed( 0 ) | commas }}
+						.text-warning.text-truncate.mv-10([matTooltip]='projectPurchaseOrder?.discount_value | commas')
+							| {{ ( projectPurchaseOrder?.discount_value || 0 )?.toFixed( 0 ) | commas }}
+						.text-warning.text-truncate.mv-10([matTooltip]='projectPurchaseOrder?.total_remain | commas')
+							| {{ ( projectPurchaseOrder?.total_remain || 0 )?.toFixed( 0 ) | commas }}
+						.text-warning.text-truncate.mv-10([matTooltip]='( projectPurchaseOrder?.total_remain * projectPurchaseOrder?.vat_percent / 100 ) | commas')
+							| {{ ( ( projectPurchaseOrder?.total_remain * projectPurchaseOrder?.vat_percent / 100 ) || 0 )?.toFixed( 0 ) | commas }}
+						.text-warning.text-truncate.mv-10([matTooltip]='( projectPurchaseOrder?.total_remain * ( 1 + projectPurchaseOrder?.vat_percent / 100 ) ) | commas')
+							| {{ ( ( projectPurchaseOrder?.total_remain * ( 1 + projectPurchaseOrder?.vat_percent / 100 ) ) || 0 )?.toFixed( 0 ) | commas }}
+
+			mat-header-row(*matHeaderRowDef='poDisplayedColumns')
+			mat-row(*matRowDef='let row; columns: poDisplayedColumns;')
+			mat-footer-row(
+				*matFooterRowDef='poDisplayedColumns',
+				[class.hide]='!dataSourcePOItem?.filteredData?.length')
+
+		mat-paginator(
+			#paginatorPOItem,
+			pageSize='30',
+			[pageSizeOptions]='[ 30, 50, 100 ]',
+			showFirstLastButtons='true')
+
+	div(
+		matDialogActions,
+		align='end')
+		button.export-btn(
+			mat-raised-button,
+			color='success',
+			(click)='exportExcel()')
+			i.fa.fa-download.mr-10
+			| {{ "FINANCE.PROJECT.LABELS.EXPORT" | translate }}
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting',
+			(click)='onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}

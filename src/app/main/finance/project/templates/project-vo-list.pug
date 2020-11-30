@@ -1,0 +1,177 @@
+mat-card.project-vo-list.mat-elevation-z8
+	.layout-row.pb-15.layout-fixer-10
+		.ph-10
+			button(
+				plugin-button-only-icon,
+				mat-raised-button,
+				[disabled]='!loaded',
+				(click)='getList()')
+				i.fa.fa-sync-alt
+		.flex-auto
+			.layout-row.layout-align-end
+				.ph-10
+					button(
+						mat-raised-button,
+						color='primary',
+						[disabled]='!loaded || !canAdd || project?.project_status === projectStatus.DONE',
+						(click)='openDialogVO()')
+						i.fa.fa-plus.mr-15
+						| {{ "FINANCE.PROJECT.TITLES.ADD_VO" | translate }}
+					button(
+						style='margin-left: 10px;',
+						mat-raised-button,
+						color='success',
+						(click)='exportExcel()')
+						i.fa.fa-download
+						| {{ "FINANCE.PROJECT.LABELS.EXPORT" | translate }}
+
+	div([fullscreen]='".mat-column-actions"')
+		loading-overlay([visible]='!loaded')
+			mat-table(
+				#table,
+				plugin-data-table,
+				matSort,
+				[dataSource]='dataSource',
+				[attr.data-label]='!dataSource?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+				// vo Column
+				ng-container(matColumnDef='vo')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='id')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.VO_CODE" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.clickable(
+						*matCellDef='let element',
+						(click)='onChooseVo?.emit( element )')
+						.font-weight-500
+							| {{ element?.id ? "VO" + ( element?.id | padNumber: 4 ) : "N/A" }}
+					mat-footer-cell(*matFooterCellDef)
+				// Name Column
+				ng-container(matColumnDef='name')
+					mat-header-cell(*matHeaderCellDef, mat-sort-header='name')
+						| {{ "GENERAL.ATTRIBUTES.NAME" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.clickable(
+						*matCellDef='let element',
+						(click)='onChooseVo?.emit( element )')
+						.font-weight-500
+							| {{ element?.name || "N/A" }}
+					mat-footer-cell(*matFooterCellDef)
+				// subtotal Column
+				ng-container(matColumnDef='subtotal')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='subtotal')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.SUBTOTAL" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						| {{ ( element?.subtotal || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell(*matFooterCellDef)
+				// discount Column
+				ng-container(matColumnDef='discount')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='discount')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.DISCOUNT" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						| {{ ( element?.discount || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+						.text-success
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+				// total_wo_vat Column
+				ng-container(matColumnDef='total_wo_vat')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='total_wo_vat')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL_VO_EXCLUDED_VAT" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						| {{ ( element?.total_wo_vat || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+						.text-success
+							| {{ ( totalFooter?.total_wo_vat || 0 )?.toFixed( 0 ) | commas }}
+				// vat Column
+				ng-container(matColumnDef='vat')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='vat')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.VO_VAT" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						| {{ ( element?.vat || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+						.text-success
+							| {{ ( totalFooter?.vat || 0 )?.toFixed( 0 ) | commas }}
+				// total_w_vat Column
+				ng-container(matColumnDef='total_w_vat')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='total_w_vat')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL_VO_INCLUDED_VAT" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						| {{ ( element?.total_w_vat || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+						.text-success
+							| {{ ( totalFooter?.total_w_vat || 0 )?.toFixed( 0 ) | commas }}
+				// total_wo_cost_vat Column
+				ng-container(matColumnDef='total_wo_cost_vat')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='total_wo_cost_vat')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL_VO_COST" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						| {{ ( element?.total_wo_cost_vat || 0 )?.toFixed( 0 ) | commas }}
+					mat-footer-cell.layout-align-end(*matFooterCellDef)
+						.text-success
+							| {{ ( totalFooter?.total_wo_cost_vat || 0 )?.toFixed( 0 ) | commas }}
+				// date Column
+				ng-container(matColumnDef='date')
+					mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='created_at')
+						| {{ "FINANCE.PROJECT.ATTRIBUTES.CREATED_DATE" | translate }}
+						| &nbsp;
+						i.fa.fa-sort
+					mat-cell.layout-align-end(*matCellDef='let element')
+						| {{ element?.created_at | momentDateFormat }}
+					mat-footer-cell(*matFooterCellDef)
+				// Status Column
+				ng-container(matColumnDef='status')
+					mat-header-cell.w-150(*matHeaderCellDef, mat-sort-header='status')
+						.text-center.flex-auto
+							| {{ "GENERAL.ATTRIBUTES.STATUS" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+					mat-cell.w-150(*matCellDef='let element')
+						status-box(
+							[color]='element?.status_name?.color',
+							[status]='element?.status_name?.name | translate')
+					mat-footer-cell.w-150(*matFooterCellDef)
+				// Actions Column
+				ng-container(matColumnDef='actions')
+					mat-header-cell.w-65(*matHeaderCellDef)
+						| {{ "GENERAL.ATTRIBUTES.ACTION" | translate }}
+					mat-cell.w-65(*matCellDef='let element')
+						action-box(*ngIf='isQS')
+							action-button(
+								color='success',
+								icon='fa fa-edit',
+								[title]='"GENERAL.LABELS.EDIT" | translate',
+								[disabled]='!loaded || isDeleting || element?.status === PROJECT_VO_STATUS?.APPROVED || element?.status === PROJECT_VO_STATUS?.WAITING_APPROVAL || project?.project_status === projectStatus.DONE',
+								(onClick)='openDialogVO( element )')
+							action-button(
+								color='warn',
+								icon='fa fa-trash',
+								[title]='"GENERAL.LABELS.DELETE" | translate',
+								[disabled]='!loaded || isDeleting || element?.status === PROJECT_VO_STATUS?.APPROVED || element?.status === PROJECT_VO_STATUS?.WAITING_APPROVAL || project?.project_status === projectStatus.DONE',
+								(onClick)='delete( element )')
+					mat-footer-cell.w-65(*matFooterCellDef)
+
+				mat-header-row(*matHeaderRowDef='displayedColumns')
+				mat-row(*matRowDef='let row; columns: displayedColumns;')
+				mat-footer-row(
+					footerRowInTop,
+					*matFooterRowDef='displayedColumns',
+					[class.hide]='!dataSource?.filteredData?.length')
+				mat-footer-row(*matFooterRowDef='displayedColumns')
+
+			mat-paginator(
+				#paginator,
+				pageSize='30',
+				[pageSizeOptions]='[ 30, 50, 100 ]',
+				showFirstLastButtons='true')

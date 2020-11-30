@@ -1,0 +1,170 @@
+.table-project-cost
+	.layout-row.pb-15.layout-fixer-10
+		.flex-auto
+			.ph-10
+				button(
+					plugin-button-only-icon,
+					mat-raised-button,
+					[disabled]='!loaded || isUploading',
+					(click)='getList();')
+					i.fa.fa-sync-alt
+				button(
+					style='margin-left: 10px;',
+					mat-raised-button,
+					color='success',
+					(click)='exportExcel()')
+					i.fa.fa-download
+					| {{ "FINANCE.PROJECT.LABELS.EXPORT" | translate }}
+		.flex-auto(*ngIf='canAddCost')
+			.layout-row.layout-align-end
+				.ph-10
+					button(
+						mat-raised-button,
+						color='success',
+						(click)='exportExcel()')
+						i.fa.fa-download.mr-10
+						| {{ "FINANCE.PROJECT.LABELS.EXPORT" | translate }}
+				.ph-10
+					button(
+						mat-raised-button,
+						color='primary',
+						[disabled]='!loaded || isUploading || project?.project_status === projectStatus.DONE',
+						(click)='openDialogUploadFile()')
+						i.fa.fa-upload.mr-15
+						| {{ "FINANCE.COST_ITEM.LABELS.IMPORT_COST_ITEMS" | translate }}
+				.ph-10
+					button(
+						mat-raised-button,
+						color='primary',
+						[disabled]='!loaded || isUploading || project?.project_status === projectStatus.DONE',
+						(click)='openDialogProjectCostItem()')
+						i.fa.fa-plus.mr-15
+						| {{ "FINANCE.COST_ITEM.LABELS.NEW_COST_ITEM" | translate }}
+
+	.mat-elevation-z8
+		div([fullscreen]='".mat-column-actions"')
+			loading-overlay([visible]='!loaded')
+				mat-table(
+					#table,
+					plugin-data-table,
+					matSort,
+					[dataSource]='dataSource',
+					[attr.data-label]='!dataSource?.filteredData?.length ? ( "GENERAL.MESSAGES.NO_DATA" | translate ) : ""')
+					// No. Column
+					ng-container(matColumnDef='no')
+						mat-header-cell.w-50(*matHeaderCellDef)
+							| {{ "GENERAL.ATTRIBUTES.NUMBER_ORDER" | translate }}
+						mat-cell.w-50(*matCellDef='let index = index')
+							| {{ index + 1 }}
+						mat-footer-cell.w-50(*matFooterCellDef)
+					// Name Column
+					ng-container(matColumnDef='name')
+						mat-header-cell.w-300(*matHeaderCellDef, mat-sort-header='name')
+							| {{ "GENERAL.ATTRIBUTES.NAME" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+						mat-cell.w-300(*matCellDef='let element')
+							| {{ element?.name || "N/A" }}
+						mat-footer-cell.w-300(*matFooterCellDef)
+					// Vendor Column
+					ng-container(matColumnDef='vendor')
+						mat-header-cell(*matHeaderCellDef, mat-sort-header='vendor')
+							| {{ "FINANCE.VENDOR.ATTRIBUTES.VENDOR" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+						mat-cell(*matCellDef='let element')
+							| {{ element?.vendor?.short_name || "N/A" }}
+						mat-footer-cell(*matFooterCellDef)
+					// Unit Column
+					ng-container(matColumnDef='unit')
+						mat-header-cell(*matHeaderCellDef, mat-sort-header='unit')
+							| {{ "GENERAL.ATTRIBUTES.UNIT" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+						mat-cell(*matCellDef='let element')
+							| {{ element?.unit || "N/A" }}
+						mat-footer-cell(*matFooterCellDef)
+					// Amount Column
+					ng-container(matColumnDef='amount')
+						mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='amount')
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.AMOUNT" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+						mat-cell.layout-align-end(*matCellDef='let element')
+							| {{ ( element?.bk_amount || element?.amount )?.toFixed( 0 ) | commas }}
+						mat-footer-cell.layout-align-end(*matFooterCellDef)
+					// Price Column
+					ng-container(matColumnDef='price')
+						mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='price')
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.PRICE" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+						mat-cell.layout-align-end(*matCellDef='let element')
+							| {{ ( element?.bk_price || element?.price )?.toFixed( 0 ) | commas }}
+						mat-footer-cell.layout-align-end(*matFooterCellDef)
+							.layout-column
+								.text-warning.mv-10
+									| {{ "FINANCE.PROJECT.ATTRIBUTES.SUBTOTAL" | translate }}
+								.mv-10
+									| {{ "FINANCE.PROJECT.ATTRIBUTES.VO_TOTAL" | translate }}
+								.text-success.mv-10
+									| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+					// Total Column
+					ng-container(matColumnDef='total')
+						mat-header-cell.layout-align-end(*matHeaderCellDef, mat-sort-header='total')
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.TOTAL" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+						mat-cell.layout-align-end(*matCellDef='let element')
+							| {{ ( element?.bk_total || element?.total )?.toFixed( 0 ) | commas }}
+						mat-footer-cell.layout-align-end(*matFooterCellDef)
+							.layout-column.text-right
+								.text-warning.text-truncate.mv-10([matTooltip]='footerRow?.sub_total | commas')
+									| {{ ( footerRow?.sub_total || 0 )?.toFixed( 0 ) | commas }}
+								.text-truncate.mv-10([matTooltip]='footerRow?.vo_total | commas')
+									| {{ ( footerRow?.vo_total || 0 )?.toFixed( 0 ) | commas }}
+								.text-success.text-truncate.mv-10([matTooltip]='( footerRow?.sub_total + footerRow?.vo_total ) | commas')
+									| {{ (( footerRow?.sub_total + footerRow?.vo_total ) || 0 )?.toFixed( 0 ) | commas }}
+					// Note Column
+					ng-container(matColumnDef='note')
+						mat-header-cell.w-300(*matHeaderCellDef, mat-sort-header='note')
+							| {{ "FINANCE.PROJECT.ATTRIBUTES.NOTE" | translate }}
+							| &nbsp;
+							i.fa.fa-sort
+						mat-cell.w-300(*matCellDef='let element')
+							| {{ element?.note || "N/A" }}
+						mat-footer-cell.w-300(*matFooterCellDef)
+					// Actions Column
+					ng-container(matColumnDef='actions')
+						mat-header-cell.w-65(*matHeaderCellDef)
+							| {{ "GENERAL.ATTRIBUTES.ACTION" | translate }}
+						mat-cell.w-65(*matCellDef='let element')
+							action-box([disabled]='isLiabilitiesAccountant || isCFO || isConstruction || isConstructionManager')
+								action-button(
+									color='success',
+									icon='fa fa-edit',
+									[title]='"GENERAL.LABELS.EDIT" | translate',
+									[disabled]='!loaded || isUploading || !canModifyCost || project?.project_status === projectStatus.DONE',
+									(onClick)='openDialogProjectCostItem( element )')
+								action-button(
+									color='warn',
+									icon='fa fa-trash',
+									[title]='"GENERAL.LABELS.DELETE" | translate',
+									[disabled]='!loaded || isUploading || !canAddCost || project?.project_status === projectStatus.DONE',
+									(onClick)='deleteProjectCostItem( element )')
+						mat-footer-cell.w-65(*matFooterCellDef)
+					mat-header-row(*matHeaderRowDef='displayedColumns')
+					mat-row(*matRowDef='let row; columns: displayedColumns;')
+					mat-footer-row(
+						footerRowInTop,
+						*matFooterRowDef='displayedColumns',
+						[class.hide]='!dataSource?.filteredData?.length || isConstruction || isConstructionManager')
+					mat-footer-row(
+						*matFooterRowDef='displayedColumns',
+						[class.hide]='!dataSource?.filteredData?.length || isConstruction || isConstructionManager')
+
+				mat-paginator(
+					#paginator,
+					pageSize='30',
+					[pageSizeOptions]='[ 30, 50, 100 ]',
+					showFirstLastButtons='true')

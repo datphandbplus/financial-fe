@@ -1,0 +1,33 @@
+@media screen and (min-width: 1441px) { // Full HD
+	.fix-to-left {
+		.app,
+		~.cdk-overlay-container {
+			max-width: 1440px;
+		}
+
+		.app {
+			border-right: 1px solid $gray;
+		}
+	}
+}
+
+@media screen and (min-width: 1601px) { // HD+
+	.fix-to-left {
+		.app,
+		~.cdk-overlay-container {
+			max-width: 1600px;
+		}
+	}
+}
+
+@media screen and (max-width: 1439px) { // Small screen
+	.drawer .mat-drawer {
+		position: absolute;
+	}
+}
+
+@media screen and (max-width: $layout-breakpoint-md - 1) {}
+
+@media screen and (max-width: $layout-breakpoint-sm - 1) {}
+
+@media screen and (max-width: $layout-breakpoint-xs - 1) {}

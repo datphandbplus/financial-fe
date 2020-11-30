@@ -1,0 +1,96 @@
+mat-card.mat-elevation-z8.mb-30.block-project-user(*ngIf='isCEO')
+	.mb-20.text-primary.font-weight-500.font-size-18
+		| {{ "FINANCE.PROJECT.LABELS.PROJECT_USER_ROLE" | translate | uppercase }}
+	form([formGroup]='projectUserForm')
+		.layout-row.layout-wrap.layout-fixer-15
+			select-box.mb-10.ph-15.flex-33(
+				fieldName='full_name',
+				fieldImage='avatar',
+				fieldSubName='email',
+				init='true',
+				[(ngModel)]='projectConfig.manage_by',
+				[label]='"FINANCE.USER.LABELS.PM" | translate',
+				[placeholder]='"FINANCE.USER.PLACEHOLDERS.PM" | translate',
+				[disableControl]='isSubmitting',
+				[formControl]='projectUserForm?.controls[ "manage_by" ]',
+				[data]='userService?.getAll( "pm-only" )',
+				[readonly]='!isCEO',
+				required,
+				ngDefaultControl)
+
+			select-box.mb-10.ph-15.flex-33(
+				fieldName='full_name',
+				fieldImage='avatar',
+				fieldSubName='email',
+				init='true',
+				[(ngModel)]='projectConfig.sale_by',
+				[label]='"FINANCE.USER.LABELS.SALE" | translate',
+				[placeholder]='"FINANCE.USER.PLACEHOLDERS.SALE" | translate',
+				[disableControl]='isSubmitting',
+				[formControl]='projectUserForm?.controls[ "sale_by" ]',
+				[data]='userService?.getAll( "sale-only" )',
+				[readonly]='!isCEO',
+				required,
+				ngDefaultControl)
+
+			select-box.mb-10.ph-15.flex-33(
+				fieldName='full_name',
+				fieldImage='avatar',
+				fieldSubName='email',
+				init='true',
+				[(ngModel)]='projectConfig.qs_by',
+				[label]='"FINANCE.USER.LABELS.QS" | translate',
+				[placeholder]='"FINANCE.USER.PLACEHOLDERS.QS" | translate',
+				[disableControl]='isSubmitting',
+				[formControl]='projectUserForm?.controls[ "qs_by" ]',
+				[data]='userService?.getAll( "qs-only" )',
+				[readonly]='!isCEO',
+				required,
+				ngDefaultControl)
+
+			select-box.mb-10.ph-15.flex-33(
+				fieldName='full_name',
+				fieldImage='avatar',
+				fieldSubName='email',
+				init='true',
+				[(ngModel)]='projectConfig.purchase_by',
+				[label]='"FINANCE.USER.LABELS.PURCHASING" | translate',
+				[placeholder]='"FINANCE.USER.PLACEHOLDERS.PURCHASING" | translate',
+				[disableControl]='isSubmitting',
+				[formControl]='projectUserForm?.controls[ "purchase_by" ]',
+				[data]='userService?.getAll( "purchase-only" )',
+				[readonly]='!isCEO',
+				required,
+				ngDefaultControl)
+
+			select-box.mb-10.ph-15.flex-33(
+				fieldName='full_name',
+				fieldImage='avatar',
+				fieldSubName='email',
+				init='true',
+				[(ngModel)]='projectConfig.construct_by',
+				[label]='"FINANCE.USER.LABELS.CONSTRUCTION" | translate',
+				[placeholder]='"FINANCE.USER.PLACEHOLDERS.CONSTRUCTION" | translate',
+				[disableControl]='isSubmitting',
+				[formControl]='projectUserForm?.controls[ "construct_by" ]',
+				[data]='userService?.getAll( "construct-only" )',
+				[readonly]='!isCEO',
+				ngDefaultControl)
+
+		.layout-row.layout-align-end
+			button(
+				*ngIf='isCEO',
+				mat-raised-button,
+				color='primary',
+				(click)='updateProjectUser()',
+				[disabled]='projectUserForm?.invalid || isSubmitting')
+				.layout-row.layout-align-center-center
+					.flex-auto
+						ng-template([ngIf]='!isSubmitting')
+							i.fa.fa-save.mr-15
+							| {{ "GENERAL.LABELS.SAVE" | translate }}
+						ng-template([ngIf]='isSubmitting')
+							| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+					mat-spinner.ml-5(
+						*ngIf='isSubmitting',
+						diameter='20')

@@ -1,0 +1,26 @@
+@import '~angular-core/lib/scss/partials/variable';
+@import 'src/scss/partials/variable';
+
+.login,
+.activate {
+	background-color: $primary;
+	color: $white;
+	text-align: center;
+
+	.mat-card {
+		padding: 30px;
+	}
+
+	.mat-raised-button {
+		height: 50px;
+		font-size: 16px;
+	}
+
+	.mat-form-field {
+		font-size: 18px;
+	}
+
+	.copyright {
+		color: $white !important;
+	}
+}

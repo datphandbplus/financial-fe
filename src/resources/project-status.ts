@@ -1,0 +1,12 @@
+export const PROJECT_STATUS: any = {
+	PITCHING		: 0,
+	CONFIRMED		: 1,
+	CONTRACTING		: 2,
+	CONTRACTED		: 3,
+	LIQUIDATION		: 4,
+	PAYMENT_RECEIVED: 5,
+	DELAYED			: 6,
+	FAIL			: 7,
+	DROPPED			: 8,
+	DONE            : 9
+};

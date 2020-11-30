@@ -1,0 +1,137 @@
+form.layout-column.p-25(
+	*ngIf='procedureIndex > -1',
+	[formGroup]='procedureForm')
+	div(matDialogContent)
+		.layout-row.layout-wrap.layout-fixer-15
+			mat-form-field.mb-10.ph-15.flex-100(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "GENERAL.LABELS.NAME" | translate }}
+				input(
+					matInput,
+					[(ngModel)]='payment.procedures[ procedureIndex ].name',
+					[placeholder]='"GENERAL.PLACEHOLDERS.NAME" | translate',
+					[formControl]='procedureForm?.controls[ "name" ]',
+					[disableControl]='isSubmitting || isUploading',
+					[readonly]='!isPurchasing || payment?.is_freezed',
+					required,
+					ngDefaultControl)
+				mat-error
+					error-message(
+						[label]='"GENERAL.LABELS.NAME" | translate',
+						[control]='procedureForm?.controls[ "name" ]')
+
+			select-box.mb-10.ph-15.flex-50(
+				translated='true',
+				[(ngModel)]='payment.procedures[ procedureIndex ].status_id',
+				[label]='"GENERAL.LABELS.STATUS" | translate',
+				[placeholder]='"GENERAL.PLACEHOLDERS.STATUS" | translate',
+				[formControl]='procedureForm?.controls[ "status" ]',
+				[disableControl]='isSubmitting || isUploading',
+				[data]='procedureStatus',
+				[readonly]='!isPurchasing || payment?.is_freezed',
+				required,
+				ngDefaultControl)
+
+			mat-form-field.ph-15.flex-50(
+				floatLabel='always',
+				appearance='outline',
+				(click)='picker?.open()')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.DEADLINE" | translate }}
+				span
+					| {{ payment?.procedures[ procedureIndex ]?.deadline ? ( payment?.procedures[ procedureIndex ]?.deadline | momentDateFormat ) : "FINANCE.PROJECT.PLACEHOLDERS.DEADLINE" | translate }}
+				input.hide(
+					matInput,
+					[min]='minDate?.format()',
+					[matDatepicker]='picker',
+					[(ngModel)]='payment.procedures[ procedureIndex ].deadline',
+					[formControl]='procedureForm?.controls[ "deadline" ]',
+					ngDefaultControl,
+					required,
+					readonly)
+				mat-datepicker-toggle(
+					matSuffix,
+					[for]='picker')
+				mat-datepicker(
+					#picker,
+					[disabled]='isSubmitting || isUploading || !isPurchasing || payment?.is_freezed')
+
+			mat-form-field.ph-15.flex-100(
+				floatLabel='always',
+				appearance='outline')
+				mat-label
+					| {{ "FINANCE.PROJECT.LABELS.NOTE" | translate }}
+				textarea(
+					matInput,
+					[(ngModel)]='payment.procedures[ procedureIndex ].note',
+					[placeholder]='"FINANCE.PROJECT.PLACEHOLDERS.NOTE" | translate',
+					[formControl]='procedureForm?.controls[ "note" ]',
+					[disableControl]='isSubmitting || isUploading || !isPurchasing || payment?.is_freezed',
+					ngDefaultControl)
+
+		div(*ngIf='isPurchasing && !viewOnly')
+			upload-box(
+				[label]='"FINANCE.PROJECT.LABELS.PROOF" | translate',
+				[disabled]='isUploading',
+				(onFileSelected)='onProcedureFileSelected( $event )')
+		.layout-column(*ngIf='payment.procedures[ procedureIndex ]?.created_at')
+			mat-form-field(appearance='outline')
+				mat-label
+					| {{ payment.procedures[ procedureIndex ]?.created_at | momentDateFormat }}
+				input(
+					matInput,
+					readonly,
+					[value]='payment.procedures[ procedureIndex ].proof?.originalname || "N/A"')
+				span(matSuffix)
+					i.fa.fa-file-invoice.text-accent.font-size-30.clickable((click)='downloadProcedure( payment.procedures[ procedureIndex ].proof?.key, payment.procedures[ procedureIndex ].proof?.location )')
+
+		.layout-row.layout-align-center-center.pt-20.pb-30.procedure-pagination
+			ng-template(
+				ngFor,
+				let-item,
+				let-i='index',
+				[ngForOf]='dataSource?.filteredData')
+				.ph-5
+					button.procedure-pagination__item(
+						mat-mini-fab,
+						type='button',
+						[ngClass]='{ "procedure-pagination__item-done": item?.status === PROCEDURE_STATUS?.CONFIRMED, "procedure-pagination__item-active": item?.temp_id === procedureIndex }',
+						[disabled]='isSubmitting || isUploading',
+						(click)='procedureIndex = item?.temp_id')
+						| {{ i + 1 }}
+						span(*ngIf='!item?.created_at')
+							| *
+
+	div(
+		matDialogActions,
+		align='end')
+		button(
+			mat-raised-button,
+			type='button',
+			[disabled]='isSubmitting || isUploading',
+			(click)='hasChange ? closeDiaglog() : onNoClick()')
+			| {{ "GENERAL.LABELS.CANCEL" | translate }}
+		button(
+			mat-raised-button,
+			color='accent',
+			type='button',
+			[disabled]='isSubmitting || isUploading',
+			(click)='backToProcedureList()')
+			| {{ "GENERAL.LABELS.BACK" | translate }}
+		button(
+			mat-raised-button,
+			color='primary',
+			*ngIf='!isLiabilitiesAccountant && !isCFO && !viewOnly',
+			(click)='updateProcedure()',
+			[disabled]='procedureForm?.invalid || isSubmitting || isUploading')
+			.layout-row.layout-align-center-center
+				.flex-auto
+					ng-template([ngIf]='!isSubmitting')
+						| {{ "GENERAL.LABELS.SAVE" | translate }}
+					ng-template([ngIf]='isSubmitting')
+						| {{ "GENERAL.LABELS.PLEASE_WAIT" | translate }}
+				mat-spinner.ml-5(
+					*ngIf='isSubmitting',
+					diameter='20')
